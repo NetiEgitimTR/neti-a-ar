@@ -53,16 +53,19 @@
   <script>
 
     let sesHazir = false;
+    let gorevSesHazir = false;
+
     let audioContext = null;
+
     let fonTimer = null;
     let fonAktif = false;
 
 
-    /* =========================
+    /* ==============================
        SES SİSTEMİ
-       ========================= */
+       ============================== */
 
-    function sesSisteminiAc() {
+    async function sesSisteminiAc() {
 
       if (!audioContext) {
 
@@ -72,24 +75,28 @@
 
         audioContext =
           new AudioContext();
-
       }
 
       if (audioContext.state === 'suspended') {
-        audioContext.resume();
+
+        try {
+          await audioContext.resume();
+        } catch(e) {}
       }
     }
 
 
-    /* =========================
+
+    /* ==============================
        PIT SESİ
-       ========================= */
+       ============================== */
 
     function popSesiCal() {
 
       if (!audioContext) return;
 
-      const now = audioContext.currentTime;
+      const now =
+        audioContext.currentTime;
 
       const oscillator =
         audioContext.createOscillator();
@@ -138,9 +145,10 @@
     }
 
 
-    /* =========================
-       FON SESİ
-       ========================= */
+
+    /* ==============================
+       FON
+       ============================== */
 
     function fonNotasiCal(
       frequency,
@@ -215,6 +223,7 @@
 
       let notaIndex = 0;
 
+
       function notaCal() {
 
         if (!fonAktif) return;
@@ -252,9 +261,10 @@
     }
 
 
-    /* =========================
-       BAŞLATMA / iPHONE SES
-       ========================= */
+
+    /* ==============================
+       SAFARI SESLERİNİ HAZIRLA
+       ============================== */
 
     window.addEventListener(
       'DOMContentLoaded',
@@ -281,17 +291,30 @@
           );
 
 
+        /*
+          İKİ SESİ DE ÖNCEDEN YÜKLE
+        */
+
+        netiSes.load();
+        gorevSes.load();
+
+
         startButton.addEventListener(
           'click',
           async () => {
 
-            sesSisteminiAc();
+            await sesSisteminiAc();
+
+
+            /* --------------------------
+               İLK NETİ SESİNİ AÇ
+               -------------------------- */
 
             try {
 
-              /* İlk Neti sesini aç */
-
-              netiSes.volume = 0;
+              netiSes.muted = true;
+              netiSes.volume = 1;
+              netiSes.currentTime = 0;
 
               await netiSes.play();
 
@@ -299,31 +322,62 @@
 
               netiSes.currentTime = 0;
 
-              netiSes.volume = 1;
+              netiSes.muted = false;
+
+              sesHazir = true;
+
+            } catch(e) {
+
+              netiSes.muted = false;
+
+              sesHazir = true;
+            }
 
 
-              /* Görev sesini de Safari için hazırla */
+            /* --------------------------
+               GÖREV SESİNİ DE AYNI
+               DOKUNUŞLA AÇ
+               -------------------------- */
 
-              gorevSes.volume = 0;
+            try {
+
+              gorevSes.muted = true;
+              gorevSes.volume = 1;
+              gorevSes.currentTime = 0;
 
               await gorevSes.play();
+
+              /*
+                Safari gerçekten medya
+                oynatmayı başlatsın diye
+                çok kısa bekliyoruz.
+              */
+
+              await new Promise(
+                resolve =>
+                  setTimeout(
+                    resolve,
+                    80
+                  )
+              );
 
               gorevSes.pause();
 
               gorevSes.currentTime = 0;
 
-              gorevSes.volume = 1;
+              gorevSes.muted = false;
 
+              gorevSesHazir = true;
 
-              sesHazir = true;
+            } catch(e) {
 
-            } catch (e) {
+              gorevSes.muted = false;
 
-              netiSes.volume = 1;
-              gorevSes.volume = 1;
-
-              sesHazir = true;
+              gorevSesHazir = true;
             }
+
+
+            sesHazir = true;
 
             startScreen.style.display =
               'none';
@@ -333,9 +387,71 @@
     );
 
 
-    /* =========================
+
+    /* ==============================
+       GÖREV SESİNİ ÇAL
+       ============================== */
+
+    async function gorevSesiniCal() {
+
+      const gorevSes =
+        document.querySelector(
+          '#gorevSes'
+        );
+
+      if (!gorevSes) return;
+
+
+      try {
+
+        /*
+          AudioContext askıya düştüyse
+          tekrar açmayı dene.
+        */
+
+        if (
+          audioContext &&
+          audioContext.state === 'suspended'
+        ) {
+
+          try {
+            await audioContext.resume();
+          } catch(e) {}
+        }
+
+
+        gorevSes.pause();
+
+        gorevSes.currentTime = 0;
+
+        gorevSes.muted = false;
+
+        gorevSes.volume = 1;
+
+
+        const promise =
+          gorevSes.play();
+
+
+        if (promise !== undefined) {
+
+          await promise;
+        }
+
+      } catch(e) {
+
+        console.log(
+          'Görev sesi oynatılamadı:',
+          e
+        );
+      }
+    }
+
+
+
+    /* ==============================
        ARI UÇUŞU
-       ========================= */
+       ============================== */
 
     AFRAME.registerComponent(
       'smooth-bee-flight',
@@ -344,8 +460,11 @@
         init: function () {
 
           this.active = false;
+
           this.startTime = 0;
+
           this.duration = 3700;
+
 
           this.points = [
 
@@ -385,64 +504,72 @@
           );
 
           this.el.object3D.scale.set(
-            1,1,1
+            1,
+            1,
+            1
           );
 
           this.el.object3D.rotation.set(
-            0,0,0
+            0,
+            0,
+            0
           );
         },
 
 
         catmull: function(
-          p0,p1,p2,p3,t
+          p0,
+          p1,
+          p2,
+          p3,
+          t
         ) {
 
-          const t2 = t*t;
-          const t3 = t2*t;
+          const t2 = t * t;
+          const t3 = t2 * t;
 
           return {
 
-            x:0.5*(
+            x: 0.5 * (
 
-              (2*p1.x)+
+              (2 * p1.x) +
 
-              (-p0.x+p2.x)*t+
-
-              (
-                2*p0.x-
-                5*p1.x+
-                4*p2.x-
-                p3.x
-              )*t2+
+              (-p0.x + p2.x) * t +
 
               (
-                -p0.x+
-                3*p1.x-
-                3*p2.x+
+                2*p0.x -
+                5*p1.x +
+                4*p2.x -
                 p3.x
-              )*t3
+              ) * t2 +
+
+              (
+                -p0.x +
+                3*p1.x -
+                3*p2.x +
+                p3.x
+              ) * t3
             ),
 
-            y:0.5*(
+            y: 0.5 * (
 
-              (2*p1.y)+
+              (2 * p1.y) +
 
-              (-p0.y+p2.y)*t+
-
-              (
-                2*p0.y-
-                5*p1.y+
-                4*p2.y-
-                p3.y
-              )*t2+
+              (-p0.y + p2.y) * t +
 
               (
-                -p0.y+
-                3*p1.y-
-                3*p2.y+
+                2*p0.y -
+                5*p1.y +
+                4*p2.y -
                 p3.y
-              )*t3
+              ) * t2 +
+
+              (
+                -p0.y +
+                3*p1.y -
+                3*p2.y +
+                p3.y
+              ) * t3
             )
           };
         },
@@ -477,6 +604,7 @@
           let localT =
             position - index;
 
+
           if (index >= segmentCount) {
 
             index =
@@ -485,11 +613,12 @@
             localT = 1;
           }
 
+
           const p0 =
             this.points[
               Math.max(
                 0,
-                index-1
+                index - 1
               )
             ];
 
@@ -499,18 +628,19 @@
           const p2 =
             this.points[
               Math.min(
-                this.points.length-1,
-                index+1
+                this.points.length - 1,
+                index + 1
               )
             ];
 
           const p3 =
             this.points[
               Math.min(
-                this.points.length-1,
-                index+2
+                this.points.length - 1,
+                index + 2
               )
             ];
+
 
           const pos =
             this.catmull(
@@ -521,11 +651,13 @@
               localT
             );
 
+
           this.el.object3D.position.set(
             pos.x,
             pos.y,
             0.09
           );
+
 
           if (progress >= 1) {
 
@@ -542,9 +674,10 @@
     );
 
 
-    /* =========================
-       GÖZ EGZERSİZİ
-       ========================= */
+
+    /* ==============================
+       14 HEDEFLİ GÖZ EGZERSİZİ
+       ============================== */
 
     AFRAME.registerComponent(
       'eye-pop-exercise',
@@ -553,7 +686,9 @@
         init: function () {
 
           this.running = false;
+
           this.timers = [];
+
 
           this.steps = [
 
@@ -615,19 +750,26 @@
             );
 
           const ctx =
-            canvas.getContext('2d');
+            canvas.getContext(
+              '2d'
+            );
 
           canvas.width = 500;
           canvas.height = 500;
 
           ctx.clearRect(
-            0,0,500,500
+            0,
+            0,
+            500,
+            500
           );
 
           ctx.textAlign = 'center';
+
           ctx.textBaseline = 'middle';
 
           ctx.lineJoin = 'round';
+
           ctx.lineCap = 'round';
 
           ctx.font =
@@ -724,7 +866,9 @@
                     );
 
                     self.el.object3D.scale.set(
-                      1,1,1
+                      1,
+                      1,
+                      1
                     );
 
                     self.el.setAttribute(
@@ -777,7 +921,7 @@
 
 
           /*
-             GÖZ EGZERSİZİ BİTİYOR
+             GÖZ EGZERSİZİ BİTTİ
           */
 
           const finishTimer =
@@ -795,21 +939,26 @@
 
 
                 /*
-                  YENİ:
-                  NETİ GÖREV VERİYOR
+                   600 MS SONRA NETİ
+                   GÖREVİ VERİYOR
                 */
 
-                setTimeout(
-                  () => {
+                const gorevTimer =
+                  setTimeout(
+                    () => {
 
-                    window.dispatchEvent(
-                      new Event(
-                        'neti-gorev-baslat'
-                      )
-                    );
+                      window.dispatchEvent(
+                        new Event(
+                          'neti-gorev-baslat'
+                        )
+                      );
 
-                  },
-                  600
+                    },
+                    600
+                  );
+
+                self.timers.push(
+                  gorevTimer
                 );
 
               },
@@ -824,9 +973,10 @@
     );
 
 
-    /* =========================
+
+    /* ==============================
        ANA NETİ ANİMASYONU
-       ========================= */
+       ============================== */
 
     AFRAME.registerComponent(
       'neti-animation',
@@ -834,7 +984,8 @@
 
         init: function () {
 
-          const target = this.el;
+          const target =
+            this.el;
 
           const neti =
             document.querySelector(
@@ -868,14 +1019,19 @@
 
 
           let basladi = false;
+
           let kayipTimer = null;
+
           let zamanlayicilar = [];
 
 
-          function timer(fn,ms) {
+          function timer(fn, ms) {
 
             const t =
-              setTimeout(fn,ms);
+              setTimeout(
+                fn,
+                ms
+              );
 
             zamanlayicilar.push(t);
 
@@ -893,19 +1049,17 @@
           }
 
 
-          /*
-             YENİ:
-             GÖZ EGZERSİZİ BİTİNCE
-             NETİ TEKRAR DİKKAT ÇEKİYOR
-          */
+
+          /* ==============================
+             GÖREV BÖLÜMÜ
+             ============================== */
 
           window.addEventListener(
             'neti-gorev-baslat',
-            () => {
+            async () => {
 
               /*
-                 Neti hafifçe büyüyüp
-                 tekrar küçülüyor.
+                 NETİ HAFİFÇE DİKKAT ÇEKİYOR
               */
 
               neti.removeAttribute(
@@ -930,42 +1084,15 @@
 
 
               /*
-                 Görev sesi
+                 YENİ v15:
+                 GÖREV SESİNİ ÇAL
               */
 
-              if (sesHazir) {
+              await gorevSesiniCal();
 
-                try {
-
-                  gorevSes.pause();
-
-                  gorevSes.currentTime = 0;
-
-                  gorevSes.volume = 1;
-
-                  const oynat =
-                    gorevSes.play();
-
-                  if (
-                    oynat !== undefined
-                  ) {
-
-                    oynat.catch(
-                      err => {
-
-                        console.log(
-                          'Görev sesi oynatılamadı:',
-                          err
-                        );
-
-                      }
-                    );
-                  }
-
-                } catch(e) {}
-              }
             }
           );
+
 
 
           function baslat() {
@@ -994,11 +1121,16 @@
             try {
 
               netiSes.pause();
+
               netiSes.currentTime = 0;
+
               netiSes.volume = 1;
 
+
               gorevSes.pause();
+
               gorevSes.currentTime = 0;
+
               gorevSes.volume = 1;
 
             } catch(e) {}
@@ -1027,7 +1159,10 @@
             );
 
 
-            /* NETİ GELİYOR */
+
+            /* ==============================
+               NETİ GELİYOR
+               ============================== */
 
             timer(
               () => {
@@ -1040,6 +1175,7 @@
                   'dur: 1100;' +
                   'easing: easeOutBack'
                 );
+
 
                 neti.setAttribute(
                   'animation__yuksel',
@@ -1058,6 +1194,8 @@
                     netiSes.pause();
 
                     netiSes.currentTime = 0;
+
+                    netiSes.muted = false;
 
                     netiSes.volume = 1;
 
@@ -1088,7 +1226,10 @@
             );
 
 
-            /* A/a */
+
+            /* ==============================
+               A / a
+               ============================== */
 
             harfler.removeAttribute(
               'animation__harf'
@@ -1132,7 +1273,10 @@
             );
 
 
-            /* ARI */
+
+            /* ==============================
+               ARI
+               ============================== */
 
             ari.setAttribute(
               'visible',
@@ -1146,11 +1290,15 @@
             );
 
             ari.object3D.scale.set(
-              1,1,1
+              1,
+              1,
+              1
             );
 
             ari.object3D.rotation.set(
-              0,0,0
+              0,
+              0,
+              0
             );
 
 
@@ -1183,7 +1331,10 @@
             );
 
 
-            /* ARI + A/a KAYBOLUR */
+
+            /* ==============================
+               ARI + A/a KAYBOLUR
+               ============================== */
 
             timer(
               () => {
@@ -1203,7 +1354,10 @@
             );
 
 
-            /* GÖZ EGZERSİZİ */
+
+            /* ==============================
+               GÖZ EGZERSİZİ
+               ============================== */
 
             timer(
               () => {
@@ -1223,6 +1377,11 @@
           }
 
 
+
+          /* ==============================
+             HEDEF BULUNDU
+             ============================== */
+
           target.addEventListener(
             'targetFound',
             () => {
@@ -1240,6 +1399,11 @@
             }
           );
 
+
+
+          /* ==============================
+             HEDEF KAYBOLDU
+             ============================== */
 
           target.addEventListener(
             'targetLost',
@@ -1267,9 +1431,12 @@
                     try {
 
                       netiSes.pause();
+
                       netiSes.currentTime = 0;
 
+
                       gorevSes.pause();
+
                       gorevSes.currentTime = 0;
 
                     } catch(e) {}
@@ -1319,9 +1486,10 @@
     );
 
 
-    /* =========================
+
+    /* ==============================
        A / a ÇİZİMİ
-       ========================= */
+       ============================== */
 
     window.addEventListener(
       'DOMContentLoaded',
@@ -1333,25 +1501,38 @@
           );
 
         const ctx =
-          canvas.getContext('2d');
+          canvas.getContext(
+            '2d'
+          );
 
         canvas.width = 1200;
         canvas.height = 600;
 
         ctx.clearRect(
-          0,0,1200,600
+          0,
+          0,
+          1200,
+          600
         );
 
         ctx.textAlign = 'center';
+
         ctx.textBaseline = 'middle';
+
         ctx.lineJoin = 'round';
+
         ctx.lineCap = 'round';
+
+
+        /* BÜYÜK A */
 
         ctx.font =
           'bold 390px Arial';
 
         ctx.lineWidth = 22;
-        ctx.strokeStyle = '#FFFFFF';
+
+        ctx.strokeStyle =
+          '#FFFFFF';
 
         ctx.strokeText(
           'A',
@@ -1359,7 +1540,8 @@
           300
         );
 
-        ctx.fillStyle = '#FF6B35';
+        ctx.fillStyle =
+          '#FF6B35';
 
         ctx.fillText(
           'A',
@@ -1368,11 +1550,15 @@
         );
 
 
+        /* KÜÇÜK a */
+
         ctx.font =
           'bold 390px Arial';
 
         ctx.lineWidth = 22;
-        ctx.strokeStyle = '#FFFFFF';
+
+        ctx.strokeStyle =
+          '#FFFFFF';
 
         ctx.strokeText(
           'ɑ',
@@ -1380,7 +1566,8 @@
           300
         );
 
-        ctx.fillStyle = '#FF6B35';
+        ctx.fillStyle =
+          '#FF6B35';
 
         ctx.fillText(
           'ɑ',
@@ -1397,7 +1584,7 @@
 <body>
 
 
-<!-- İLK NETİ SESİ -->
+<!-- NETİ'NİN İLK SESİ -->
 
 <audio
   id="netiSes"
@@ -1407,7 +1594,7 @@
 </audio>
 
 
-<!-- YENİ GÖREV SESİ -->
+<!-- NETİ'NİN GÖREV SESİ -->
 
 <audio
   id="gorevSes"
@@ -1415,6 +1602,7 @@
   preload="auto"
   playsinline>
 </audio>
+
 
 
 <div id="startScreen">
@@ -1430,8 +1618,11 @@
 </div>
 
 
+
 <canvas id="harfCanvas"></canvas>
+
 <canvas id="tekHarfCanvas"></canvas>
+
 
 
 <a-scene
@@ -1450,7 +1641,9 @@
     antialias: true;
   "
 
-  vr-mode-ui="enabled: false"
+  vr-mode-ui="
+    enabled: false
+  "
 
   device-orientation-permission-ui="
     enabled: false
@@ -1474,16 +1667,22 @@
   </a-assets>
 
 
+
   <a-camera
     position="0 0 0"
     look-controls="enabled: false">
   </a-camera>
 
 
+
   <a-entity
-    mindar-image-target="targetIndex: 0"
+    mindar-image-target="
+      targetIndex: 0
+    "
     neti-animation>
 
+
+    <!-- NETİ -->
 
     <a-image
       id="netiKarakter"
@@ -1500,6 +1699,9 @@
     </a-image>
 
 
+
+    <!-- İLK A / a -->
+
     <a-plane
       id="harfler"
       position="0 0.55 0.04"
@@ -1515,6 +1717,9 @@
     </a-plane>
 
 
+
+    <!-- GÖZ EGZERSİZİ HARFİ -->
+
     <a-plane
       id="tekHarf"
       position="0 0.48 0.12"
@@ -1529,6 +1734,9 @@
       ">
     </a-plane>
 
+
+
+    <!-- ARI -->
 
     <a-image
       id="ariKarakter"
@@ -1549,6 +1757,7 @@
 
 
   </a-entity>
+
 
 </a-scene>
 
