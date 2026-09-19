@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
 <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -17,54 +17,67 @@ body{
 #startScreen{
   position:fixed;
   inset:0;
-  z-index:99999;
+  z-index:9999;
   display:flex;
   flex-direction:column;
-  align-items:center;
   justify-content:center;
+  align-items:center;
   background:rgba(255,248,225,.97);
 }
 
 #startButton{
-  border:none;
-  border-radius:25px;
+  border:0;
+  border-radius:26px;
   padding:18px 28px;
-  font-size:22px;
-  font-weight:bold;
   background:#ff8a3d;
   color:white;
-  box-shadow:0 6px 18px rgba(0,0,0,.22);
+  font-size:22px;
+  font-weight:700;
+  box-shadow:0 6px 18px rgba(0,0,0,.2);
 }
 
 #startText{
   margin-top:15px;
-  padding:0 30px;
-  text-align:center;
   font-size:16px;
   color:#555;
 }
 
-#yazmaCanvas{
+#drawCanvas{
   display:none;
 }
 </style>
+</head>
+
+<body>
+
+<div id="startScreen">
+  <button id="startButton">
+    ✏️ Neti ile küçük a yazalım
+  </button>
+
+  <div id="startText">
+    Yazma sayfasını kameraya göster.
+  </div>
+</div>
+
+<canvas id="drawCanvas" width="1200" height="1200"></canvas>
 
 <script>
 
-let kullaniciBaslatti=false;
+let userStarted = false;
 
 window.addEventListener("DOMContentLoaded",()=>{
 
-  const buton=document.querySelector("#startButton");
-  const ekran=document.querySelector("#startScreen");
+  document.querySelector("#startButton")
+  .addEventListener("click",()=>{
 
-  buton.addEventListener("click",()=>{
+    userStarted = true;
 
-    kullaniciBaslatti=true;
-    ekran.style.display="none";
+    document.querySelector("#startScreen")
+      .style.display="none";
 
     window.dispatchEvent(
-      new Event("yazma-baslat")
+      new Event("neti-start")
     );
 
   });
@@ -72,59 +85,34 @@ window.addEventListener("DOMContentLoaded",()=>{
 });
 
 
-AFRAME.registerComponent("kucuk-a-v6",{
+AFRAME.registerComponent("neti-writing",{
 
 init:function(){
 
   const target=this.el;
 
-  const canvas=
-    document.querySelector("#yazmaCanvas");
+  const canvas=document.querySelector("#drawCanvas");
+  const ctx=canvas.getContext("2d");
 
-  const ctx=
-    canvas.getContext("2d");
+  const plane=document.querySelector("#drawPlane");
+  const neti=document.querySelector("#neti");
 
-  const plane=
-    document.querySelector("#yazmaPlane");
+  let targetVisible=false;
+  let started=false;
 
-  const neti=
-    document.querySelector("#netiYazma");
-
-
-  canvas.width=1200;
-  canvas.height=1200;
-
-
-  let hedefVar=false;
-  let basladi=false;
-  let tekrar=1;
-
-  let raf=null;
   let timers=[];
+  let raf=null;
+
+  let round=1;
 
 
-  /* =========================
-     ZAMANLAYICI
-  ========================= */
+  /* ==============================
+     TEXTURE UPDATE
+  ============================== */
 
-  function bekle(fn,ms){
+  function update(){
 
-    const id=setTimeout(fn,ms);
-
-    timers.push(id);
-
-    return id;
-  }
-
-
-  /* =========================
-     TEXTURE
-  ========================= */
-
-  function guncelle(){
-
-    const mesh=
-      plane.getObject3D("mesh");
+    const mesh=plane.getObject3D("mesh");
 
     if(
       mesh &&
@@ -136,128 +124,58 @@ init:function(){
   }
 
 
-  /* =========================
-     CANVAS TEMİZLE
-  ========================= */
+  function later(fn,ms){
 
-  function temizle(){
+    const id=setTimeout(fn,ms);
+    timers.push(id);
+
+    return id;
+  }
+
+
+  /* ==============================
+     CANVAS
+  ============================== */
+
+  function clearAll(){
 
     ctx.clearRect(
-      0,
-      0,
+      0,0,
       canvas.width,
       canvas.height
     );
 
-    guncelle();
+    update();
   }
 
 
-  /* =========================
-     YÖNERGE KUTUSU
-  ========================= */
+  /* ==============================
+     a GEOMETRİSİ
+  ============================== */
 
-  function yonerge(
-    baslik,
-    aciklama
-  ){
+  /*
+     DİK ÇİZGİ ARTIK
+     c'DEN DAHA YUKARIDAN BAŞLIYOR.
+  */
 
-    ctx.save();
+  const STEM_X = 760;
 
-    ctx.fillStyle=
-      "rgba(255,255,255,.96)";
-
-    ctx.strokeStyle=
-      "#ff9f43";
-
-    ctx.lineWidth=7;
-
-    ctx.beginPath();
-
-    ctx.roundRect(
-      150,
-      45,
-      900,
-      150,
-      35
-    );
-
-    ctx.fill();
-    ctx.stroke();
+  const STEM_TOP = 270;
+  const JOIN_TOP = 390;
+  const JOIN_BOTTOM = 790;
+  const STEM_BOTTOM = 850;
 
 
-    ctx.textAlign="center";
+  function bezier(p0,p1,p2,count){
 
-    ctx.fillStyle="#333";
+    const arr=[];
 
-    ctx.font=
-      "bold 48px Arial";
+    for(let i=0;i<=count;i++){
 
-    ctx.fillText(
-      baslik,
-      600,
-      105
-    );
-
-
-    ctx.fillStyle="#666";
-
-    ctx.font=
-      "bold 31px Arial";
-
-    ctx.fillText(
-      aciklama,
-      600,
-      157
-    );
-
-    ctx.restore();
-
-    guncelle();
-  }
-
-
-  /* =========================
-     KÜÇÜK a GEOMETRİSİ
-
-     c'nin üst ucu ile
-     düz çizginin üstü
-     aynı noktada birleşiyor.
-  ========================= */
-
-  const C_START={
-    x:760,
-    y:420
-  };
-
-  const C_END={
-    x:760,
-    y:790
-  };
-
-  const STEM_TOP={
-    x:760,
-    y:420
-  };
-
-  const STEM_BOTTOM={
-    x:760,
-    y:810
-  };
-
-
-  function bezier(
-    p0,p1,p2,n
-  ){
-
-    const sonuc=[];
-
-    for(let i=0;i<=n;i++){
-
-      const t=i/n;
+      const t=i/count;
       const m=1-t;
 
-      sonuc.push({
+      arr.push({
 
         x:
           m*m*p0.x+
@@ -273,137 +191,111 @@ init:function(){
 
     }
 
-    return sonuc;
+    return arr;
   }
 
 
-  function cYolu(){
+  function cPath(){
 
-    const yol=[];
+    const p=[];
 
     /*
-      SAĞ ÜSTTEN BAŞLA
-      SOLA VE AŞAĞI DÖN
-      SAĞ ALTTA BİTİR
+       Başlangıç sağ üst birleşme noktası.
     */
 
-    yol.push(
+    p.push(
       ...bezier(
-        {x:760,y:420},
-        {x:670,y:320},
-        {x:555,y:320},
-        40
+        {x:760,y:390},
+        {x:650,y:295},
+        {x:525,y:300},
+        45
       )
     );
 
-    yol.push(
+    p.push(
       ...bezier(
-        {x:555,y:320},
-        {x:350,y:320},
-        {x:350,y:570},
-        55
+        {x:525,y:300},
+        {x:300,y:300},
+        {x:300,y:560},
+        60
       )
     );
 
-    yol.push(
+    p.push(
       ...bezier(
-        {x:350,y:570},
-        {x:350,y:825},
-        {x:560,y:825},
-        55
+        {x:300,y:560},
+        {x:300,y:830},
+        {x:535,y:830},
+        60
       )
     );
 
-    yol.push(
+    p.push(
       ...bezier(
-        {x:560,y:825},
-        {x:685,y:825},
+        {x:535,y:830},
+        {x:675,y:830},
         {x:760,y:790},
-        35
+        45
       )
     );
 
-    return yol;
+    return p;
   }
 
 
-  function duzYolu(){
+  function stemPath(){
 
-    const yol=[];
+    const p=[];
 
-    const adet=80;
+    for(let i=0;i<=100;i++){
 
-    for(let i=0;i<=adet;i++){
+      const t=i/100;
 
-      const t=i/adet;
-
-      yol.push({
-
-        x:760,
-
+      p.push({
+        x:STEM_X,
         y:
-          420+
-          (810-420)*t
-
+          STEM_TOP+
+          (STEM_BOTTOM-STEM_TOP)*t
       });
 
     }
 
-    return yol;
+    return p;
   }
 
 
-  /* =========================
-     GRİ KILAVUZ a
-  ========================= */
+  /* ==============================
+     PATH DRAW
+  ============================== */
 
-  function kilavuzCiz(){
-
-    const c=cYolu();
-    const d=duzYolu();
+  function strokePath(
+    points,
+    color,
+    width,
+    dash=[]
+  ){
 
     ctx.save();
 
-    ctx.strokeStyle=
-      "rgba(90,90,90,.40)";
-
-    ctx.lineWidth=52;
-
+    ctx.strokeStyle=color;
+    ctx.lineWidth=width;
     ctx.lineCap="round";
     ctx.lineJoin="round";
 
+    ctx.setLineDash(dash);
 
     ctx.beginPath();
 
     ctx.moveTo(
-      c[0].x,
-      c[0].y
+      points[0].x,
+      points[0].y
     );
 
-    for(let i=1;i<c.length;i++){
+    for(let i=1;i<points.length;i++){
 
       ctx.lineTo(
-        c[i].x,
-        c[i].y
-      );
-
-    }
-
-    ctx.stroke();
-
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-      d[0].x,
-      d[0].y
-    );
-
-    for(let i=1;i<d.length;i++){
-
-      ctx.lineTo(
-        d[i].x,
-        d[i].y
+        points[i].x,
+        points[i].y
       );
 
     }
@@ -411,81 +303,76 @@ init:function(){
     ctx.stroke();
 
     ctx.restore();
-
-    guncelle();
   }
 
 
-  /* =========================
+  /* ==============================
+     GRİ KILAVUZ
+  ============================== */
+
+  function drawGuide(){
+
+    strokePath(
+      cPath(),
+      "rgba(125,135,145,.48)",
+      92
+    );
+
+    strokePath(
+      stemPath(),
+      "rgba(125,135,145,.48)",
+      92
+    );
+
+    update();
+  }
+
+
+  /* ==============================
      OK
-  ========================= */
+  ============================== */
 
-  function ok(
-    x1,y1,
-    x2,y2
-  ){
-
-    const aci=
-      Math.atan2(
-        y2-y1,
-        x2-x1
-      );
-
-    const boy=28;
+  function arrow(x,y,angle){
 
     ctx.save();
 
-    ctx.strokeStyle="#ffd400";
-    ctx.fillStyle="#ffd400";
+    ctx.translate(x,y);
+    ctx.rotate(angle);
 
-    ctx.lineWidth=13;
-    ctx.lineCap="round";
-
-
-    ctx.beginPath();
-
-    ctx.moveTo(x1,y1);
-    ctx.lineTo(x2,y2);
-
-    ctx.stroke();
-
+    /*
+      SARI OK
+      BEYAZ KENAR
+    */
 
     ctx.beginPath();
 
-    ctx.moveTo(x2,y2);
-
-    ctx.lineTo(
-      x2-boy*Math.cos(
-        aci-Math.PI/6
-      ),
-      y2-boy*Math.sin(
-        aci-Math.PI/6
-      )
-    );
-
-    ctx.lineTo(
-      x2-boy*Math.cos(
-        aci+Math.PI/6
-      ),
-      y2-boy*Math.sin(
-        aci+Math.PI/6
-      )
-    );
+    ctx.moveTo(-36,-18);
+    ctx.lineTo(5,-18);
+    ctx.lineTo(5,-34);
+    ctx.lineTo(45,0);
+    ctx.lineTo(5,34);
+    ctx.lineTo(5,18);
+    ctx.lineTo(-36,18);
 
     ctx.closePath();
+
+    ctx.lineWidth=8;
+    ctx.strokeStyle="white";
+    ctx.fillStyle="#ffd400";
+
+    ctx.stroke();
     ctx.fill();
 
     ctx.restore();
-
   }
 
 
-  /* =========================
-     1 VE 2 NUMARALARI
-  ========================= */
+  /* ==============================
+     NUMARA
+  ============================== */
 
-  function numara(
-    x,y,sayi
+  function numberCircle(
+    x,y,text,color
   ){
 
     ctx.save();
@@ -493,209 +380,322 @@ init:function(){
     ctx.beginPath();
 
     ctx.arc(
-      x,
-      y,
-      34,
+      x,y,
+      43,
       0,
       Math.PI*2
     );
 
-    ctx.fillStyle="#29a9ff";
+    ctx.fillStyle=color;
     ctx.fill();
 
-    ctx.lineWidth=5;
+    ctx.lineWidth=8;
     ctx.strokeStyle="white";
     ctx.stroke();
 
-
     ctx.fillStyle="white";
 
-    ctx.font=
-      "bold 38px Arial";
+    ctx.font="bold 48px Arial";
 
     ctx.textAlign="center";
     ctx.textBaseline="middle";
 
     ctx.fillText(
-      sayi,
+      text,
       x,
       y+2
     );
 
     ctx.restore();
-
   }
 
 
-  /* =========================
-     C OKLARI
-  ========================= */
+  /* ==============================
+     KESİK YOL + OKLAR
+  ============================== */
 
-  function cOklari(){
+  function drawDirections(){
 
     /*
-      Oklar kırmızı çizginin
-      hemen DIŞINDA.
+      BEYAZ KESİK YOL
     */
 
-    ok(
-      700,280,
-      585,255
+    strokePath(
+      cPath(),
+      "rgba(255,255,255,.95)",
+      8,
+      [22,18]
     );
 
-    ok(
-      285,400,
-      270,525
+    strokePath(
+      stemPath(),
+      "rgba(255,255,255,.95)",
+      8,
+      [22,18]
     );
 
-    ok(
-      390,885,
-      520,900
+
+    /*
+      C YÖN OKLARI
+    */
+
+    arrow(
+      570,295,
+      Math.PI
     );
 
-    ok(
-      635,890,
-      720,825
+    arrow(
+      300,505,
+      Math.PI/2
     );
 
-    numara(
-      820,
-      355,
-      "1"
+    arrow(
+      405,805,
+      .55
     );
 
-    guncelle();
+    arrow(
+      635,820,
+      -.35
+    );
+
+
+    /*
+      DİK ÇİZGİ
+    */
+
+    arrow(
+      760,505,
+      Math.PI/2
+    );
+
+    arrow(
+      760,680,
+      Math.PI/2
+    );
+
+
+    numberCircle(
+      760,
+      215,
+      "1",
+      "#168cff"
+    );
+
+
+    numberCircle(
+      845,
+      850,
+      "2",
+      "#ff2f2f"
+    );
+
+    update();
   }
 
 
-  /* =========================
-     DÜZ ÇİZGİ OKLARI
-  ========================= */
+  /* ==============================
+     YÖNERGE PANELİ
+  ============================== */
 
-  function duzOklari(){
+  function instruction(
+    title,
+    subtitle
+  ){
 
-    ok(
-      850,475,
-      850,590
+    /*
+      ESKİ YAZI ALANINI
+      TAMAMEN TEMİZLE.
+      ARTIK YAZILAR ÜST ÜSTE
+      BİNMEYECEK.
+    */
+
+    ctx.clearRect(
+      110,
+      20,
+      980,
+      215
     );
 
-    ok(
-      850,640,
-      850,755
+
+    ctx.save();
+
+    ctx.fillStyle=
+      "rgba(255,255,255,.97)";
+
+    ctx.strokeStyle="#ff991f";
+    ctx.lineWidth=9;
+
+    ctx.beginPath();
+
+    ctx.roundRect(
+      135,
+      35,
+      930,
+      165,
+      40
     );
 
-    numara(
-      820,
-      355,
-      "2"
+    ctx.fill();
+    ctx.stroke();
+
+
+    ctx.textAlign="center";
+
+    ctx.fillStyle="#143d73";
+
+    ctx.font=
+      "bold 48px Arial";
+
+    ctx.fillText(
+      title,
+      600,
+      105
     );
 
-    guncelle();
+
+    ctx.fillStyle="#555";
+
+    ctx.font=
+      "bold 29px Arial";
+
+    ctx.fillText(
+      subtitle,
+      600,
+      157
+    );
+
+    ctx.restore();
+
+    update();
   }
 
 
-  /* =========================
-     ÇİZGİ ANİMASYONU
-  ========================= */
+  /* ==============================
+     ANİMASYON
+  ============================== */
 
-  function animasyonCiz(
-    noktalar,
-    sure,
-    bitince
+  function animatePath(
+    points,
+    duration,
+    done
   ){
 
     let start=null;
-    let son=0;
+    let last=0;
 
 
-    function frame(zaman){
+    function frame(time){
 
       if(start===null){
-        start=zaman;
+        start=time;
       }
 
-      const oran=
+      const progress=
         Math.min(
-          (zaman-start)/sure,
+          (time-start)/duration,
           1
         );
 
-      const hedef=
+
+      const end=
         Math.min(
-          noktalar.length-1,
+          points.length-1,
           Math.floor(
-            oran*
-            (noktalar.length-1)
+            progress*
+            (points.length-1)
           )
         );
 
 
       ctx.save();
 
-      ctx.strokeStyle="#ff3b30";
-
-      ctx.lineWidth=45;
+      ctx.strokeStyle="#ff3030";
+      ctx.lineWidth=62;
 
       ctx.lineCap="round";
       ctx.lineJoin="round";
 
 
-      while(son<hedef){
+      while(last<end){
 
         ctx.beginPath();
 
         ctx.moveTo(
-          noktalar[son].x,
-          noktalar[son].y
+          points[last].x,
+          points[last].y
         );
 
         ctx.lineTo(
-          noktalar[son+1].x,
-          noktalar[son+1].y
+          points[last+1].x,
+          points[last+1].y
         );
 
         ctx.stroke();
 
-        son++;
-
+        last++;
       }
 
       ctx.restore();
 
 
       /*
-        KALEM UCUNDA SARI NOKTA
+        KIRMIZININ ÜZERİNDE
+        BEYAZ KESİK YOL
       */
 
-      const p=
-        noktalar[hedef];
+      const partial=
+        points.slice(
+          0,
+          end+1
+        );
+
+      if(partial.length>1){
+
+        strokePath(
+          partial,
+          "rgba(255,255,255,.92)",
+          7,
+          [20,17]
+        );
+
+      }
+
+
+      /*
+        PARLAYAN KALEM NOKTASI
+      */
+
+      const p=points[end];
 
       ctx.save();
+
+      ctx.shadowColor="#ffd400";
+      ctx.shadowBlur=25;
 
       ctx.beginPath();
 
       ctx.arc(
-        p.x,
-        p.y,
-        13,
+        p.x,p.y,
+        19,
         0,
         Math.PI*2
       );
 
-      ctx.fillStyle="#ffd400";
+      ctx.fillStyle="#fff200";
       ctx.fill();
 
-      ctx.lineWidth=4;
+      ctx.lineWidth=6;
       ctx.strokeStyle="white";
       ctx.stroke();
 
       ctx.restore();
 
 
-      guncelle();
+      update();
 
 
-      if(oran<1){
+      if(progress<1){
 
         raf=
           requestAnimationFrame(
@@ -706,8 +706,8 @@ init:function(){
 
         raf=null;
 
-        if(bitince){
-          bitince();
+        if(done){
+          done();
         }
 
       }
@@ -723,178 +723,152 @@ init:function(){
   }
 
 
-  /* =========================
-     1. ADIM
-  ========================= */
+  /* ==============================
+     TUR BAŞLAT
+  ============================== */
 
-  function birinciAdim(){
+  function startRound(){
 
-    temizle();
+    clearAll();
 
-    kilavuzCiz();
+    drawGuide();
+    drawDirections();
 
 
-    if(tekrar===1){
+    if(round===1){
 
-      yonerge(
+      instruction(
         "1. Önce c çizgisini takip et.",
-        "Oku takip ederek yavaşça ilerle."
+        "Okları takip ederek yavaşça ilerle."
       );
 
     }else{
 
-      yonerge(
-        "Bir kez daha deneyelim!",
-        "Önce c çizgisini tekrar izleyelim."
+      instruction(
+        "Tekrar yazıyoruz...",
+        "Aynı hareketi bir kez daha izle."
       );
 
     }
 
 
-    cOklari();
+    later(()=>{
 
+      animatePath(
+        cPath(),
+        6000,
+        startStem
+      );
 
-    /*
-      ÇOCUK ÖNCE KILAVUZU
-      VE OKLARI GÖRSÜN
-    */
-
-    bekle(
-      ()=>{
-        animasyonCiz(
-          cYolu(),
-          5500,
-          ikinciAdimHazirlik
-        );
-      },
-      1600
-    );
+    },1800);
 
   }
 
 
-  /* =========================
-     2. ADIM
-  ========================= */
+  /* ==============================
+     DİK ÇİZGİ
+  ============================== */
 
-  function ikinciAdimHazirlik(){
+  function startStem(){
 
-    /*
-      KIRMIZI C SİLİNMİYOR.
-    */
-
-    yonerge(
+    instruction(
       "2. Şimdi düz çizgiyi çiz.",
       "Yukarıdan aşağı doğru ilerle."
     );
 
-    duzOklari();
 
+    /*
+      c BİTTİKTEN SONRA
+      KALEM KALKMIŞ GİBİ
+      KISA BEKLEME
+    */
 
-    bekle(
-      ()=>{
-        animasyonCiz(
-          duzYolu(),
-          3300,
-          harfTamam
-        );
-      },
-      1400
-    );
+    later(()=>{
+
+      animatePath(
+        stemPath(),
+        4000,
+        finished
+      );
+
+    },1500);
 
   }
 
 
-  /* =========================
-     HARF TAMAMLANDI
-  ========================= */
+  /* ==============================
+     TUR BİTTİ
+  ============================== */
 
-  function harfTamam(){
+  function finished(){
 
-    if(tekrar===1){
+    if(round===1){
 
-      yonerge(
-        "Harika! Küçük a tamamlandı.",
-        "Şimdi bir kez daha izleyelim."
+      instruction(
+        "Harika! Bir kez daha.",
+        "Küçük a harfini tekrar izleyelim."
       );
 
+      round=2;
 
-      neti.removeAttribute(
-        "animation__tebrik"
-      );
-
-      neti.setAttribute(
-        "animation__tebrik",
-        "property: scale;"+
-        "from: 1 1 1;"+
-        "to: 1.10 1.10 1.10;"+
-        "dir: alternate;"+
-        "loop: 2;"+
-        "dur: 300;"+
-        "easing: easeInOutQuad"
-      );
-
-
-      tekrar=2;
-
-      bekle(
-        birinciAdim,
-        2200
+      later(
+        startRound,
+        2300
       );
 
     }else{
 
-      sonEkran();
+      finalScreen();
 
     }
 
   }
 
 
-  /* =========================
-     SON
-  ========================= */
+  /* ==============================
+     SON EKRAN
+  ============================== */
 
-  function sonEkran(){
+  function finalScreen(){
 
-    yonerge(
-      "Harika! Şimdi sıra sende! ✏️",
-      "Kitabındaki küçük a harflerini yaz."
+    instruction(
+      "Şimdi sen de yaz! ✏️",
+      "Kitabındaki küçük a harflerini tamamla."
     );
 
 
     neti.removeAttribute(
-      "animation__tebrik"
+      "animation__finish"
     );
 
+
     neti.setAttribute(
-      "animation__tebrik",
+      "animation__finish",
+
       "property: scale;"+
-      "from: 1 1 1;"+
-      "to: 1.13 1.13 1.13;"+
-      "dir: alternate;"+
-      "loop: 3;"+
-      "dur: 320;"+
-      "easing: easeInOutQuad"
+      "from:1 1 1;"+
+      "to:1.13 1.13 1.13;"+
+      "dir:alternate;"+
+      "loop:3;"+
+      "dur:320;"+
+      "easing:easeInOutQuad"
     );
 
   }
 
 
-  /* =========================
-     BAŞLAT
-  ========================= */
+  /* ==============================
+     START
+  ============================== */
 
-  function baslat(){
+  function begin(){
 
-    if(basladi) return;
-    if(!hedefVar) return;
-    if(!kullaniciBaslatti) return;
+    if(started) return;
+    if(!targetVisible) return;
+    if(!userStarted) return;
 
-    basladi=true;
-    tekrar=1;
-
-    temizle();
+    started=true;
+    round=1;
 
 
     plane.setAttribute(
@@ -908,40 +882,33 @@ init:function(){
       "true"
     );
 
+
     neti.setAttribute(
       "scale",
       ".05 .05 .05"
     );
 
+
     neti.setAttribute(
       "position",
-      "-0.40 0.60 0.06"
+      "-0.43 0.61 0.07"
     );
 
 
     neti.setAttribute(
-      "animation__buyume",
-      "property: scale;"+
-      "from: .05 .05 .05;"+
-      "to: 1 1 1;"+
-      "dur: 900;"+
-      "easing: easeOutBack"
+      "animation__enter",
+
+      "property:scale;"+
+      "from:.05 .05 .05;"+
+      "to:1 1 1;"+
+      "dur:900;"+
+      "easing:easeOutBack"
     );
 
 
-    neti.setAttribute(
-      "animation__yuksel",
-      "property: position;"+
-      "from: -0.40 0.42 0.06;"+
-      "to: -0.40 0.60 0.06;"+
-      "dur: 900;"+
-      "easing: easeOutQuad"
-    );
-
-
-    bekle(
-      birinciAdim,
-      1200
+    later(
+      startRound,
+      1100
     );
 
   }
@@ -951,8 +918,8 @@ init:function(){
     "targetFound",
     ()=>{
 
-      hedefVar=true;
-      baslat();
+      targetVisible=true;
+      begin();
 
     }
   );
@@ -962,15 +929,15 @@ init:function(){
     "targetLost",
     ()=>{
 
-      hedefVar=false;
+      targetVisible=false;
 
     }
   );
 
 
   window.addEventListener(
-    "yazma-baslat",
-    baslat
+    "neti-start",
+    begin
   );
 
 }
@@ -978,48 +945,27 @@ init:function(){
 });
 
 </script>
-</head>
-
-<body>
-
-
-<div id="startScreen">
-
-<button id="startButton">
-✏️ Neti ile küçük a yazalım
-</button>
-
-<div id="startText">
-Dokun ve yazma sayfasını kameraya göster.
-</div>
-
-</div>
-
-
-<canvas id="yazmaCanvas"></canvas>
 
 
 <a-scene
 
 mindar-image="
 imageTargetSrc: ./targets%202.mind;
-filterMinCF: 0.0001;
-filterBeta: 0.01;
+filterMinCF:0.0001;
+filterBeta:0.01;
+"
+
+renderer="
+colorManagement:true;
+alpha:true;
+antialias:true;
 "
 
 color-space="sRGB"
 
-renderer="
-colorManagement: true;
-alpha: true;
-antialias: true;
-"
+vr-mode-ui="enabled:false"
 
-vr-mode-ui="enabled: false"
-
-device-orientation-permission-ui="
-enabled: false;
-">
+device-orientation-permission-ui="enabled:false">
 
 
 <a-assets>
@@ -1034,21 +980,21 @@ crossorigin="anonymous">
 
 <a-camera
 position="0 0 0"
-look-controls="enabled: false">
+look-controls="enabled:false">
 </a-camera>
 
 
 <a-entity
-mindar-image-target="targetIndex: 0"
-kucuk-a-v6>
+mindar-image-target="targetIndex:0"
+neti-writing>
 
 
 <a-image
-id="netiYazma"
+id="neti"
 src="#netiAsset"
-position="-0.40 0.60 0.06"
-width="0.30"
-height="0.30"
+position="-0.43 0.61 0.07"
+width=".29"
+height=".29"
 visible="false"
 material="
 shader:flat;
@@ -1059,13 +1005,13 @@ alphaTest:.01;
 
 
 <a-plane
-id="yazmaPlane"
-position="0 0.02 0.08"
+id="drawPlane"
+position="0 .02 .08"
 width="1.15"
 height="1.15"
 visible="false"
 material="
-src:#yazmaCanvas;
+src:#drawCanvas;
 transparent:true;
 shader:flat;
 ">
