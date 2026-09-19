@@ -13,6 +13,48 @@
       overflow: hidden;
     }
   </style>
+
+  <script>
+    AFRAME.registerComponent('neti-animation', {
+      init: function () {
+
+        const target = this.el;
+        const neti = document.querySelector('#netiKarakter');
+
+        target.addEventListener('targetFound', () => {
+
+          neti.setAttribute('scale', '0.05 0.05 0.05');
+          neti.setAttribute('position', '0 -0.25 0.03');
+          neti.setAttribute('rotation', '0 0 0');
+
+          neti.removeAttribute('animation__buyume');
+          neti.removeAttribute('animation__yuksel');
+
+          setTimeout(() => {
+
+            neti.setAttribute(
+              'animation__buyume',
+              'property: scale; from: 0.05 0.05 0.05; to: 1 1 1; dur: 1800; easing: easeOutBack'
+            );
+
+            neti.setAttribute(
+              'animation__yuksel',
+              'property: position; from: 0 -0.25 0.03; to: 0 0.08 0.03; dur: 1800; easing: easeOutQuad'
+            );
+
+          }, 100);
+        });
+
+        target.addEventListener('targetLost', () => {
+          neti.removeAttribute('animation__buyume');
+          neti.removeAttribute('animation__yuksel');
+          neti.setAttribute('scale', '0.05 0.05 0.05');
+          neti.setAttribute('position', '0 -0.25 0.03');
+        });
+      }
+    });
+  </script>
+
 </head>
 
 <body>
@@ -36,13 +78,17 @@
     look-controls="enabled: false">
   </a-camera>
 
-  <a-entity mindar-image-target="targetIndex: 0">
+  <a-entity
+    mindar-image-target="targetIndex: 0"
+    neti-animation>
 
     <a-image
+      id="netiKarakter"
       src="#neti"
-      position="0 0.05 0.02"
+      position="0 -0.25 0.03"
       width="0.75"
       height="0.75"
+      scale="0.05 0.05 0.05"
       material="shader: flat; transparent: true; alphaTest: 0.01">
     </a-image>
 
