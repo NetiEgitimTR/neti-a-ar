@@ -20,38 +20,64 @@
 
         const target = this.el;
         const neti = document.querySelector('#netiKarakter');
+        const harfler = document.querySelector('#harfler');
 
         target.addEventListener('targetFound', () => {
 
-          neti.setAttribute('scale', '0.05 0.05 0.05');
-          neti.setAttribute('position', '0 -0.25 0.03');
-          neti.setAttribute('rotation', '0 0 0');
-
+          // Her taramada başlangıç durumuna dön
           neti.removeAttribute('animation__buyume');
           neti.removeAttribute('animation__yuksel');
+          harfler.removeAttribute('animation__harf');
 
+          neti.setAttribute('scale', '0.05 0.05 0.05');
+          neti.setAttribute('position', '0 -0.25 0.03');
+
+          harfler.setAttribute('scale', '0.01 0.01 0.01');
+          harfler.setAttribute('visible', 'false');
+
+          // NETİ ORTAYA ÇIKIYOR
           setTimeout(() => {
 
             neti.setAttribute(
               'animation__buyume',
-              'property: scale; from: 0.05 0.05 0.05; to: 1 1 1; dur: 1800; easing: easeOutBack'
+              'property: scale; from: 0.05 0.05 0.05; to: 1 1 1; dur: 1500; easing: easeOutBack'
             );
 
             neti.setAttribute(
               'animation__yuksel',
-              'property: position; from: 0 -0.25 0.03; to: 0 0.08 0.03; dur: 1800; easing: easeOutQuad'
+              'property: position; from: 0 -0.25 0.03; to: 0 0.08 0.03; dur: 1500; easing: easeOutQuad'
             );
 
           }, 100);
+
+          // A ve a HARFLERİ ORTAYA ÇIKIYOR
+          setTimeout(() => {
+
+            harfler.setAttribute('visible', 'true');
+
+            harfler.setAttribute(
+              'animation__harf',
+              'property: scale; from: 0.01 0.01 0.01; to: 1 1 1; dur: 900; easing: easeOutBack'
+            );
+
+          }, 1700);
+
         });
 
         target.addEventListener('targetLost', () => {
+
           neti.removeAttribute('animation__buyume');
           neti.removeAttribute('animation__yuksel');
+          harfler.removeAttribute('animation__harf');
 
           neti.setAttribute('scale', '0.05 0.05 0.05');
           neti.setAttribute('position', '0 -0.25 0.03');
+
+          harfler.setAttribute('scale', '0.01 0.01 0.01');
+          harfler.setAttribute('visible', 'false');
+
         });
+
       }
     });
   </script>
@@ -83,6 +109,7 @@
     mindar-image-target="targetIndex: 0"
     neti-animation>
 
+    <!-- NETİ -->
     <a-image
       id="netiKarakter"
       src="#neti"
@@ -92,6 +119,23 @@
       scale="0.05 0.05 0.05"
       material="shader: flat; transparent: true; alphaTest: 0.01">
     </a-image>
+
+    <!-- A a HARFLERİ -->
+    <a-entity
+      id="harfler"
+      position="0 0.55 0.04"
+      scale="0.01 0.01 0.01"
+      visible="false">
+
+      <a-text
+        value="A a"
+        align="center"
+        color="#FF6B35"
+        width="2.5"
+        font="https://cdn.aframe.io/fonts/mozillavr.fnt">
+      </a-text>
+
+    </a-entity>
 
   </a-entity>
 
