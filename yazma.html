@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -16,10 +16,11 @@ html,body{
   font-family:Arial,sans-serif;
 }
 
+/* BAŞLANGIÇ */
 #startScreen{
   position:fixed;
   inset:0;
-  z-index:10000;
+  z-index:9999;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -32,9 +33,9 @@ html,body{
   border-radius:28px;
   padding:18px 28px;
   background:#ff8a3d;
-  color:#fff;
+  color:white;
   font-size:21px;
-  font-weight:700;
+  font-weight:bold;
   box-shadow:0 6px 18px rgba(0,0,0,.22);
 }
 
@@ -42,44 +43,100 @@ html,body{
   margin-top:14px;
   font-size:16px;
   color:#555;
+  text-align:center;
 }
 
-/* YÖNERGE ARTIK CANVAS'TA DEĞİL */
+/* ÜST YÖNERGE */
 #instruction{
   position:fixed;
   z-index:9000;
-  top:13%;
+
+  top:16%;
   left:50%;
+
   transform:translateX(-50%);
-  width:min(82vw,480px);
+
+  width:78vw;
+  max-width:470px;
+
   box-sizing:border-box;
 
-  background:rgba(255,255,255,.96);
-  border:4px solid #ff9c38;
-  border-radius:22px;
+  background:rgba(255,255,255,.97);
 
-  padding:10px 15px;
+  border:4px solid #ff981f;
+  border-radius:23px;
+
+  padding:11px 15px;
+
   text-align:center;
 
-  box-shadow:0 5px 16px rgba(0,0,0,.16);
+  box-shadow:0 5px 18px rgba(0,0,0,.18);
 
   display:none;
   pointer-events:none;
 }
 
 #instructionTitle{
-  font-size:20px;
-  line-height:1.15;
+  color:#143b73;
+  font-size:21px;
   font-weight:800;
-  color:#173c68;
+  line-height:1.15;
 }
 
 #instructionText{
   margin-top:4px;
-  font-size:14px;
-  line-height:1.2;
-  font-weight:600;
   color:#555;
+  font-size:14px;
+  font-weight:700;
+  line-height:1.2;
+}
+
+/* SON BALON */
+#speech{
+  position:fixed;
+
+  z-index:9001;
+
+  right:4%;
+  top:43%;
+
+  width:145px;
+
+  box-sizing:border-box;
+
+  background:#ffd36a;
+
+  border:4px solid white;
+  border-radius:45%;
+
+  padding:18px 12px;
+
+  color:#422600;
+
+  font-size:22px;
+  font-weight:800;
+
+  text-align:center;
+
+  box-shadow:0 5px 18px rgba(0,0,0,.18);
+
+  display:none;
+
+  pointer-events:none;
+}
+
+#speech:after{
+  content:"";
+
+  position:absolute;
+
+  bottom:-25px;
+  left:42px;
+
+  border-width:26px 14px 0 0;
+  border-style:solid;
+
+  border-color:#ffd36a transparent transparent transparent;
 }
 
 #drawCanvas{
@@ -91,6 +148,7 @@ html,body{
 <body>
 
 <div id="startScreen">
+
   <button id="startButton">
     ✏️ Neti ile küçük a yazalım
   </button>
@@ -98,12 +156,24 @@ html,body{
   <div id="startText">
     Dokun ve yazma sayfasını kameraya göster.
   </div>
+
 </div>
 
+
 <div id="instruction">
+
   <div id="instructionTitle"></div>
+
   <div id="instructionText"></div>
+
 </div>
+
+
+<div id="speech">
+  Şimdi<br>
+  sen de yaz! ✏️
+</div>
+
 
 <canvas
   id="drawCanvas"
@@ -111,21 +181,26 @@ html,body{
   height="1200">
 </canvas>
 
+
 <script>
+
 let userStarted=false;
+
 
 window.addEventListener("DOMContentLoaded",()=>{
 
-  const startScreen=document.querySelector("#startScreen");
-  const startButton=document.querySelector("#startButton");
+  const button=
+    document.querySelector("#startButton");
 
-  startButton.addEventListener("click",()=>{
+  button.addEventListener("click",()=>{
 
     userStarted=true;
-    startScreen.style.display="none";
+
+    document.querySelector("#startScreen")
+      .style.display="none";
 
     window.dispatchEvent(
-      new Event("user-started")
+      new Event("neti-user-start")
     );
 
   });
@@ -133,33 +208,53 @@ window.addEventListener("DOMContentLoaded",()=>{
 });
 
 
-AFRAME.registerComponent("perfect-a-writing",{
+AFRAME.registerComponent("school-a-writing",{
 
 init:function(){
 
   const target=this.el;
 
-  const canvas=document.querySelector("#drawCanvas");
-  const ctx=canvas.getContext("2d");
+  const canvas=
+    document.querySelector("#drawCanvas");
 
-  const plane=document.querySelector("#drawPlane");
-  const neti=document.querySelector("#neti");
+  const ctx=
+    canvas.getContext("2d");
 
-  const instruction=document.querySelector("#instruction");
-  const instructionTitle=document.querySelector("#instructionTitle");
-  const instructionText=document.querySelector("#instructionText");
+  const plane=
+    document.querySelector("#drawPlane");
+
+  const neti=
+    document.querySelector("#neti");
+
+  const netiHead=
+    document.querySelector("#netiHead");
+
+  const instruction=
+    document.querySelector("#instruction");
+
+  const title=
+    document.querySelector("#instructionTitle");
+
+  const text=
+    document.querySelector("#instructionText");
+
+  const speech=
+    document.querySelector("#speech");
+
 
   let targetVisible=false;
   let started=false;
   let round=1;
 
-  /* =========================
-     TEXTURE
-  ========================= */
 
-  function updateTexture(){
+  /* =====================================
+     CANVAS GÜNCELLE
+  ===================================== */
 
-    const mesh=plane.getObject3D("mesh");
+  function update(){
+
+    const mesh=
+      plane.getObject3D("mesh");
 
     if(
       mesh &&
@@ -168,63 +263,57 @@ init:function(){
     ){
       mesh.material.map.needsUpdate=true;
     }
+
   }
 
 
-  /* =========================
-     YÖNERGE
-  ========================= */
-
-  function showInstruction(title,text){
-
-    instructionTitle.textContent=title;
-    instructionText.textContent=text;
-
-    instruction.style.display="block";
-  }
-
-
-  /* =========================
-     TEMİZLE
-  ========================= */
-
-  function clear(){
+  function clearCanvas(){
 
     ctx.clearRect(
-      0,0,
-      canvas.width,
-      canvas.height
+      0,
+      0,
+      1200,
+      1200
     );
 
-    updateTexture();
+    update();
+
   }
 
 
-  /* =====================================================
-     KÜÇÜK a'NIN GERÇEK YAPISI
+  /* =====================================
+     YÖNERGE
+  ===================================== */
+
+  function message(a,b){
+
+    title.textContent=a;
+    text.textContent=b;
+
+    instruction.style.display="block";
+
+  }
+
+
+  /* =====================================
+     KÜÇÜK a GEOMETRİSİ
      
-     1. hareket:
-     sağ üstten başlayıp sola doğru
-     TAM C biçiminde döner.
+     BU KEZ TAM DAİRESEL.
+  ===================================== */
 
-     2. hareket:
-     C'nin birleşim yerinin biraz
-     üstünden başlayıp aşağı iner.
-  ===================================================== */
+  const CX=545;
+  const CY=615;
 
-
-  const CENTER_X=555;
-  const CENTER_Y=610;
-
-  const RX=245;
-  const RY=255;
+  const R=245;
 
   /*
-     C'nin sağ üst ve sağ alt uçları
+     c'nin başlangıcı sağ üst.
+
+     Açıklık yaklaşık 80 derece.
   */
 
-  const START_ANGLE=-42*Math.PI/180;
-  const END_ANGLE=42*Math.PI/180;
+  const START_DEG=-38;
+  const END_DEG=38;
 
 
   function cPath(){
@@ -232,67 +321,85 @@ init:function(){
     const points=[];
 
     /*
-      Saat yönünün tersine:
-      sağ üst -> üst -> sol ->
-      alt -> sağ alt
+       -38°'den geriye doğru
+       bütün daireyi dolaşıyoruz.
+
+       Böylece:
+       sağ üst
+       -> üst
+       -> sol
+       -> alt
+       -> sağ alt
     */
 
-    const totalAngle=
-      Math.PI*2 -
-      (END_ANGLE-START_ANGLE);
+    const travel=
+      360-(END_DEG-START_DEG);
 
-    const count=220;
+    const count=280;
+
 
     for(let i=0;i<=count;i++){
 
       const t=i/count;
 
-      let angle=
-        START_ANGLE -
-        totalAngle*t;
+      const degree=
+        START_DEG-
+        travel*t;
+
+      const angle=
+        degree*Math.PI/180;
+
 
       points.push({
 
         x:
-          CENTER_X+
-          RX*Math.cos(angle),
+          CX+
+          R*Math.cos(angle),
 
         y:
-          CENTER_Y+
-          RY*Math.sin(angle)
+          CY+
+          R*Math.sin(angle)
 
       });
 
     }
 
     return points;
+
   }
 
 
   const cPoints=cPath();
 
-  /*
-     C'nin sağ üst birleşim noktası
-  */
-
-  const joinTop=cPoints[0];
 
   /*
-     DİK ÇİZGİ:
-     C'nin üst birleşiminden
-     yaklaşık 100 px daha yukarıda başlar.
+     C'NİN SAĞ ÜST NOKTASI
   */
 
-  const STEM_X=joinTop.x;
+  const join=cPoints[0];
 
-  const STEM_TOP=joinTop.y-105;
-  const STEM_BOTTOM=835;
+
+  /*
+     DİK ÇİZGİ
+     
+     C'nin başlangıcından
+     DAHA YUKARIDA başlıyor.
+  */
+
+  const STEM_X=join.x;
+
+  const STEM_TOP=join.y-125;
+
+  const STEM_BOTTOM=
+    CY+R+8;
 
 
   function stemPath(){
 
     const points=[];
-    const count=120;
+
+    const count=150;
+
 
     for(let i=0;i<=count;i++){
 
@@ -304,33 +411,41 @@ init:function(){
 
         y:
           STEM_TOP+
-          (STEM_BOTTOM-STEM_TOP)*t
+          (
+            STEM_BOTTOM-
+            STEM_TOP
+          )*t
 
       });
 
     }
 
     return points;
+
   }
 
 
-  const stemPoints=stemPath();
+  const stemPoints=
+    stemPath();
 
 
-  /* =========================
-     YOL ÇİZ
-  ========================= */
+  /* =====================================
+     ÇİZGİ
+  ===================================== */
 
-  function drawPath(
+  function path(
     points,
     color,
     width,
     dash=[]
   ){
 
+    if(points.length<2) return;
+
     ctx.save();
 
     ctx.strokeStyle=color;
+
     ctx.lineWidth=width;
 
     ctx.lineCap="round";
@@ -338,12 +453,14 @@ init:function(){
 
     ctx.setLineDash(dash);
 
+
     ctx.beginPath();
 
     ctx.moveTo(
       points[0].x,
       points[0].y
     );
+
 
     for(let i=1;i<points.length;i++){
 
@@ -354,253 +471,456 @@ init:function(){
 
     }
 
+
     ctx.stroke();
 
     ctx.restore();
+
   }
 
 
-  /* =========================
-     GRİ HARF ŞABLONU
-  ========================= */
+  /* =====================================
+     GRİ ŞABLON
+  ===================================== */
 
-  function drawGuide(){
-
-    /*
-      DIŞ GRİ KILAVUZ
-    */
-
-    drawPath(
-      cPoints,
-      "rgba(135,140,145,.55)",
-      105
-    );
-
-    drawPath(
-      stemPoints,
-      "rgba(135,140,145,.55)",
-      105
-    );
+  function guide(){
 
     /*
-      İÇ AÇIK GRİ YOL
+       KOYU GRİ DIŞ ÇERÇEVE
     */
 
-    drawPath(
+    path(
       cPoints,
-      "rgba(225,225,225,.92)",
-      66
+      "rgba(125,135,145,.58)",
+      108
     );
 
-    drawPath(
+
+    path(
       stemPoints,
-      "rgba(225,225,225,.92)",
-      66
+      "rgba(125,135,145,.58)",
+      108
     );
+
 
     /*
-      ORTA KESİK KILAVUZ
+       AÇIK GRİ İÇ KISIM
     */
 
-    drawPath(
+    path(
       cPoints,
-      "rgba(255,255,255,.96)",
-      7,
-      [20,18]
+      "rgba(220,225,228,.98)",
+      74
     );
 
-    drawPath(
+
+    path(
       stemPoints,
-      "rgba(255,255,255,.96)",
-      7,
-      [20,18]
+      "rgba(220,225,228,.98)",
+      74
     );
 
-    updateTexture();
+
+    /*
+       BEYAZ KESİK KILAVUZ
+    */
+
+    path(
+      cPoints,
+      "white",
+      8,
+      [24,20]
+    );
+
+
+    path(
+      stemPoints,
+      "white",
+      8,
+      [24,20]
+    );
+
+
+    update();
+
   }
 
 
-  /* =========================
-     NUMARA
-  ========================= */
+  /* =====================================
+     NUMARALAR
+  ===================================== */
 
-  function numberCircle(x,y,text){
+  function numberCircle(
+    x,
+    y,
+    number,
+    color
+  ){
 
     ctx.save();
 
-    ctx.shadowColor="rgba(0,0,0,.18)";
-    ctx.shadowBlur=10;
+
+    ctx.shadowColor=
+      "rgba(0,0,0,.25)";
+
+    ctx.shadowBlur=12;
+
 
     ctx.beginPath();
-    ctx.arc(x,y,43,0,Math.PI*2);
 
-    ctx.fillStyle="#ff2d2d";
+    ctx.arc(
+      x,
+      y,
+      45,
+      0,
+      Math.PI*2
+    );
+
+
+    ctx.fillStyle=color;
     ctx.fill();
+
 
     ctx.shadowBlur=0;
 
+    ctx.strokeStyle="white";
+
     ctx.lineWidth=8;
-    ctx.strokeStyle="#fff";
+
     ctx.stroke();
 
-    ctx.fillStyle="#fff";
-    ctx.font="bold 50px Arial";
+
+    ctx.fillStyle="white";
+
+    ctx.font=
+      "bold 52px Arial";
 
     ctx.textAlign="center";
+
     ctx.textBaseline="middle";
 
+
     ctx.fillText(
-      text,
+      number,
       x,
       y+2
     );
 
+
     ctx.restore();
+
   }
 
 
-  /* =========================
+  /* =====================================
      SARI OK
-  ========================= */
+  ===================================== */
 
-  function arrow(x,y,angle){
+  function arrow(
+    x,
+    y,
+    rotation
+  ){
 
     ctx.save();
 
     ctx.translate(x,y);
-    ctx.rotate(angle);
 
-    ctx.shadowColor="rgba(0,0,0,.18)";
-    ctx.shadowBlur=6;
+    ctx.rotate(rotation);
+
 
     ctx.beginPath();
 
-    ctx.moveTo(-35,-17);
-    ctx.lineTo(5,-17);
 
-    ctx.lineTo(5,-31);
+    ctx.moveTo(
+      -38,
+      -18
+    );
 
-    ctx.lineTo(43,0);
+    ctx.lineTo(
+      4,
+      -18
+    );
 
-    ctx.lineTo(5,31);
+    ctx.lineTo(
+      4,
+      -33
+    );
 
-    ctx.lineTo(5,17);
+    ctx.lineTo(
+      45,
+      0
+    );
 
-    ctx.lineTo(-35,17);
+    ctx.lineTo(
+      4,
+      33
+    );
+
+    ctx.lineTo(
+      4,
+      18
+    );
+
+    ctx.lineTo(
+      -38,
+      18
+    );
+
 
     ctx.closePath();
 
-    ctx.fillStyle="#ffd600";
 
-    ctx.lineWidth=7;
-    ctx.strokeStyle="#fff";
+    ctx.fillStyle="#ffd500";
+
+    ctx.strokeStyle="white";
+
+    ctx.lineWidth=8;
+
 
     ctx.stroke();
+
     ctx.fill();
 
+
     ctx.restore();
+
   }
 
 
-  /* =========================
-     YÖN OKLARI
-  ========================= */
+  /* =====================================
+     OKLAR + 1 / 2
+  ===================================== */
 
-  function drawDirections(){
+  function directions(){
 
     /*
-      1 = C HAREKETİ
+       1 = C HAREKETİ
     */
 
     numberCircle(
-      joinTop.x+42,
-      joinTop.y-58,
-      "1"
+      join.x+18,
+      STEM_TOP-60,
+      "1",
+      "#1677ff"
     );
 
 
     /*
-      C ÜZERİNDEKİ OKLAR
+       C OKLARI
     */
 
     arrow(
-      590,
-      350,
+      555,
+      370,
       Math.PI
     );
 
+
     arrow(
-      335,
-      500,
+      305,
+      535,
       Math.PI/2
     );
 
-    arrow(
-      390,
-      790,
-      .45
-    );
 
     arrow(
-      620,
+      365,
+      785,
+      .62
+    );
+
+
+    arrow(
+      610,
       850,
-      -.15
+      -.35
     );
 
 
     /*
-      2 = DİK ÇİZGİ
+       2 = DİK ÇİZGİ
     */
 
     numberCircle(
-      STEM_X+72,
-      STEM_TOP+35,
-      "2"
+      STEM_X+92,
+      STEM_BOTTOM,
+      "2",
+      "#ff2d2d"
+    );
+
+
+    /*
+       DÜZ ÇİZGİ OKLARI
+    */
+
+    arrow(
+      STEM_X,
+      520,
+      Math.PI/2
     );
 
 
     arrow(
       STEM_X,
-      500,
+      705,
       Math.PI/2
     );
 
-    arrow(
-      STEM_X,
-      690,
-      Math.PI/2
-    );
 
-    updateTexture();
+    update();
+
   }
 
 
-  /* =========================
-     ANİMASYONLU KIRMIZI ÇİZGİ
-  ========================= */
+  /* =====================================
+     KIRMIZI ANİMASYON
 
-  function animateRed(
-    points,
-    duration,
-    done
+     Her karede baştan yeniden çiziyoruz.
+     Böylece çizgi bozulmuyor.
+  ===================================== */
+
+  let completedC=false;
+
+
+  function drawScene(
+    activePoints=null,
+    activeIsStem=false
   ){
 
-    let startTime=null;
+    clearCanvas();
+
+    guide();
+
+
+    /*
+       C DAHA ÖNCE TAMAMLANDIYSA
+       KIRMIZI C'Yİ KORU.
+    */
+
+    if(completedC){
+
+      path(
+        cPoints,
+        "#ff3030",
+        70
+      );
+
+      path(
+        cPoints,
+        "white",
+        8,
+        [24,20]
+      );
+
+    }
+
+
+    /*
+       AKTİF ÇİZGİ
+    */
+
+    if(activePoints){
+
+      path(
+        activePoints,
+        "#ff3030",
+        70
+      );
+
+      path(
+        activePoints,
+        "white",
+        8,
+        [24,20]
+      );
+
+    }
+
+
+    directions();
+
+
+    /*
+       KALEM NOKTASI
+    */
+
+    if(
+      activePoints &&
+      activePoints.length
+    ){
+
+      const p=
+        activePoints[
+          activePoints.length-1
+        ];
+
+
+      ctx.save();
+
+      ctx.shadowColor="#ffd500";
+
+      ctx.shadowBlur=25;
+
+
+      ctx.beginPath();
+
+      ctx.arc(
+        p.x,
+        p.y,
+        18,
+        0,
+        Math.PI*2
+      );
+
+
+      ctx.fillStyle="#fff000";
+
+      ctx.fill();
+
+
+      ctx.lineWidth=5;
+
+      ctx.strokeStyle="white";
+
+      ctx.stroke();
+
+
+      ctx.restore();
+
+    }
+
+
+    update();
+
+  }
+
+
+  function animate(
+    points,
+    duration,
+    done,
+    isStem=false
+  ){
+
+    let start=null;
 
 
     function frame(time){
 
-      if(startTime===null){
-        startTime=time;
+      if(start===null){
+        start=time;
       }
+
 
       const progress=
         Math.min(
-          (time-startTime)/duration,
+          (time-start)/duration,
           1
         );
 
-      const endIndex=
+
+      const index=
         Math.max(
           1,
           Math.floor(
@@ -610,79 +930,24 @@ init:function(){
         );
 
 
-      /*
-        O ANA KADAR OLAN YOL
-      */
-
       const partial=
         points.slice(
           0,
-          endIndex+1
+          index+1
         );
 
 
-      /*
-        KIRMIZI ÇİZGİ
-      */
-
-      drawPath(
+      drawScene(
         partial,
-        "#ff3030",
-        68
+        isStem
       );
-
-
-      /*
-        KIRMIZININ ORTASINDA
-        BEYAZ KESİK YOL
-      */
-
-      drawPath(
-        partial,
-        "rgba(255,255,255,.95)",
-        7,
-        [20,18]
-      );
-
-
-      /*
-        PARLAYAN KALEM NOKTASI
-      */
-
-      const p=
-        points[endIndex];
-
-      ctx.save();
-
-      ctx.shadowColor="#ffe000";
-      ctx.shadowBlur=25;
-
-      ctx.beginPath();
-
-      ctx.arc(
-        p.x,
-        p.y,
-        17,
-        0,
-        Math.PI*2
-      );
-
-      ctx.fillStyle="#fff000";
-      ctx.fill();
-
-      ctx.lineWidth=5;
-      ctx.strokeStyle="#fff";
-      ctx.stroke();
-
-      ctx.restore();
-
-
-      updateTexture();
 
 
       if(progress<1){
 
-        requestAnimationFrame(frame);
+        requestAnimationFrame(
+          frame
+        );
 
       }else{
 
@@ -695,49 +960,47 @@ init:function(){
     }
 
 
-    requestAnimationFrame(frame);
+    requestAnimationFrame(
+      frame
+    );
+
   }
 
 
-  /* =========================
-     1. HAREKET
-  ========================= */
+  /* =====================================
+     1. C ÇİZİMİ
+  ===================================== */
 
-  function startC(){
+  function firstStroke(){
 
-    clear();
+    completedC=false;
 
-    drawGuide();
-    drawDirections();
+    drawScene();
 
 
     if(round===1){
 
-      showInstruction(
-        "1. Önce c çizgisini çiz.",
-        "Sarı okları takip et."
+      message(
+        "1. Önce c çizgisini takip et.",
+        "Okları takip ederek yavaşça ilerle."
       );
 
     }else{
 
-      showInstruction(
+      message(
         "Tekrar yazıyoruz...",
-        "Önce c hareketini bir kez daha izle."
+        "Önce c çizgisini bir kez daha izle."
       );
 
     }
 
 
-    /*
-      KILAVUZU ÖNCE GÖRSÜN
-    */
-
     setTimeout(()=>{
 
-      animateRed(
+      animate(
         cPoints,
         6500,
-        startStem
+        secondStroke
       );
 
     },1600);
@@ -745,13 +1008,18 @@ init:function(){
   }
 
 
-  /* =========================
-     2. HAREKET
-  ========================= */
+  /* =====================================
+     2. DÜZ ÇİZGİ
+  ===================================== */
 
-  function startStem(){
+  function secondStroke(){
 
-    showInstruction(
+    completedC=true;
+
+    drawScene();
+
+
+    message(
       "2. Şimdi düz çizgiyi çiz.",
       "Yukarıdan aşağı doğru ilerle."
     );
@@ -759,10 +1027,11 @@ init:function(){
 
     setTimeout(()=>{
 
-      animateRed(
+      animate(
         stemPoints,
         4000,
-        finishRound
+        roundFinished,
+        true
       );
 
     },1300);
@@ -770,24 +1039,34 @@ init:function(){
   }
 
 
-  /* =========================
-     TUR BİTİŞİ
-  ========================= */
+  /* =====================================
+     TUR TAMAMLANDI
+  ===================================== */
 
-  function finishRound(){
+  function roundFinished(){
+
+    completedC=true;
+
+    drawScene(
+      stemPoints,
+      true
+    );
+
 
     if(round===1){
 
-      showInstruction(
+      message(
         "Harika! Bir kez daha.",
         "Küçük a harfini tekrar izleyelim."
       );
 
+
       round=2;
 
+
       setTimeout(
-        startC,
-        2200
+        firstStroke,
+        2300
       );
 
     }else{
@@ -799,46 +1078,84 @@ init:function(){
   }
 
 
-  /* =========================
-     SON
-  ========================= */
+  /* =====================================
+     SON EKRAN
+  ===================================== */
 
   function finish(){
 
-    showInstruction(
-      "Şimdi sen de yaz! ✏️",
-      "Kitabındaki küçük a harflerini yaz."
+    message(
+      "Harika! Küçük a tamamlandı.",
+      "Şimdi kitabında sen dene."
     );
+
+
+    /*
+       NETİ'NİN KAFASI
+    */
+
+    netiHead.setAttribute(
+      "visible",
+      "true"
+    );
+
+
+    netiHead.setAttribute(
+      "scale",
+      ".05 .05 .05"
+    );
+
+
+    netiHead.setAttribute(
+      "animation__head",
+
+      "property:scale;"+
+      "from:.05 .05 .05;"+
+      "to:1 1 1;"+
+      "dur:650;"+
+      "easing:easeOutBack"
+    );
+
+
+    /*
+       KONUŞMA BALONU
+    */
+
+    speech.style.display="block";
 
 
     neti.removeAttribute(
       "animation__finish"
     );
 
+
     neti.setAttribute(
       "animation__finish",
 
       "property:scale;"+
       "from:1 1 1;"+
-      "to:1.12 1.12 1.12;"+
+      "to:1.10 1.10 1.10;"+
       "dir:alternate;"+
       "loop:3;"+
-      "dur:320;"+
+      "dur:300;"+
       "easing:easeInOutQuad"
     );
 
   }
 
 
-  /* =========================
+  /* =====================================
      BAŞLAT
-  ========================= */
+  ===================================== */
 
   function begin(){
 
     if(started) return;
+
     if(!targetVisible) return;
+
     if(!userStarted) return;
+
 
     started=true;
     round=1;
@@ -863,25 +1180,19 @@ init:function(){
 
 
     neti.setAttribute(
-      "position",
-      "-0.43 0.63 0.09"
-    );
-
-
-    neti.setAttribute(
       "animation__enter",
 
       "property:scale;"+
       "from:.05 .05 .05;"+
       "to:1 1 1;"+
-      "dur:900;"+
+      "dur:850;"+
       "easing:easeOutBack"
     );
 
 
     setTimeout(
-      startC,
-      1100
+      firstStroke,
+      1000
     );
 
   }
@@ -892,6 +1203,7 @@ init:function(){
     ()=>{
 
       targetVisible=true;
+
       begin();
 
     }
@@ -909,7 +1221,7 @@ init:function(){
 
 
   window.addEventListener(
-    "user-started",
+    "neti-user-start",
     begin
   );
 
@@ -959,15 +1271,16 @@ look-controls="enabled:false">
 
 <a-entity
 mindar-image-target="targetIndex:0"
-perfect-a-writing>
+school-a-writing>
 
 
+<!-- SOL ÜST NETİ -->
 <a-image
 id="neti"
 src="#netiAsset"
-position="-0.43 0.63 0.09"
-width=".28"
-height=".28"
+position="-0.43 0.63 0.10"
+width=".29"
+height=".29"
 visible="false"
 material="
 shader:flat;
@@ -977,9 +1290,26 @@ alphaTest:.01;
 </a-image>
 
 
+<!-- SAĞDA SONDA ÇIKAN NETİ -->
+<a-image
+id="netiHead"
+src="#netiAsset"
+position=".43 -.03 .11"
+width=".22"
+height=".22"
+visible="false"
+material="
+shader:flat;
+transparent:true;
+alphaTest:.01;
+">
+</a-image>
+
+
+<!-- HARF -->
 <a-plane
 id="drawPlane"
-position="0 0.02 0.08"
+position="0 .01 .08"
 width="1.12"
 height="1.12"
 visible="false"
