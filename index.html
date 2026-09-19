@@ -19,7 +19,9 @@
   </style>
 
   <script>
+
     AFRAME.registerComponent('neti-animation', {
+
       init: function () {
 
         const target = this.el;
@@ -27,216 +29,594 @@
         const harfler = document.querySelector('#harfler');
         const ari = document.querySelector('#ariKarakter');
 
+        let sahneBasladi = false;
+        let kayipTimer = null;
+
         let timerNeti;
         let timerHarf;
         let timerAri;
 
-        target.addEventListener('targetFound', () => {
+
+        function sahneyiBaslat() {
+
+          if (sahneBasladi) return;
+
+          sahneBasladi = true;
 
           clearTimeout(timerNeti);
           clearTimeout(timerHarf);
           clearTimeout(timerAri);
 
+          /* NETİ BAŞLANGIÇ */
+
           neti.removeAttribute('animation__buyume');
           neti.removeAttribute('animation__yuksel');
 
+          neti.setAttribute(
+            'scale',
+            '0.05 0.05 0.05'
+          );
+
+          neti.setAttribute(
+            'position',
+            '0 -0.25 0.03'
+          );
+
+
+          /* HARFLER BAŞLANGIÇ */
+
           harfler.removeAttribute('animation__harf');
 
+          harfler.setAttribute(
+            'scale',
+            '0.01 0.01 0.01'
+          );
+
+          harfler.setAttribute(
+            'visible',
+            'false'
+          );
+
+
+          /* ARI BAŞLANGIÇ */
+
           ari.removeAttribute('animation__buyume');
-          ari.removeAttribute('animation__ucus');
+          ari.removeAttribute('animation__ucus1');
+          ari.removeAttribute('animation__ucus2');
+          ari.removeAttribute('animation__ucus3');
+          ari.removeAttribute('animation__donus');
 
-          // BAŞLANGIÇ
-          neti.setAttribute('scale', '0.05 0.05 0.05');
-          neti.setAttribute('position', '0 -0.25 0.03');
+          ari.setAttribute(
+            'scale',
+            '0.01 0.01 0.01'
+          );
 
-          harfler.setAttribute('scale', '0.01 0.01 0.01');
-          harfler.setAttribute('visible', 'false');
+          ari.setAttribute(
+            'position',
+            '-0.42 0.28 0.08'
+          );
 
-          ari.setAttribute('scale', '0.01 0.01 0.01');
-          ari.setAttribute('position', '-0.38 0.28 0.07');
-          ari.setAttribute('visible', 'false');
+          /*
+             Arının görselini uçuş yönüne
+             doğru hafif yatırıyoruz.
+          */
 
-          // 1 — NETİ
+          ari.setAttribute(
+            'rotation',
+            '0 0 -12'
+          );
+
+          ari.setAttribute(
+            'visible',
+            'false'
+          );
+
+
+          /* 1 — NETİ ÇIKIYOR */
+
           timerNeti = setTimeout(() => {
 
             neti.setAttribute(
               'animation__buyume',
-              'property: scale; from: 0.05 0.05 0.05; to: 1 1 1; dur: 1500; easing: easeOutBack'
+              'property: scale;' +
+              'from: 0.05 0.05 0.05;' +
+              'to: 1 1 1;' +
+              'dur: 1400;' +
+              'easing: easeOutBack'
             );
 
             neti.setAttribute(
               'animation__yuksel',
-              'property: position; from: 0 -0.25 0.03; to: 0 0.08 0.03; dur: 1500; easing: easeOutQuad'
+              'property: position;' +
+              'from: 0 -0.25 0.03;' +
+              'to: 0 0.08 0.03;' +
+              'dur: 1400;' +
+              'easing: easeOutQuad'
             );
 
           }, 100);
 
-          // 2 — A a
+
+          /* 2 — A a GELİYOR */
+
           timerHarf = setTimeout(() => {
 
-            harfler.setAttribute('visible', 'true');
+            harfler.setAttribute(
+              'visible',
+              'true'
+            );
 
             harfler.setAttribute(
               'animation__harf',
-              'property: scale; from: 0.01 0.01 0.01; to: 1 1 1; dur: 800; easing: easeOutBack'
+              'property: scale;' +
+              'from: 0.01 0.01 0.01;' +
+              'to: 1 1 1;' +
+              'dur: 700;' +
+              'easing: easeOutBack'
             );
 
-          }, 1700);
+          }, 1600);
 
-          // 3 — ARI
+
+          /* 3 — ARI UÇUYOR */
+
           timerAri = setTimeout(() => {
 
-            ari.setAttribute('visible', 'true');
+            ari.setAttribute(
+              'visible',
+              'true'
+            );
+
+            /* Arı ortaya çıkıyor */
 
             ari.setAttribute(
               'animation__buyume',
-              'property: scale; from: 0.01 0.01 0.01; to: 1 1 1; dur: 600; easing: easeOutBack'
+              'property: scale;' +
+              'from: 0.01 0.01 0.01;' +
+              'to: 1 1 1;' +
+              'dur: 450;' +
+              'easing: easeOutBack'
             );
+
+
+            /*
+              1. UÇUŞ
+              Sol aşağıdan orta yukarıya
+            */
 
             ari.setAttribute(
-              'animation__ucus',
-              'property: position; from: -0.38 0.28 0.07; to: 0.38 0.28 0.07; dur: 2300; easing: easeInOutSine'
+              'animation__ucus1',
+              'property: position;' +
+              'from: -0.42 0.25 0.08;' +
+              'to: -0.10 0.38 0.08;' +
+              'dur: 900;' +
+              'easing: easeInOutSine'
             );
 
-          }, 2800);
 
-        });
+            /*
+              Hafif yön eğimi
+            */
+
+            ari.setAttribute(
+              'animation__donus',
+              'property: rotation;' +
+              'from: 0 0 -15;' +
+              'to: 0 0 8;' +
+              'dur: 900;' +
+              'easing: easeInOutSine'
+            );
 
 
-        target.addEventListener('targetLost', () => {
+            /*
+              2. UÇUŞ
+            */
 
-          clearTimeout(timerNeti);
-          clearTimeout(timerHarf);
-          clearTimeout(timerAri);
+            setTimeout(() => {
 
-          neti.removeAttribute('animation__buyume');
-          neti.removeAttribute('animation__yuksel');
+              ari.removeAttribute(
+                'animation__ucus1'
+              );
 
-          harfler.removeAttribute('animation__harf');
+              ari.setAttribute(
+                'animation__ucus2',
+                'property: position;' +
+                'from: -0.10 0.38 0.08;' +
+                'to: 0.15 0.27 0.08;' +
+                'dur: 800;' +
+                'easing: easeInOutSine'
+              );
 
-          ari.removeAttribute('animation__buyume');
-          ari.removeAttribute('animation__ucus');
+              ari.removeAttribute(
+                'animation__donus'
+              );
 
-          neti.setAttribute('scale', '0.05 0.05 0.05');
-          neti.setAttribute('position', '0 -0.25 0.03');
+              ari.setAttribute(
+                'animation__donus',
+                'property: rotation;' +
+                'from: 0 0 8;' +
+                'to: 0 0 -8;' +
+                'dur: 800;' +
+                'easing: easeInOutSine'
+              );
 
-          harfler.setAttribute('scale', '0.01 0.01 0.01');
-          harfler.setAttribute('visible', 'false');
+            }, 900);
 
-          ari.setAttribute('scale', '0.01 0.01 0.01');
-          ari.setAttribute('position', '-0.38 0.28 0.07');
-          ari.setAttribute('visible', 'false');
 
-        });
+            /*
+              3. UÇUŞ
+              Sağ tarafa yükseliyor
+            */
+
+            setTimeout(() => {
+
+              ari.removeAttribute(
+                'animation__ucus2'
+              );
+
+              ari.setAttribute(
+                'animation__ucus3',
+                'property: position;' +
+                'from: 0.15 0.27 0.08;' +
+                'to: 0.40 0.36 0.08;' +
+                'dur: 850;' +
+                'easing: easeOutSine'
+              );
+
+              ari.removeAttribute(
+                'animation__donus'
+              );
+
+              ari.setAttribute(
+                'animation__donus',
+                'property: rotation;' +
+                'from: 0 0 -8;' +
+                'to: 0 0 5;' +
+                'dur: 850;' +
+                'easing: easeInOutSine'
+              );
+
+            }, 1700);
+
+
+          }, 2600);
+
+        }
+
+
+        /*
+          SAYFA BULUNDU
+        */
+
+        target.addEventListener(
+          'targetFound',
+          () => {
+
+            /*
+              Sayfa bir an kaybolup geri geldiyse
+              sıfırlama işlemini iptal ediyoruz.
+            */
+
+            if (kayipTimer) {
+
+              clearTimeout(kayipTimer);
+              kayipTimer = null;
+
+            }
+
+            sahneyiBaslat();
+
+          }
+        );
+
+
+        /*
+          SAYFA KAYBOLDU
+        */
+
+        target.addEventListener(
+          'targetLost',
+          () => {
+
+            /*
+              HEMEN sıfırlamıyoruz.
+
+              2 saniye bekliyoruz.
+
+              Böylece kamera çok küçük hareket
+              ettiğinde Neti ve arı tekrar tekrar
+              başlamıyor.
+            */
+
+            kayipTimer = setTimeout(() => {
+
+              sahneBasladi = false;
+
+              clearTimeout(timerNeti);
+              clearTimeout(timerHarf);
+              clearTimeout(timerAri);
+
+              neti.removeAttribute(
+                'animation__buyume'
+              );
+
+              neti.removeAttribute(
+                'animation__yuksel'
+              );
+
+              harfler.removeAttribute(
+                'animation__harf'
+              );
+
+              ari.removeAttribute(
+                'animation__buyume'
+              );
+
+              ari.removeAttribute(
+                'animation__ucus1'
+              );
+
+              ari.removeAttribute(
+                'animation__ucus2'
+              );
+
+              ari.removeAttribute(
+                'animation__ucus3'
+              );
+
+              ari.removeAttribute(
+                'animation__donus'
+              );
+
+              neti.setAttribute(
+                'scale',
+                '0.05 0.05 0.05'
+              );
+
+              harfler.setAttribute(
+                'visible',
+                'false'
+              );
+
+              ari.setAttribute(
+                'visible',
+                'false'
+              );
+
+            }, 2000);
+
+          }
+        );
 
       }
-    });
-
-
-    window.addEventListener('DOMContentLoaded', () => {
-
-      const canvas = document.querySelector('#harfCanvas');
-      const ctx = canvas.getContext('2d');
-
-      canvas.width = 1024;
-      canvas.height = 512;
-
-      ctx.clearRect(0, 0, 1024, 512);
-
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-
-      ctx.font = 'bold 330px Arial';
-      ctx.lineWidth = 18;
-
-      ctx.strokeStyle = '#FFFFFF';
-      ctx.strokeText('A a', 512, 255);
-
-      ctx.fillStyle = '#FF6B35';
-      ctx.fillText('A a', 512, 255);
 
     });
+
+
+    /*
+      A a HARFLERİNİ OLUŞTUR
+    */
+
+    window.addEventListener(
+      'DOMContentLoaded',
+      () => {
+
+        const canvas =
+          document.querySelector('#harfCanvas');
+
+        const ctx =
+          canvas.getContext('2d');
+
+        canvas.width = 1024;
+        canvas.height = 512;
+
+        ctx.clearRect(
+          0,
+          0,
+          1024,
+          512
+        );
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        ctx.font =
+          'bold 330px Arial';
+
+        ctx.lineWidth = 18;
+
+        ctx.strokeStyle =
+          '#FFFFFF';
+
+        ctx.strokeText(
+          'A a',
+          512,
+          255
+        );
+
+        ctx.fillStyle =
+          '#FF6B35';
+
+        ctx.fillText(
+          'A a',
+          512,
+          255
+        );
+
+      }
+    );
+
   </script>
 
 </head>
+
 
 <body>
 
 <canvas id="harfCanvas"></canvas>
 
+
 <a-scene
-  mindar-image="imageTargetSrc: ./targets.mind;"
+
+  mindar-image="
+    imageTargetSrc: ./targets.mind;
+  "
+
   color-space="sRGB"
-  renderer="colorManagement: true; alpha: true;"
-  vr-mode-ui="enabled: false"
-  device-orientation-permission-ui="enabled: false">
+
+  renderer="
+    colorManagement: true;
+    alpha: true;
+  "
+
+  vr-mode-ui="
+    enabled: false
+  "
+
+  device-orientation-permission-ui="
+    enabled: false
+  ">
+
 
   <a-assets>
 
+
     <!-- NETİ -->
+
     <img
       id="neti"
       src="./72509361-9673-4AB6-8739-B7646C5522E4.png"
-      crossorigin="anonymous">
+      crossorigin="anonymous"
+    >
+
 
     <!-- ARI -->
+
     <img
       id="ariPNG"
       src="./831FD224-0476-409E-B2D5-24D2A8AD424E.png"
-      crossorigin="anonymous">
+      crossorigin="anonymous"
+    >
+
 
   </a-assets>
 
 
   <a-camera
+
     position="0 0 0"
-    look-controls="enabled: false">
+
+    look-controls="
+      enabled: false
+    ">
+
   </a-camera>
 
 
   <a-entity
-    mindar-image-target="targetIndex: 0"
+
+    mindar-image-target="
+      targetIndex: 0
+    "
+
     neti-animation>
 
 
     <!-- NETİ -->
+
     <a-image
+
       id="netiKarakter"
+
       src="#neti"
-      position="0 -0.25 0.03"
+
+      position="
+        0 -0.25 0.03
+      "
+
       width="0.75"
+
       height="0.75"
-      scale="0.05 0.05 0.05"
-      material="shader: flat; transparent: true; alphaTest: 0.01">
+
+      scale="
+        0.05 0.05 0.05
+      "
+
+      material="
+        shader: flat;
+        transparent: true;
+        alphaTest: 0.01;
+      ">
+
     </a-image>
 
 
     <!-- A a -->
+
     <a-plane
+
       id="harfler"
-      position="0 0.55 0.04"
+
+      position="
+        0 0.55 0.04
+      "
+
       width="0.9"
+
       height="0.45"
-      scale="0.01 0.01 0.01"
+
+      scale="
+        0.01 0.01 0.01
+      "
+
       visible="false"
-      material="src: #harfCanvas; transparent: true; shader: flat;">
+
+      material="
+        src: #harfCanvas;
+        transparent: true;
+        shader: flat;
+      ">
+
     </a-plane>
 
 
     <!-- ARI -->
+
     <a-image
+
       id="ariKarakter"
+
       src="#ariPNG"
-      position="-0.38 0.28 0.07"
-      width="0.30"
-      height="0.30"
-      scale="0.01 0.01 0.01"
+
+      position="
+        -0.42 0.25 0.08
+      "
+
+      width="0.28"
+
+      height="0.28"
+
+      scale="
+        0.01 0.01 0.01
+      "
+
+      rotation="
+        0 0 -15
+      "
+
       visible="false"
-      material="shader: flat; transparent: true; alphaTest: 0.01">
+
+      material="
+        shader: flat;
+        transparent: true;
+        alphaTest: 0.01;
+      ">
+
     </a-image>
 
 
   </a-entity>
+
 
 </a-scene>
 
