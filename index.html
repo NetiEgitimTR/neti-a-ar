@@ -12,6 +12,10 @@
       margin: 0;
       overflow: hidden;
     }
+
+    #harfCanvas {
+      display: none;
+    }
   </style>
 
   <script>
@@ -24,18 +28,19 @@
 
         target.addEventListener('targetFound', () => {
 
-          // Her taramada başlangıç durumuna dön
+          // Animasyonları temizle
           neti.removeAttribute('animation__buyume');
           neti.removeAttribute('animation__yuksel');
           harfler.removeAttribute('animation__harf');
 
+          // Başlangıç konumları
           neti.setAttribute('scale', '0.05 0.05 0.05');
           neti.setAttribute('position', '0 -0.25 0.03');
 
           harfler.setAttribute('scale', '0.01 0.01 0.01');
           harfler.setAttribute('visible', 'false');
 
-          // NETİ ORTAYA ÇIKIYOR
+          // NETİ ÇIKIYOR
           setTimeout(() => {
 
             neti.setAttribute(
@@ -50,7 +55,7 @@
 
           }, 100);
 
-          // A ve a HARFLERİ ORTAYA ÇIKIYOR
+          // A a HARFLERİ ÇIKIYOR
           setTimeout(() => {
 
             harfler.setAttribute('visible', 'true');
@@ -80,11 +85,52 @@
 
       }
     });
+
+    window.addEventListener('DOMContentLoaded', () => {
+
+      // A ve a harflerini canvas üzerine çiz
+      const canvas = document.querySelector('#harfCanvas');
+      const ctx = canvas.getContext('2d');
+
+      canvas.width = 1024;
+      canvas.height = 512;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      ctx.font = 'bold 330px Arial';
+      ctx.lineWidth = 18;
+
+      // Beyaz dış çizgi
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.strokeText('A a', 512, 255);
+
+      // Turuncu harf
+      ctx.fillStyle = '#FF6B35';
+      ctx.fillText('A a', 512, 255);
+
+      // A-Frame dokusunu yenile
+      setTimeout(() => {
+        const material = document.querySelector('#harfler').getObject3D('mesh');
+        if (
+          material &&
+          material.material &&
+          material.material.map
+        ) {
+          material.material.map.needsUpdate = true;
+        }
+      }, 1000);
+
+    });
   </script>
 
 </head>
 
 <body>
+
+<canvas id="harfCanvas"></canvas>
 
 <a-scene
   mindar-image="imageTargetSrc: ./targets.mind;"
@@ -94,10 +140,14 @@
   device-orientation-permission-ui="enabled: false">
 
   <a-assets>
+
     <img
       id="neti"
       src="./72509361-9673-4AB6-8739-B7646C5522E4.png"
       crossorigin="anonymous">
+
+    <canvas id="harfTexture"></canvas>
+
   </a-assets>
 
   <a-camera
@@ -120,22 +170,16 @@
       material="shader: flat; transparent: true; alphaTest: 0.01">
     </a-image>
 
-    <!-- A a HARFLERİ -->
-    <a-entity
+    <!-- A a -->
+    <a-plane
       id="harfler"
       position="0 0.55 0.04"
+      width="0.9"
+      height="0.45"
       scale="0.01 0.01 0.01"
-      visible="false">
-
-      <a-text
-        value="A a"
-        align="center"
-        color="#FF6B35"
-        width="2.5"
-        font="https://cdn.aframe.io/fonts/mozillavr.fnt">
-      </a-text>
-
-    </a-entity>
+      visible="false"
+      material="src: #harfCanvas; transparent: true; shader: flat;">
+    </a-plane>
 
   </a-entity>
 
