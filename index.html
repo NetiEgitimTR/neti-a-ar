@@ -18,32 +18,25 @@
       display: none;
     }
 
-    /* BAŞLAT EKRANI */
     #startScreen {
       position: fixed;
       inset: 0;
       z-index: 99999;
-
       display: flex;
       align-items: center;
       justify-content: center;
       flex-direction: column;
-
       background: rgba(255, 248, 225, 0.96);
     }
 
     #startButton {
       border: none;
       border-radius: 25px;
-
       padding: 18px 28px;
-
       font-size: 22px;
       font-weight: bold;
-
       background: #ff8a3d;
       color: white;
-
       box-shadow: 0 6px 16px rgba(0,0,0,0.20);
     }
 
@@ -56,14 +49,14 @@
     }
   </style>
 
-
   <script>
 
-    /* =========================================
-       SES İZNİ
-       ========================================= */
-
     let sesHazir = false;
+
+
+    /* =====================================
+       SESİ iPHONE'DA AKTİF ET
+       ===================================== */
 
     window.addEventListener('DOMContentLoaded', () => {
 
@@ -79,11 +72,6 @@
 
       startButton.addEventListener('click', async () => {
 
-        /*
-          iPhone / Safari için sesi
-          kullanıcı dokunuşuyla aktif ediyoruz.
-        */
-
         try {
 
           netiSes.volume = 0;
@@ -91,6 +79,7 @@
           await netiSes.play();
 
           netiSes.pause();
+
           netiSes.currentTime = 0;
 
           netiSes.volume = 1;
@@ -99,11 +88,7 @@
 
         } catch (e) {
 
-          /*
-            Bazı Safari sürümlerinde sessiz
-            ön oynatma reddedilebilir.
-            Yine de devam ediyoruz.
-          */
+          netiSes.volume = 1;
 
           sesHazir = true;
 
@@ -117,27 +102,36 @@
 
 
 
-    /* =========================================
+    /* =====================================
        ARININ AKICI UÇUŞU
-       ========================================= */
+       ===================================== */
 
     AFRAME.registerComponent('smooth-bee-flight', {
 
       init: function () {
 
         this.active = false;
+
         this.startTime = 0;
 
+
         /*
-          TEK TUR
-          NORMAL HIZ
+          YENİ SÜRE:
+
+          Arı yaklaşık 1.7 saniyede başlıyor.
+          Ses 5.57 saniye.
+
+          Uçuş yaklaşık 3.7 saniye sürüyor.
+
+          Böylece sesin sonuna doğru
+          A'nın üzerine ulaşıyor.
         */
 
-        this.duration = 6000;
+        this.duration = 3700;
 
 
         /*
-          ARININ ROTASI
+          BEĞENDİĞİMİZ AYNI ROTA
         */
 
         this.points = [
@@ -189,13 +183,15 @@
 
         this.active = true;
 
+
         this.el.setAttribute(
           'visible',
           true
         );
 
+
         /*
-          ARININ BOYUTU SABİT
+          SABİT BOYUT
         */
 
         this.el.object3D.scale.set(
@@ -204,8 +200,9 @@
           1
         );
 
+
         /*
-          ARI SALLANMIYOR
+          SALLANMA YOK
         */
 
         this.el.object3D.rotation.set(
@@ -217,14 +214,16 @@
       },
 
 
-      /*
-        YUMUŞAK EĞRİ
-      */
+      /* =====================================
+         YUMUŞAK EĞRİ
+         ===================================== */
 
       catmull: function(p0, p1, p2, p3, t) {
 
         const t2 = t * t;
+
         const t3 = t2 * t;
+
 
         return {
 
@@ -277,6 +276,10 @@
 
       },
 
+
+      /* =====================================
+         UÇUŞ
+         ===================================== */
 
       tick: function () {
 
@@ -366,8 +369,7 @@
 
 
         /*
-          SADECE KONUM DEĞİŞİYOR.
-          Sallanma ve büyüyüp küçülme YOK.
+          SADECE ROTA ÜZERİNDE İLERLE
         */
 
         this.el.object3D.position.set(
@@ -378,7 +380,7 @@
 
 
         /*
-          UÇUŞ BİTTİ
+          BİTİŞ
         */
 
         if (progress >= 1) {
@@ -387,8 +389,7 @@
 
 
           /*
-            BÜYÜK A'NIN ÜSTÜNDE DUR
-            A'YI KAPATMA
+            A'NIN ÜSTÜ
           */
 
           this.el.object3D.position.set(
@@ -419,9 +420,9 @@
 
 
 
-    /* =========================================
-       ANA AR SAHNESİ
-       ========================================= */
+    /* =====================================
+       ANA AR ANİMASYONU
+       ===================================== */
 
     AFRAME.registerComponent('neti-animation', {
 
@@ -511,7 +512,7 @@
 
 
           /* =====================================
-             NETİ BAŞLANGIÇ
+             NETİ
              ===================================== */
 
           neti.removeAttribute(
@@ -535,9 +536,8 @@
           );
 
 
-
           /*
-            NETİ ÇIKIYOR
+            NETİ + SES AYNI ANDA
           */
 
           timer(() => {
@@ -549,7 +549,7 @@
               'property: scale;' +
               'from: 0.05 0.05 0.05;' +
               'to: 1 1 1;' +
-              'dur: 1400;' +
+              'dur: 1100;' +
               'easing: easeOutBack'
 
             );
@@ -562,19 +562,20 @@
               'property: position;' +
               'from: 0 -0.25 0.03;' +
               'to: 0 0.08 0.03;' +
-              'dur: 1400;' +
+              'dur: 1100;' +
               'easing: easeOutQuad'
 
             );
 
 
-            /* ==============================
-               NETİ'NİN SESİ BAŞLIYOR
-               ============================== */
+            /*
+              SES BAŞLIYOR
+            */
 
             if (sesHazir) {
 
               netiSes.currentTime = 0;
+
 
               const oynat =
                 netiSes.play();
@@ -601,6 +602,7 @@
 
           /* =====================================
              A a
+             SES DEVAM EDERKEN GELİYOR
              ===================================== */
 
           harfler.removeAttribute(
@@ -620,6 +622,10 @@
           );
 
 
+          /*
+            1.5 SANİYE
+          */
+
           timer(() => {
 
             harfler.setAttribute(
@@ -635,17 +641,18 @@
               'property: scale;' +
               'from: 0.01 0.01 0.01;' +
               'to: 1 1 1;' +
-              'dur: 700;' +
+              'dur: 550;' +
               'easing: easeOutBack'
 
             );
 
-          }, 1600);
+          }, 1500);
 
 
 
           /* =====================================
              ARI
+             DAHA ERKEN BAŞLIYOR
              ===================================== */
 
           ari.setAttribute(
@@ -676,7 +683,11 @@
 
 
           /*
-            ARI UÇMAYA BAŞLIYOR
+            1.7 SANİYEDE UÇUŞ BAŞLIYOR
+
+            1.7 + 3.7 = 5.4 saniye
+
+            Ses yaklaşık 5.57 saniye.
           */
 
           timer(() => {
@@ -693,7 +704,7 @@
 
             }
 
-          }, 2600);
+          }, 1700);
 
         }
 
@@ -747,11 +758,6 @@
             }
 
 
-            /*
-              Kısa kamera kayıplarında
-              animasyonu yeniden başlatma.
-            */
-
             kayipTimer =
               setTimeout(() => {
 
@@ -759,12 +765,15 @@
 
                 timerlariTemizle();
 
+
                 try {
 
                   netiSes.pause();
+
                   netiSes.currentTime = 0;
 
                 } catch(e) {}
+
 
               }, 2000);
 
@@ -778,9 +787,9 @@
 
 
 
-    /* =========================================
+    /* =====================================
        A ve küçük a
-       ========================================= */
+       ===================================== */
 
     window.addEventListener(
 
@@ -907,10 +916,7 @@
 <body>
 
 
-<!-- =========================================
-     SES DOSYASI
-     GitHub'a yüklediğin dosyanın adı
-     ========================================= -->
+<!-- SES -->
 
 <audio
   id="netiSes"
@@ -920,9 +926,7 @@
 
 
 
-<!-- =========================================
-     İLK AÇILIŞ BUTONU
-     ========================================= -->
+<!-- BAŞLAT -->
 
 <div id="startScreen">
 
@@ -969,81 +973,49 @@
 
   <a-assets>
 
-
-    <!-- NETİ -->
-
     <img
       id="neti"
-
       src="./72509361-9673-4AB6-8739-B7646C5522E4.png"
-
       crossorigin="anonymous"
     >
 
-
-
-    <!-- ARI -->
 
     <img
       id="ariPNG"
-
       src="./831FD224-0476-409E-B2D5-24D2A8AD424E.png"
-
       crossorigin="anonymous"
     >
-
 
   </a-assets>
 
 
 
   <a-camera
-
     position="0 0 0"
-
-    look-controls="
-      enabled: false
-    ">
-
+    look-controls="enabled: false">
   </a-camera>
 
 
 
   <a-entity
-
-    mindar-image-target="
-      targetIndex: 0
-    "
-
+    mindar-image-target="targetIndex: 0"
     neti-animation>
 
 
     <!-- NETİ -->
 
     <a-image
-
       id="netiKarakter"
-
       src="#neti"
-
-      position="
-        0 -0.25 0.03
-      "
-
+      position="0 -0.25 0.03"
       width="0.75"
-
       height="0.75"
-
-      scale="
-        0.05 0.05 0.05
-      "
-
+      scale="0.05 0.05 0.05"
       material="
         shader: flat;
         transparent: true;
         alphaTest: 0.01;
       ">
-
     </a-image>
 
 
@@ -1051,29 +1023,17 @@
     <!-- A a -->
 
     <a-plane
-
       id="harfler"
-
-      position="
-        0 0.55 0.04
-      "
-
+      position="0 0.55 0.04"
       width="0.90"
-
       height="0.45"
-
-      scale="
-        0.01 0.01 0.01
-      "
-
+      scale="0.01 0.01 0.01"
       visible="false"
-
       material="
         src: #harfCanvas;
         transparent: true;
         shader: flat;
       ">
-
     </a-plane>
 
 
@@ -1081,37 +1041,20 @@
     <!-- ARI -->
 
     <a-image
-
       id="ariKarakter"
-
       src="#ariPNG"
-
-      position="
-        -0.48 -0.30 0.09
-      "
-
+      position="-0.48 -0.30 0.09"
       width="0.22"
-
       height="0.22"
-
-      scale="
-        1 1 1
-      "
-
-      rotation="
-        0 0 0
-      "
-
+      scale="1 1 1"
+      rotation="0 0 0"
       visible="false"
-
       smooth-bee-flight
-
       material="
         shader: flat;
         transparent: true;
         alphaTest: 0.01;
       ">
-
     </a-image>
 
 
