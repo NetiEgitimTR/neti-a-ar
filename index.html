@@ -19,7 +19,9 @@
   </style>
 
   <script>
+
     AFRAME.registerComponent('neti-animation', {
+
       init: function () {
 
         const target = this.el;
@@ -36,7 +38,8 @@
           timers.push(t);
         }
 
-        function animasyonlariTemizle() {
+        function temizle() {
+
           timers.forEach(clearTimeout);
           timers = [];
 
@@ -45,50 +48,181 @@
 
           harfler.removeAttribute('animation__harf');
 
-          ari.removeAttribute('animation__buyume');
           ari.removeAttribute('animation__yol');
-          ari.removeAttribute('animation__egim');
+          ari.removeAttribute('animation__donus');
+          ari.removeAttribute('animation__buyume');
         }
 
-        function ariHareket(
-          from,
-          to,
+
+        /*
+        ARININ TEK HAREKETİ
+        */
+
+        function ariGit(
+          fromX, fromY,
+          toX, toY,
           sure,
-          baslangicAci,
-          bitisAci
+          basAci,
+          sonAci
         ) {
 
           ari.removeAttribute('animation__yol');
-          ari.removeAttribute('animation__egim');
+          ari.removeAttribute('animation__donus');
 
           ari.setAttribute(
             'animation__yol',
             `property: position;
-             from: ${from};
-             to: ${to};
+             from: ${fromX} ${fromY} 0.09;
+             to: ${toX} ${toY} 0.09;
              dur: ${sure};
              easing: easeInOutSine`
           );
 
           ari.setAttribute(
-            'animation__egim',
+            'animation__donus',
             `property: rotation;
-             from: 0 0 ${baslangicAci};
-             to: 0 0 ${bitisAci};
+             from: 0 0 ${basAci};
+             to: 0 0 ${sonAci};
              dur: ${sure};
              easing: easeInOutSine`
           );
         }
 
-        function sahneyiBaslat() {
+
+        /*
+        BİR TUR UÇUŞ
+
+        Yaklaşık 2.8 saniye.
+        */
+
+        function tur(baslangic) {
+
+          /*
+          SOL ALT → YUKARI
+          */
+
+          timer(() => {
+
+            ariGit(
+              -0.48, -0.30,
+              -0.28, -0.02,
+              400,
+              -25, -35
+            );
+
+          }, baslangic);
+
+
+          /*
+          → AŞAĞI
+          */
+
+          timer(() => {
+
+            ariGit(
+              -0.28, -0.02,
+              -0.05, -0.26,
+              380,
+              -35, 30
+            );
+
+          }, baslangic + 400);
+
+
+          /*
+          → YUKARI
+          */
+
+          timer(() => {
+
+            ariGit(
+              -0.05, -0.26,
+              0.18, -0.07,
+              380,
+              30, -30
+            );
+
+          }, baslangic + 780);
+
+
+          /*
+          → SAĞ ALT
+          */
+
+          timer(() => {
+
+            ariGit(
+              0.18, -0.07,
+              0.39, -0.22,
+              350,
+              -30, 20
+            );
+
+          }, baslangic + 1160);
+
+
+          /*
+          → SAĞ YUKARI
+          */
+
+          timer(() => {
+
+            ariGit(
+              0.39, -0.22,
+              0.48, 0.18,
+              420,
+              20, -45
+            );
+
+          }, baslangic + 1510);
+
+
+          /*
+          → ÜST SAĞ
+          */
+
+          timer(() => {
+
+            ariGit(
+              0.48, 0.18,
+              0.35, 0.55,
+              400,
+              -45, -80
+            );
+
+          }, baslangic + 1930);
+
+
+          /*
+          → ÜST SOL
+          */
+
+          timer(() => {
+
+            ariGit(
+              0.35, 0.55,
+              -0.18, 0.60,
+              450,
+              -80, -110
+            );
+
+          }, baslangic + 2330);
+
+        }
+
+
+        function baslat() {
 
           if (basladi) return;
 
           basladi = true;
 
-          animasyonlariTemizle();
+          temizle();
 
-          /* NETİ BAŞLANGIÇ */
+
+          /*
+          BAŞLANGIÇ
+          */
 
           neti.setAttribute(
             'scale',
@@ -101,20 +235,16 @@
           );
 
 
-          /* HARFLER */
+          harfler.setAttribute(
+            'visible',
+            'false'
+          );
 
           harfler.setAttribute(
             'scale',
             '0.01 0.01 0.01'
           );
 
-          harfler.setAttribute(
-            'visible',
-            'false'
-          );
-
-
-          /* ARI */
 
           ari.setAttribute(
             'visible',
@@ -128,33 +258,32 @@
 
           ari.setAttribute(
             'position',
-            '-0.47 -0.32 0.08'
-          );
-
-          ari.setAttribute(
-            'rotation',
-            '0 0 -20'
+            '-0.48 -0.30 0.09'
           );
 
 
-          /* 1 — NETİ ÇIKIYOR */
+          /*
+          NETİ ÇIKIYOR
+          */
 
           timer(() => {
 
             neti.setAttribute(
               'animation__buyume',
-              'property: scale; from: 0.05 0.05 0.05; to: 1 1 1; dur: 1400; easing: easeOutBack'
+              'property: scale; from: 0.05 0.05 0.05; to: 1 1 1; dur: 1100; easing: easeOutBack'
             );
 
             neti.setAttribute(
               'animation__yuksel',
-              'property: position; from: 0 -0.25 0.03; to: 0 0.08 0.03; dur: 1400; easing: easeOutQuad'
+              'property: position; from: 0 -0.25 0.03; to: 0 0.08 0.03; dur: 1100; easing: easeOutQuad'
             );
 
           }, 100);
 
 
-          /* 2 — A ɑ GELİYOR */
+          /*
+          A a GELİYOR
+          */
 
           timer(() => {
 
@@ -165,13 +294,15 @@
 
             harfler.setAttribute(
               'animation__harf',
-              'property: scale; from: 0.01 0.01 0.01; to: 1 1 1; dur: 700; easing: easeOutBack'
+              'property: scale; from: 0.01 0.01 0.01; to: 1 1 1; dur: 600; easing: easeOutBack'
             );
 
-          }, 1600);
+          }, 1250);
 
 
-          /* 3 — ARI BAŞLIYOR */
+          /*
+          ARI GELİYOR
+          */
 
           timer(() => {
 
@@ -182,162 +313,95 @@
 
             ari.setAttribute(
               'animation__buyume',
-              'property: scale; from: 0.01 0.01 0.01; to: 1 1 1; dur: 450; easing: easeOutBack'
+              'property: scale; from: 0.01 0.01 0.01; to: 1 1 1; dur: 250; easing: easeOutBack'
             );
 
-            /*
-              SOL ALT → İLK TEPE
-            */
-
-            ariHareket(
-              '-0.47 -0.32 0.08',
-              '-0.28 -0.05 0.08',
-              700,
-              -20,
-              -35
-            );
-
-          }, 2600);
+          }, 2000);
 
 
           /*
-            İLK TEPE → AŞAĞI
+          1. TUR
+          */
+
+          tur(2250);
+
+
+          /*
+          ARIYI TEKRAR SOL ALTA AL
+          2. TUR BAŞLASIN
           */
 
           timer(() => {
 
-            ariHareket(
-              '-0.28 -0.05 0.08',
-              '-0.05 -0.27 0.08',
-              650,
-              -35,
-              25
+            ari.removeAttribute('animation__yol');
+            ari.removeAttribute('animation__donus');
+
+            ari.setAttribute(
+              'position',
+              '-0.48 -0.30 0.09'
             );
 
-          }, 3300);
+            ari.setAttribute(
+              'rotation',
+              '0 0 -25'
+            );
+
+          }, 5030);
 
 
           /*
-            AŞAĞI → İKİNCİ TEPE
+          2. TUR
+          */
+
+          tur(5100);
+
+
+          /*
+          2. TURDAN SONRA
+          BÜYÜK A'NIN ÜSTÜNE GİDİYOR
+
+          A'YI KAPATMIYOR.
           */
 
           timer(() => {
 
-            ariHareket(
-              '-0.05 -0.27 0.08',
-              '0.16 -0.08 0.08',
-              650,
-              25,
-              -30
+            ariGit(
+              -0.18, 0.60,
+              -0.25, 0.78,
+              450,
+              -110, 0
             );
 
-          }, 3950);
+          }, 7880);
 
 
           /*
-            İKİNCİ TEPE → AŞAĞI
+          SON KONUM
           */
 
           timer(() => {
 
-            ariHareket(
-              '0.16 -0.08 0.08',
-              '0.31 -0.25 0.08',
-              600,
-              -30,
-              20
+            ari.removeAttribute('animation__yol');
+            ari.removeAttribute('animation__donus');
+
+            ari.setAttribute(
+              'position',
+              '-0.25 0.78 0.09'
             );
 
-          }, 4600);
-
-
-          /*
-            SAĞ TARAFTAN YUKARI
-          */
-
-          timer(() => {
-
-            ariHareket(
-              '0.31 -0.25 0.08',
-              '0.46 0.08 0.08',
-              700,
-              20,
-              -35
+            ari.setAttribute(
+              'rotation',
+              '0 0 0'
             );
 
-          }, 5200);
-
-
-          /*
-            YUKARI KIVRILIYOR
-          */
-
-          timer(() => {
-
-            ariHareket(
-              '0.46 0.08 0.08',
-              '0.36 0.42 0.08',
-              700,
-              -35,
-              -60
-            );
-
-          }, 5900);
-
-
-          /*
-            A ɑ'NIN ÜSTÜNE GELİYOR
-          */
-
-          timer(() => {
-
-            ariHareket(
-              '0.36 0.42 0.08',
-              '0.10 0.62 0.08',
-              650,
-              -60,
-              -90
-            );
-
-          }, 6600);
-
-
-          /*
-            HARFLERİN ETRAFINDA
-            SOLA DOĞRU KIVRILIYOR
-          */
-
-          timer(() => {
-
-            ariHareket(
-              '0.10 0.62 0.08',
-              '-0.20 0.60 0.08',
-              600,
-              -90,
-              -140
-            );
-
-          }, 7250);
-
-
-          /*
-            SON KONUM
-          */
-
-          timer(() => {
-
-            ariHareket(
-              '-0.20 0.60 0.08',
-              '-0.05 0.48 0.08',
-              550,
-              -140,
-              0
-            );
-
-          }, 7850);
+          }, 8330);
 
         }
 
+
+        /*
+        SAYFA BULUNDU
+        */
 
         target.addEventListener(
           'targetFound',
@@ -348,15 +412,17 @@
               kayipTimer = null;
             }
 
-            sahneyiBaslat();
+            baslat();
 
           }
         );
 
 
         /*
-          TİTREMEYİ AZALTMAK İÇİN
-          HEDEF KAYBOLUNCA 2 SANİYE BEKLE
+        SAYFA KAYBOLDU
+
+        Titremeyi azaltmak için
+        hemen sıfırlamıyoruz.
         */
 
         target.addEventListener(
@@ -371,12 +437,7 @@
 
               basladi = false;
 
-              animasyonlariTemizle();
-
-              neti.setAttribute(
-                'scale',
-                '0.05 0.05 0.05'
-              );
+              temizle();
 
               harfler.setAttribute(
                 'visible',
@@ -394,11 +455,12 @@
         );
 
       }
+
     });
 
 
     /*
-      A ve KÜÇÜK a
+    A ve KÜÇÜK a
     */
 
     window.addEventListener(
@@ -415,10 +477,7 @@
         canvas.height = 600;
 
         ctx.clearRect(
-          0,
-          0,
-          1200,
-          600
+          0, 0, 1200, 600
         );
 
         ctx.textAlign = 'center';
@@ -427,17 +486,15 @@
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
 
+
         /*
-          BÜYÜK A
+        BÜYÜK A
         */
 
-        ctx.font =
-          'bold 390px Arial';
+        ctx.font = 'bold 390px Arial';
 
         ctx.lineWidth = 22;
-
-        ctx.strokeStyle =
-          '#FFFFFF';
+        ctx.strokeStyle = '#FFFFFF';
 
         ctx.strokeText(
           'A',
@@ -445,8 +502,7 @@
           300
         );
 
-        ctx.fillStyle =
-          '#FF6B35';
+        ctx.fillStyle = '#FF6B35';
 
         ctx.fillText(
           'A',
@@ -456,20 +512,14 @@
 
 
         /*
-          KÜÇÜK a
-
-          Tek katlı "ɑ" kullanıyoruz.
-          Böylece okulda öğretilen
-          küçük a görünümüne daha yakın.
+        KÜÇÜK a
+        TEK KATLI
         */
 
-        ctx.font =
-          'bold 390px Arial';
+        ctx.font = 'bold 390px Arial';
 
         ctx.lineWidth = 22;
-
-        ctx.strokeStyle =
-          '#FFFFFF';
+        ctx.strokeStyle = '#FFFFFF';
 
         ctx.strokeText(
           'ɑ',
@@ -477,8 +527,7 @@
           300
         );
 
-        ctx.fillStyle =
-          '#FF6B35';
+        ctx.fillStyle = '#FF6B35';
 
         ctx.fillText(
           'ɑ',
@@ -490,7 +539,6 @@
     );
 
   </script>
-
 </head>
 
 
@@ -515,9 +563,7 @@
     antialias: true;
   "
 
-  vr-mode-ui="
-    enabled: false
-  "
+  vr-mode-ui="enabled: false"
 
   device-orientation-permission-ui="
     enabled: false
@@ -525,7 +571,6 @@
 
 
   <a-assets>
-
 
     <!-- NETİ -->
 
@@ -544,27 +589,17 @@
       crossorigin="anonymous"
     >
 
-
   </a-assets>
 
 
   <a-camera
-
     position="0 0 0"
-
-    look-controls="
-      enabled: false
-    ">
-
+    look-controls="enabled: false">
   </a-camera>
 
 
   <a-entity
-
-    mindar-image-target="
-      targetIndex: 0
-    "
-
+    mindar-image-target="targetIndex: 0"
     neti-animation>
 
 
@@ -576,17 +611,12 @@
 
       src="#neti"
 
-      position="
-        0 -0.25 0.03
-      "
+      position="0 -0.25 0.03"
 
       width="0.75"
-
       height="0.75"
 
-      scale="
-        0.05 0.05 0.05
-      "
+      scale="0.05 0.05 0.05"
 
       material="
         shader: flat;
@@ -597,23 +627,18 @@
     </a-image>
 
 
-    <!-- A ɑ -->
+    <!-- A a -->
 
     <a-plane
 
       id="harfler"
 
-      position="
-        0 0.55 0.04
-      "
+      position="0 0.55 0.04"
 
       width="0.90"
-
       height="0.45"
 
-      scale="
-        0.01 0.01 0.01
-      "
+      scale="0.01 0.01 0.01"
 
       visible="false"
 
@@ -634,21 +659,14 @@
 
       src="#ariPNG"
 
-      position="
-        -0.47 -0.32 0.08
-      "
+      position="-0.48 -0.30 0.09"
 
-      width="0.25"
+      width="0.22"
+      height="0.22"
 
-      height="0.25"
+      scale="0.01 0.01 0.01"
 
-      scale="
-        0.01 0.01 0.01
-      "
-
-      rotation="
-        0 0 -20
-      "
+      rotation="0 0 -25"
 
       visible="false"
 
@@ -662,7 +680,6 @@
 
 
   </a-entity>
-
 
 </a-scene>
 
