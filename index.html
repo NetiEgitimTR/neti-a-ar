@@ -51,6 +51,7 @@
   </style>
 
   <script>
+
     let sesHazir = false;
     let audioContext = null;
     let fonTimer = null;
@@ -61,19 +62,20 @@
        SES SİSTEMİ
        ========================= */
 
-    async function sesSisteminiAc() {
+    function sesSisteminiAc() {
+
       if (!audioContext) {
+
         const AudioContext =
           window.AudioContext ||
           window.webkitAudioContext;
 
-        audioContext = new AudioContext();
+        audioContext =
+          new AudioContext();
       }
 
       if (audioContext.state === 'suspended') {
-        try {
-          await audioContext.resume();
-        } catch(e) {}
+        audioContext.resume();
       }
     }
 
@@ -83,6 +85,7 @@
        ========================= */
 
     function popSesiCal() {
+
       if (!audioContext) return;
 
       const now = audioContext.currentTime;
@@ -91,17 +94,26 @@
 
       oscillator.type = 'sine';
 
-      oscillator.frequency.setValueAtTime(720, now);
+      oscillator.frequency.setValueAtTime(
+        720,
+        now
+      );
+
       oscillator.frequency.exponentialRampToValueAtTime(
         980,
         now + 0.07
       );
 
-      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.setValueAtTime(
+        0.0001,
+        now
+      );
+
       gain.gain.exponentialRampToValueAtTime(
         0.13,
         now + 0.015
       );
+
       gain.gain.exponentialRampToValueAtTime(
         0.0001,
         now + 0.16
@@ -116,24 +128,42 @@
 
 
     /* =========================
-       FON SESİ
+       GÖZ EGZERSİZİ FON SESİ
        ========================= */
 
-    function fonNotasiCal(frequency, duration = 0.55) {
+    function fonNotasiCal(
+      frequency,
+      duration = 0.55
+    ) {
+
       if (!audioContext) return;
 
-      const now = audioContext.currentTime;
-      const oscillator = audioContext.createOscillator();
-      const gain = audioContext.createGain();
+      const now =
+        audioContext.currentTime;
+
+      const oscillator =
+        audioContext.createOscillator();
+
+      const gain =
+        audioContext.createGain();
 
       oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(frequency, now);
 
-      gain.gain.setValueAtTime(0.0001, now);
+      oscillator.frequency.setValueAtTime(
+        frequency,
+        now
+      );
+
+      gain.gain.setValueAtTime(
+        0.0001,
+        now
+      );
+
       gain.gain.exponentialRampToValueAtTime(
         0.018,
         now + 0.08
       );
+
       gain.gain.exponentialRampToValueAtTime(
         0.0001,
         now + duration
@@ -143,11 +173,15 @@
       gain.connect(audioContext.destination);
 
       oscillator.start(now);
-      oscillator.stop(now + duration + 0.05);
+
+      oscillator.stop(
+        now + duration + 0.05
+      );
     }
 
 
     function fonBaslat() {
+
       fonDurdur();
 
       if (!audioContext) return;
@@ -167,7 +201,9 @@
 
       let notaIndex = 0;
 
+
       function notaCal() {
+
         if (!fonAktif) return;
 
         fonNotasiCal(
@@ -179,10 +215,11 @@
           (notaIndex + 1) %
           notalar.length;
 
-        fonTimer = setTimeout(
-          notaCal,
-          750
-        );
+        fonTimer =
+          setTimeout(
+            notaCal,
+            750
+          );
       }
 
       notaCal();
@@ -190,17 +227,20 @@
 
 
     function fonDurdur() {
+
       fonAktif = false;
 
       if (fonTimer) {
+
         clearTimeout(fonTimer);
+
         fonTimer = null;
       }
     }
 
 
     /* =========================
-       BAŞLANGIÇ / SES İZNİ
+       BAŞLANGIÇ
        ========================= */
 
     window.addEventListener(
@@ -208,114 +248,65 @@
       () => {
 
         const startButton =
-          document.querySelector('#startButton');
+          document.querySelector(
+            '#startButton'
+          );
 
         const startScreen =
-          document.querySelector('#startScreen');
+          document.querySelector(
+            '#startScreen'
+          );
 
-        const netiSes =
-          document.querySelector('#netiSes');
+        const tamSes =
+          document.querySelector(
+            '#tamSes'
+          );
 
-        const gorevSes =
-          document.querySelector('#gorevSes');
 
-        netiSes.load();
-        gorevSes.load();
+        tamSes.load();
 
 
         startButton.addEventListener(
           'click',
           async () => {
 
-            await sesSisteminiAc();
+            sesSisteminiAc();
 
 
-            /* İlk Neti sesi */
+            /*
+              iPHONE / SAFARI:
+              TEK SES DOSYASININ
+              KİLİDİNİ AÇIYORUZ
+            */
 
             try {
-              netiSes.muted = true;
-              netiSes.volume = 1;
-              netiSes.currentTime = 0;
 
-              await netiSes.play();
+              tamSes.muted = true;
+              tamSes.volume = 1;
+              tamSes.currentTime = 0;
 
-              netiSes.pause();
-              netiSes.currentTime = 0;
-              netiSes.muted = false;
+              await tamSes.play();
+
+              tamSes.pause();
+
+              tamSes.currentTime = 0;
+              tamSes.muted = false;
+
+              sesHazir = true;
 
             } catch(e) {
-              netiSes.muted = false;
+
+              tamSes.muted = false;
+              sesHazir = true;
             }
 
 
-            /* Görev sesini de hazırla */
-
-            try {
-              gorevSes.muted = true;
-              gorevSes.volume = 1;
-              gorevSes.currentTime = 0;
-
-              await gorevSes.play();
-
-              await new Promise(
-                resolve =>
-                  setTimeout(resolve, 80)
-              );
-
-              gorevSes.pause();
-              gorevSes.currentTime = 0;
-              gorevSes.muted = false;
-
-            } catch(e) {
-              gorevSes.muted = false;
-            }
-
-            sesHazir = true;
-            startScreen.style.display = 'none';
+            startScreen.style.display =
+              'none';
           }
         );
       }
     );
-
-
-    /* =========================
-       GÖREV SESİ
-       ========================= */
-
-    async function gorevSesiniCal() {
-      const gorevSes =
-        document.querySelector('#gorevSes');
-
-      if (!gorevSes) return;
-
-      try {
-        if (
-          audioContext &&
-          audioContext.state === 'suspended'
-        ) {
-          try {
-            await audioContext.resume();
-          } catch(e) {}
-        }
-
-        gorevSes.pause();
-        gorevSes.currentTime = 0;
-        gorevSes.muted = false;
-        gorevSes.volume = 1;
-
-        const oynat = gorevSes.play();
-
-        if (oynat !== undefined) {
-          await oynat;
-        }
-
-      } catch(e) {
-        console.log(
-          'Görev sesi oynatılamadı:',
-          e
-        );
-      }
-    }
 
 
     /* =========================
@@ -325,12 +316,15 @@
     AFRAME.registerComponent(
       'smooth-bee-flight',
       {
+
         init: function () {
+
           this.active = false;
           this.startTime = 0;
           this.duration = 3700;
 
           this.points = [
+
             {x:-0.48, y:-0.30},
             {x:-0.40, y:-0.18},
             {x:-0.32, y:-0.03},
@@ -349,12 +343,16 @@
             {x:0.02, y:0.75},
             {x:-0.15, y:0.78},
             {x:-0.27, y:0.79}
+
           ];
         },
 
 
         startFlight: function () {
-          this.startTime = performance.now();
+
+          this.startTime =
+            performance.now();
+
           this.active = true;
 
           this.el.setAttribute(
@@ -362,25 +360,38 @@
             true
           );
 
-          this.el.object3D.scale.set(1,1,1);
-          this.el.object3D.rotation.set(0,0,0);
+          this.el.object3D.scale.set(
+            1,1,1
+          );
+
+          this.el.object3D.rotation.set(
+            0,0,0
+          );
         },
 
 
-        catmull: function(p0,p1,p2,p3,t) {
+        catmull: function(
+          p0,p1,p2,p3,t
+        ) {
+
           const t2 = t*t;
           const t3 = t2*t;
 
           return {
+
             x:0.5*(
+
               (2*p1.x)+
+
               (-p0.x+p2.x)*t+
+
               (
                 2*p0.x-
                 5*p1.x+
                 4*p2.x-
                 p3.x
               )*t2+
+
               (
                 -p0.x+
                 3*p1.x-
@@ -390,14 +401,18 @@
             ),
 
             y:0.5*(
+
               (2*p1.y)+
+
               (-p0.y+p2.y)*t+
+
               (
                 2*p0.y-
                 5*p1.y+
                 4*p2.y-
                 p3.y
               )*t2+
+
               (
                 -p0.y+
                 3*p1.y-
@@ -410,6 +425,7 @@
 
 
         tick: function () {
+
           if (!this.active) return;
 
           const elapsed =
@@ -437,14 +453,22 @@
           let localT =
             position - index;
 
+
           if (index >= segmentCount) {
-            index = segmentCount - 1;
+
+            index =
+              segmentCount - 1;
+
             localT = 1;
           }
 
+
           const p0 =
             this.points[
-              Math.max(0,index-1)
+              Math.max(
+                0,
+                index-1
+              )
             ];
 
           const p1 =
@@ -466,6 +490,7 @@
               )
             ];
 
+
           const pos =
             this.catmull(
               p0,
@@ -475,13 +500,16 @@
               localT
             );
 
+
           this.el.object3D.position.set(
             pos.x,
             pos.y,
             0.09
           );
 
+
           if (progress >= 1) {
+
             this.active = false;
 
             this.el.object3D.position.set(
@@ -502,11 +530,15 @@
     AFRAME.registerComponent(
       'eye-pop-exercise',
       {
+
         init: function () {
+
           this.running = false;
           this.timers = [];
 
+
           this.steps = [
+
             {x:-0.40,y:0.72,letter:'A',show:950,gap:250},
             {x:0.40,y:0.22,letter:'a',show:950,gap:250},
             {x:0.40,y:0.72,letter:'A',show:950,gap:250},
@@ -527,11 +559,13 @@
             {x:0.39,y:0.20,letter:'A',show:700,gap:170},
 
             {x:0.00,y:0.48,letter:'a',show:900,gap:0}
+
           ];
         },
 
 
         clearTimers: function () {
+
           this.timers.forEach(
             clearTimeout
           );
@@ -541,8 +575,11 @@
 
 
         stopExercise: function () {
+
           this.running = false;
+
           this.clearTimers();
+
           fonDurdur();
 
           this.el.setAttribute(
@@ -553,6 +590,7 @@
 
 
         drawLetter: function(letter) {
+
           const canvas =
             document.querySelector(
               '#tekHarfCanvas'
@@ -577,10 +615,16 @@
             'bold 360px Arial';
 
           ctx.lineWidth = 20;
-          ctx.strokeStyle = '#FFFFFF';
-          ctx.fillStyle = '#FF6B35';
+
+          ctx.strokeStyle =
+            '#FFFFFF';
+
+          ctx.fillStyle =
+            '#FF6B35';
+
 
           if (letter === 'A') {
+
             ctx.strokeText(
               'A',
               250,
@@ -593,8 +637,10 @@
               255
             );
           }
+
 
           if (letter === 'a') {
+
             ctx.strokeText(
               'ɑ',
               250,
@@ -607,6 +653,7 @@
               255
             );
           }
+
 
           const mesh =
             this.el.getObject3D(
@@ -618,6 +665,7 @@
             mesh.material &&
             mesh.material.map
           ) {
+
             mesh.material.map.needsUpdate =
               true;
           }
@@ -625,6 +673,7 @@
 
 
         startExercise: function () {
+
           this.stopExercise();
 
           this.running = true;
@@ -632,7 +681,9 @@
           fonBaslat();
 
           const self = this;
+
           let currentTime = 0;
+
 
           this.steps.forEach(
             (step) => {
@@ -640,6 +691,7 @@
               const showTimer =
                 setTimeout(
                   () => {
+
                     if (!self.running) return;
 
                     self.drawLetter(
@@ -662,6 +714,7 @@
                     );
 
                     popSesiCal();
+
                   },
                   currentTime
                 );
@@ -670,19 +723,23 @@
                 showTimer
               );
 
+
               const hideAt =
                 currentTime +
                 step.show;
 
+
               const hideTimer =
                 setTimeout(
                   () => {
+
                     if (!self.running) return;
 
                     self.el.setAttribute(
                       'visible',
                       'false'
                     );
+
                   },
                   hideAt
                 );
@@ -691,18 +748,23 @@
                 hideTimer
               );
 
+
               currentTime +=
                 step.show +
                 step.gap;
+
             }
           );
 
 
-          /* Egzersiz bitince görev */
+          /*
+            GÖZ EGZERSİZİ BİTİYOR
+          */
 
           const finishTimer =
             setTimeout(
               () => {
+
                 self.running = false;
 
                 self.el.setAttribute(
@@ -712,21 +774,26 @@
 
                 fonDurdur();
 
-                const gorevTimer =
-                  setTimeout(
-                    () => {
-                      window.dispatchEvent(
-                        new Event(
-                          'neti-gorev-baslat'
-                        )
-                      );
-                    },
-                    600
-                  );
 
-                self.timers.push(
-                  gorevTimer
+                /*
+                  NETİ DİKKAT ÇEKSİN.
+                  SESİ BURADA BAŞLATMIYORUZ.
+                  TEK MP3 ZATEN ÇALIYOR.
+                */
+
+                setTimeout(
+                  () => {
+
+                    window.dispatchEvent(
+                      new Event(
+                        'neti-gorev-animasyon'
+                      )
+                    );
+
+                  },
+                  600
                 );
+
               },
               currentTime + 100
             );
@@ -746,6 +813,7 @@
     AFRAME.registerComponent(
       'neti-animation',
       {
+
         init: function () {
 
           const target = this.el;
@@ -770,15 +838,11 @@
               '#ariKarakter'
             );
 
-          const netiSes =
+          const tamSes =
             document.querySelector(
-              '#netiSes'
+              '#tamSes'
             );
 
-          const gorevSes =
-            document.querySelector(
-              '#gorevSes'
-            );
 
           let basladi = false;
           let kayipTimer = null;
@@ -786,15 +850,18 @@
 
 
           function timer(fn,ms) {
+
             const t =
               setTimeout(fn,ms);
 
             zamanlayicilar.push(t);
+
             return t;
           }
 
 
           function timerlariTemizle() {
+
             zamanlayicilar.forEach(
               clearTimeout
             );
@@ -804,12 +871,12 @@
 
 
           /* =========================
-             GÖREV BÖLÜMÜ
+             SONDA NETİ HAREKETİ
              ========================= */
 
           window.addEventListener(
-            'neti-gorev-baslat',
-            async () => {
+            'neti-gorev-animasyon',
+            () => {
 
               neti.removeAttribute(
                 'animation__gorev'
@@ -831,37 +898,43 @@
                 'easing: easeInOutQuad'
               );
 
-              await gorevSesiniCal();
             }
           );
 
 
           function baslat() {
+
             if (basladi) return;
 
             basladi = true;
 
             timerlariTemizle();
+
             fonDurdur();
+
 
             if (
               tekHarf.components[
                 'eye-pop-exercise'
               ]
             ) {
+
               tekHarf.components[
                 'eye-pop-exercise'
               ].stopExercise();
             }
 
-            try {
-              netiSes.pause();
-              netiSes.currentTime = 0;
-              netiSes.volume = 1;
 
-              gorevSes.pause();
-              gorevSes.currentTime = 0;
-              gorevSes.volume = 1;
+            try {
+
+              tamSes.pause();
+
+              tamSes.currentTime = 0;
+
+              tamSes.muted = false;
+
+              tamSes.volume = 1;
+
             } catch(e) {}
 
 
@@ -888,10 +961,13 @@
             );
 
 
-            /* Neti gelir */
+            /* =========================
+               NETİ GELİR + TEK MP3 BAŞLAR
+               ========================= */
 
             timer(
               () => {
+
                 neti.setAttribute(
                   'animation__buyume',
                   'property: scale;' +
@@ -910,34 +986,49 @@
                   'easing: easeOutQuad'
                 );
 
+
                 if (sesHazir) {
+
                   try {
-                    netiSes.pause();
-                    netiSes.currentTime = 0;
-                    netiSes.muted = false;
-                    netiSes.volume = 1;
+
+                    tamSes.pause();
+
+                    tamSes.currentTime = 0;
+
+                    tamSes.muted = false;
+
+                    tamSes.volume = 1;
 
                     const oynat =
-                      netiSes.play();
+                      tamSes.play();
 
-                    if (oynat !== undefined) {
+                    if (
+                      oynat !== undefined
+                    ) {
+
                       oynat.catch(
                         err => {
+
                           console.log(
                             'Neti sesi oynatılamadı:',
                             err
                           );
+
                         }
                       );
                     }
+
                   } catch(e) {}
                 }
+
               },
               100
             );
 
 
-            /* A/a gelir */
+            /* =========================
+               A / a
+               ========================= */
 
             harfler.removeAttribute(
               'animation__harf'
@@ -958,8 +1049,10 @@
               '0.01 0.01 0.01'
             );
 
+
             timer(
               () => {
+
                 harfler.setAttribute(
                   'visible',
                   'true'
@@ -973,12 +1066,15 @@
                   'dur: 550;' +
                   'easing: easeOutBack'
                 );
+
               },
               1500
             );
 
 
-            /* Arı */
+            /* =========================
+               ARI
+               ========================= */
 
             ari.setAttribute(
               'visible',
@@ -999,18 +1095,22 @@
               0,0,0
             );
 
+
             if (
               ari.components[
                 'smooth-bee-flight'
               ]
             ) {
+
               ari.components[
                 'smooth-bee-flight'
               ].active = false;
             }
 
+
             timer(
               () => {
+
                 const flight =
                   ari.components[
                     'smooth-bee-flight'
@@ -1019,15 +1119,19 @@
                 if (flight) {
                   flight.startFlight();
                 }
+
               },
               1700
             );
 
 
-            /* Arı ve A/a kaybolur */
+            /* =========================
+               ARI + A/a KAYBOLUR
+               ========================= */
 
             timer(
               () => {
+
                 ari.setAttribute(
                   'visible',
                   'false'
@@ -1037,15 +1141,19 @@
                   'visible',
                   'false'
                 );
+
               },
               6400
             );
 
 
-            /* Göz egzersizi */
+            /* =========================
+               GÖZ EGZERSİZİ
+               ========================= */
 
             timer(
               () => {
+
                 const exercise =
                   tekHarf.components[
                     'eye-pop-exercise'
@@ -1054,16 +1162,23 @@
                 if (exercise) {
                   exercise.startExercise();
                 }
+
               },
               6700
             );
           }
 
 
+          /* =========================
+             HEDEF BULUNDU
+             ========================= */
+
           target.addEventListener(
             'targetFound',
             () => {
+
               if (kayipTimer) {
+
                 clearTimeout(
                   kayipTimer
                 );
@@ -1076,51 +1191,65 @@
           );
 
 
+          /* =========================
+             HEDEF KAYBOLDU
+             ========================= */
+
           target.addEventListener(
             'targetLost',
             () => {
 
               if (kayipTimer) {
+
                 clearTimeout(
                   kayipTimer
                 );
               }
 
+
               kayipTimer =
                 setTimeout(
                   () => {
+
                     basladi = false;
 
                     timerlariTemizle();
+
                     fonDurdur();
 
-                    try {
-                      netiSes.pause();
-                      netiSes.currentTime = 0;
 
-                      gorevSes.pause();
-                      gorevSes.currentTime = 0;
+                    try {
+
+                      tamSes.pause();
+
+                      tamSes.currentTime = 0;
+
                     } catch(e) {}
+
 
                     if (
                       ari.components[
                         'smooth-bee-flight'
                       ]
                     ) {
+
                       ari.components[
                         'smooth-bee-flight'
                       ].active = false;
                     }
 
+
                     if (
                       tekHarf.components[
                         'eye-pop-exercise'
                       ]
                     ) {
+
                       tekHarf.components[
                         'eye-pop-exercise'
                       ].stopExercise();
                     }
+
 
                     ari.setAttribute(
                       'visible',
@@ -1131,6 +1260,7 @@
                       'visible',
                       'false'
                     );
+
                   },
                   2000
                 );
@@ -1169,6 +1299,9 @@
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
 
+
+        /* BÜYÜK A */
+
         ctx.font =
           'bold 390px Arial';
 
@@ -1189,6 +1322,8 @@
           300
         );
 
+
+        /* KÜÇÜK a */
 
         ctx.font =
           'bold 390px Arial';
@@ -1219,21 +1354,11 @@
 <body>
 
 
-<!-- İLK NETİ SESİ -->
+<!-- TEK BİRLEŞİK NETİ SES DOSYASI -->
 
 <audio
-  id="netiSes"
-  src="./Merhaba%20Ben%20Neti%20A%20s.mp3"
-  preload="auto"
-  playsinline>
-</audio>
-
-
-<!-- GÖREV SESİ - DOSYA ADI DÜZELTİLDİ -->
-
-<audio
-  id="gorevSes"
-  src="./Harika%20%C5%9Eimdi%20s%C4%B1ra%20se.mp3"
+  id="tamSes"
+  src="./neti-a-tam-ses.mp3"
   preload="auto"
   playsinline>
 </audio>
@@ -1307,6 +1432,8 @@
     neti-animation>
 
 
+    <!-- NETİ -->
+
     <a-image
       id="netiKarakter"
       src="#neti"
@@ -1321,6 +1448,8 @@
       ">
     </a-image>
 
+
+    <!-- A / a -->
 
     <a-plane
       id="harfler"
@@ -1337,6 +1466,8 @@
     </a-plane>
 
 
+    <!-- GÖZ EGZERSİZİ -->
+
     <a-plane
       id="tekHarf"
       position="0 0.48 0.12"
@@ -1351,6 +1482,8 @@
       ">
     </a-plane>
 
+
+    <!-- ARI -->
 
     <a-image
       id="ariKarakter"
