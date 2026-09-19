@@ -54,726 +54,294 @@
 
     let sesHazir = false;
 
+    let audioContext = null;
+
+    let fonTimer = null;
+
+    let fonAktif = false;
+
+
+    /* ==========================================
+       SES SİSTEMİNİ HAZIRLA
+       ========================================== */
+
+    function sesSisteminiAc() {
+
+      if (!audioContext) {
+
+        const AudioContext =
+          window.AudioContext ||
+          window.webkitAudioContext;
+
+        audioContext =
+          new AudioContext();
+
+      }
+
+      if (
+        audioContext.state === 'suspended'
+      ) {
+
+        audioContext.resume();
+
+      }
+
+    }
+
+
+
+    /* ==========================================
+       YUMUŞAK POP SESİ
+
+       Her harf belirdiğinde çalacak.
+       ========================================== */
+
+    function popSesiCal() {
+
+      if (!audioContext) return;
+
+
+      const now =
+        audioContext.currentTime;
+
+
+      const oscillator =
+        audioContext.createOscillator();
+
+
+      const gain =
+        audioContext.createGain();
+
+
+      oscillator.type =
+        'sine';
+
+
+      /*
+        Hafif parlak ama rahatsız etmeyen
+        kısa ses.
+      */
+
+      oscillator.frequency.setValueAtTime(
+        620,
+        now
+      );
+
+
+      oscillator.frequency.exponentialRampToValueAtTime(
+        820,
+        now + 0.07
+      );
+
+
+      gain.gain.setValueAtTime(
+        0.0001,
+        now
+      );
+
+
+      gain.gain.exponentialRampToValueAtTime(
+        0.055,
+        now + 0.015
+      );
+
+
+      gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        now + 0.16
+      );
+
+
+      oscillator.connect(gain);
+
+      gain.connect(
+        audioContext.destination
+      );
+
+
+      oscillator.start(now);
+
+      oscillator.stop(
+        now + 0.18
+      );
+
+    }
+
+
+
+    /* ==========================================
+       HAFİF FON SESİ
+
+       Göz egzersizi sırasında çok hafif
+       müzikal tonlar çalıyor.
+       ========================================== */
+
+    function fonNotasiCal(
+      frequency,
+      duration = 0.55
+    ) {
+
+      if (!audioContext) return;
+
+
+      const now =
+        audioContext.currentTime;
+
+
+      const oscillator =
+        audioContext.createOscillator();
+
+
+      const gain =
+        audioContext.createGain();
+
+
+      oscillator.type =
+        'sine';
+
+
+      oscillator.frequency.setValueAtTime(
+        frequency,
+        now
+      );
+
+
+      /*
+        Fon özellikle çok düşük.
+        Pop sesinden daha geride kalıyor.
+      */
+
+      gain.gain.setValueAtTime(
+        0.0001,
+        now
+      );
+
+
+      gain.gain.exponentialRampToValueAtTime(
+        0.018,
+        now + 0.08
+      );
+
+
+      gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        now + duration
+      );
+
+
+      oscillator.connect(gain);
+
+      gain.connect(
+        audioContext.destination
+      );
+
+
+      oscillator.start(now);
+
+      oscillator.stop(
+        now + duration + 0.05
+      );
+
+    }
+
+
+
+    function fonBaslat() {
+
+      fonDurdur();
+
+      if (!audioContext) return;
+
+
+      fonAktif = true;
+
+
+      /*
+        Sakin, sevimli küçük nota dizisi.
+      */
+
+      const notalar = [
+        261.63,
+        329.63,
+        392.00,
+        329.63,
+        293.66,
+        349.23,
+        392.00,
+        329.63
+      ];
+
+
+      let notaIndex = 0;
+
+
+      function notaCal() {
+
+        if (!fonAktif) return;
+
+
+        fonNotasiCal(
+          notalar[notaIndex],
+          0.55
+        );
+
+
+        notaIndex =
+          (notaIndex + 1) %
+          notalar.length;
+
+
+        fonTimer =
+          setTimeout(
+            notaCal,
+            750
+          );
+
+      }
+
+
+      notaCal();
+
+    }
+
+
+
+    function fonDurdur() {
+
+      fonAktif = false;
+
+
+      if (fonTimer) {
+
+        clearTimeout(
+          fonTimer
+        );
+
+        fonTimer = null;
+
+      }
+
+    }
+
+
 
     /* ==========================================
        iPHONE / SAFARI SES İZNİ
        ========================================== */
 
-    window.addEventListener('DOMContentLoaded', () => {
-
-      const startButton =
-        document.querySelector('#startButton');
-
-      const startScreen =
-        document.querySelector('#startScreen');
-
-      const netiSes =
-        document.querySelector('#netiSes');
-
-
-      startButton.addEventListener('click', async () => {
-
-        try {
-
-          netiSes.volume = 0;
-
-          await netiSes.play();
-
-          netiSes.pause();
-
-          netiSes.currentTime = 0;
-
-          netiSes.volume = 1;
-
-          sesHazir = true;
-
-        } catch (e) {
-
-          netiSes.volume = 1;
-
-          sesHazir = true;
-
-        }
-
-        startScreen.style.display = 'none';
-
-      });
-
-    });
-
-
-
-    /* ==========================================
-       ARI UÇUŞU
-       ========================================== */
-
-    AFRAME.registerComponent('smooth-bee-flight', {
-
-      init: function () {
-
-        this.active = false;
-        this.startTime = 0;
-        this.duration = 3700;
-
-        this.points = [
-
-          {x:-0.48, y:-0.30},
-          {x:-0.40, y:-0.18},
-          {x:-0.32, y:-0.03},
-          {x:-0.25, y: 0.08},
-          {x:-0.17, y: 0.03},
-          {x:-0.08, y:-0.13},
-          {x: 0.02, y:-0.23},
-          {x: 0.14, y:-0.22},
-          {x: 0.25, y:-0.12},
-          {x: 0.35, y: 0.02},
-          {x: 0.43, y: 0.18},
-          {x: 0.45, y: 0.35},
-          {x: 0.40, y: 0.50},
-          {x: 0.30, y: 0.62},
-          {x: 0.17, y: 0.70},
-          {x: 0.02, y: 0.75},
-          {x:-0.15, y: 0.78},
-          {x:-0.27, y: 0.79}
-
-        ];
-
-      },
-
-
-      startFlight: function () {
-
-        this.startTime = performance.now();
-        this.active = true;
-
-        this.el.setAttribute(
-          'visible',
-          true
-        );
-
-        this.el.object3D.scale.set(
-          1, 1, 1
-        );
-
-        this.el.object3D.rotation.set(
-          0, 0, 0
-        );
-
-      },
-
-
-      catmull: function(p0, p1, p2, p3, t) {
-
-        const t2 = t * t;
-        const t3 = t2 * t;
-
-        return {
-
-          x: 0.5 * (
-
-            (2 * p1.x) +
-
-            (-p0.x + p2.x) * t +
-
-            (
-              2*p0.x -
-              5*p1.x +
-              4*p2.x -
-              p3.x
-            ) * t2 +
-
-            (
-              -p0.x +
-              3*p1.x -
-              3*p2.x +
-              p3.x
-            ) * t3
-          ),
-
-          y: 0.5 * (
-
-            (2 * p1.y) +
-
-            (-p0.y + p2.y) * t +
-
-            (
-              2*p0.y -
-              5*p1.y +
-              4*p2.y -
-              p3.y
-            ) * t2 +
-
-            (
-              -p0.y +
-              3*p1.y -
-              3*p2.y +
-              p3.y
-            ) * t3
-          )
-
-        };
-
-      },
-
-
-      tick: function () {
-
-        if (!this.active) return;
-
-
-        const elapsed =
-          performance.now() - this.startTime;
-
-
-        let progress =
-          elapsed / this.duration;
-
-
-        if (progress >= 1) {
-          progress = 1;
-        }
-
-
-        const segmentCount =
-          this.points.length - 1;
-
-
-        let position =
-          progress * segmentCount;
-
-
-        let index =
-          Math.floor(position);
-
-
-        let localT =
-          position - index;
-
-
-        if (index >= segmentCount) {
-
-          index =
-            segmentCount - 1;
-
-          localT = 1;
-
-        }
-
-
-        const p0 =
-          this.points[
-            Math.max(0, index - 1)
-          ];
-
-
-        const p1 =
-          this.points[index];
-
-
-        const p2 =
-          this.points[
-            Math.min(
-              this.points.length - 1,
-              index + 1
-            )
-          ];
-
-
-        const p3 =
-          this.points[
-            Math.min(
-              this.points.length - 1,
-              index + 2
-            )
-          ];
-
-
-        const pos =
-          this.catmull(
-            p0,
-            p1,
-            p2,
-            p3,
-            localT
-          );
-
-
-        this.el.object3D.position.set(
-          pos.x,
-          pos.y,
-          0.09
-        );
-
-
-        if (progress >= 1) {
-
-          this.active = false;
-
-          this.el.object3D.position.set(
-            -0.27,
-            0.79,
-            0.09
-          );
-
-        }
-
-      }
-
-    });
-
-
-
-    /* ==========================================
-       GÖZ EGZERSİZİ - v11
-
-       14 HEDEF
-       A / a DÖNÜŞÜMLÜ
-
-       Önce sakin,
-       sonlara doğru biraz daha hızlı.
-       ========================================== */
-
-    AFRAME.registerComponent('eye-pop-exercise', {
-
-      init: function () {
-
-        this.running = false;
-        this.timers = [];
-
-
-        /*
-          Her hedefin:
-          x = yatay konumu
-          y = dikey konumu
-          letter = gösterilecek harf
-          show = görünme süresi
-          gap = kaybolduktan sonraki boşluk
-        */
-
-        this.steps = [
-
-          /* 1 - SOL ÜST */
-          {
-            x:-0.40,
-            y: 0.72,
-            letter:'A',
-            show:950,
-            gap:250
-          },
-
-          /* 2 - SAĞ ALT */
-          {
-            x: 0.40,
-            y: 0.22,
-            letter:'a',
-            show:950,
-            gap:250
-          },
-
-          /* 3 - SAĞ ÜST */
-          {
-            x: 0.40,
-            y: 0.72,
-            letter:'A',
-            show:950,
-            gap:250
-          },
-
-          /* 4 - SOL ALT */
-          {
-            x:-0.40,
-            y: 0.22,
-            letter:'a',
-            show:950,
-            gap:250
-          },
-
-          /* 5 - ORTA */
-          {
-            x: 0.00,
-            y: 0.48,
-            letter:'A',
-            show:900,
-            gap:230
-          },
-
-          /* 6 - EN SOL */
-          {
-            x:-0.46,
-            y: 0.48,
-            letter:'a',
-            show:900,
-            gap:230
-          },
-
-          /* 7 - EN SAĞ */
-          {
-            x: 0.46,
-            y: 0.48,
-            letter:'A',
-            show:900,
-            gap:230
-          },
-
-          /* 8 - ÜST ORTA */
-          {
-            x: 0.00,
-            y: 0.80,
-            letter:'a',
-            show:850,
-            gap:220
-          },
-
-          /* 9 - ALT ORTA */
-          {
-            x: 0.00,
-            y: 0.16,
-            letter:'A',
-            show:850,
-            gap:220
-          },
-
-          /* 10 - SOL ORTA */
-          {
-            x:-0.42,
-            y: 0.48,
-            letter:'a',
-            show:800,
-            gap:200
-          },
-
-          /* 11 - SAĞ ÜST */
-          {
-            x: 0.39,
-            y: 0.70,
-            letter:'A',
-            show:750,
-            gap:180
-          },
-
-          /* 12 - SOL ALT */
-          {
-            x:-0.39,
-            y: 0.20,
-            letter:'a',
-            show:750,
-            gap:180
-          },
-
-          /* 13 - SAĞ ALT */
-          {
-            x: 0.39,
-            y: 0.20,
-            letter:'A',
-            show:700,
-            gap:170
-          },
-
-          /* 14 - ORTA BİTİŞ */
-          {
-            x: 0.00,
-            y: 0.48,
-            letter:'a',
-            show:900,
-            gap:0
-          }
-
-        ];
-
-      },
-
-
-      clearTimers: function () {
-
-        this.timers.forEach(
-          clearTimeout
-        );
-
-        this.timers = [];
-
-      },
-
-
-      stopExercise: function () {
-
-        this.running = false;
-
-        this.clearTimers();
-
-        this.el.setAttribute(
-          'visible',
-          'false'
-        );
-
-      },
-
-
-      drawLetter: function(letter) {
-
-        const canvas =
+    window.addEventListener(
+      'DOMContentLoaded',
+      () => {
+
+        const startButton =
           document.querySelector(
-            '#tekHarfCanvas'
+            '#startButton'
           );
 
 
-        const ctx =
-          canvas.getContext('2d');
-
-
-        canvas.width = 500;
-        canvas.height = 500;
-
-
-        ctx.clearRect(
-          0,
-          0,
-          canvas.width,
-          canvas.height
-        );
-
-
-        ctx.textAlign =
-          'center';
-
-
-        ctx.textBaseline =
-          'middle';
-
-
-        ctx.lineJoin =
-          'round';
-
-
-        ctx.lineCap =
-          'round';
-
-
-        ctx.font =
-          'bold 360px Arial';
-
-
-        ctx.lineWidth =
-          20;
-
-
-        ctx.strokeStyle =
-          '#FFFFFF';
-
-
-        ctx.fillStyle =
-          '#FF6B35';
-
-
-        if (letter === 'A') {
-
-          ctx.strokeText(
-            'A',
-            250,
-            255
-          );
-
-          ctx.fillText(
-            'A',
-            250,
-            255
-          );
-
-        }
-
-
-        if (letter === 'a') {
-
-          ctx.strokeText(
-            'ɑ',
-            250,
-            255
-          );
-
-          ctx.fillText(
-            'ɑ',
-            250,
-            255
-          );
-
-        }
-
-
-        const mesh =
-          this.el.getObject3D('mesh');
-
-
-        if (
-          mesh &&
-          mesh.material &&
-          mesh.material.map
-        ) {
-
-          mesh.material.map.needsUpdate =
-            true;
-
-        }
-
-      },
-
-
-      startExercise: function () {
-
-        this.stopExercise();
-
-        this.running = true;
-
-
-        const self = this;
-
-        let currentTime = 0;
-
-
-        /*
-          14 HARFİ TEK TEK PLANLA
-        */
-
-        this.steps.forEach(
-          (step, index) => {
-
-
-            /* HARF BELİRİR */
-
-            const showTimer =
-              setTimeout(() => {
-
-                if (!self.running) return;
-
-
-                self.drawLetter(
-                  step.letter
-                );
-
-
-                self.el.object3D.position.set(
-                  step.x,
-                  step.y,
-                  0.12
-                );
-
-
-                self.el.object3D.scale.set(
-                  1,
-                  1,
-                  1
-                );
-
-
-                self.el.setAttribute(
-                  'visible',
-                  'true'
-                );
-
-
-              }, currentTime);
-
-
-            self.timers.push(
-              showTimer
-            );
-
-
-
-            /* HARF KAYBOLUR */
-
-            const hideAt =
-              currentTime +
-              step.show;
-
-
-            const hideTimer =
-              setTimeout(() => {
-
-                if (!self.running) return;
-
-
-                self.el.setAttribute(
-                  'visible',
-                  'false'
-                );
-
-
-              }, hideAt);
-
-
-            self.timers.push(
-              hideTimer
-            );
-
-
-            currentTime +=
-              step.show +
-              step.gap;
-
-          }
-        );
-
-
-        /*
-          EGZERSİZİN SONU
-        */
-
-        const finishTimer =
-          setTimeout(() => {
-
-            self.running = false;
-
-            self.el.setAttribute(
-              'visible',
-              'false'
-            );
-
-
-          }, currentTime + 100);
-
-
-        self.timers.push(
-          finishTimer
-        );
-
-      }
-
-    });
-
-
-
-    /* ==========================================
-       ANA NETİ ANİMASYONU
-       ========================================== */
-
-    AFRAME.registerComponent('neti-animation', {
-
-      init: function () {
-
-        const target =
-          this.el;
-
-
-        const neti =
+        const startScreen =
           document.querySelector(
-            '#netiKarakter'
-          );
-
-
-        const harfler =
-          document.querySelector(
-            '#harfler'
-          );
-
-
-        const tekHarf =
-          document.querySelector(
-            '#tekHarf'
-          );
-
-
-        const ari =
-          document.querySelector(
-            '#ariKarakter'
+            '#startScreen'
           );
 
 
@@ -783,296 +351,1059 @@
           );
 
 
-        let basladi = false;
+        startButton.addEventListener(
+          'click',
+          async () => {
 
-        let kayipTimer = null;
+            /*
+              Web Audio'yu kullanıcının
+              dokunuşuyla açıyoruz.
+            */
 
-        let zamanlayicilar = [];
+            sesSisteminiAc();
 
 
-        function timer(fn, ms) {
+            /*
+              Neti MP3'ünü Safari için
+              kullanıma hazır hale getiriyoruz.
+            */
 
-          const t =
-            setTimeout(fn, ms);
+            try {
 
-          zamanlayicilar.push(t);
+              netiSes.volume = 0;
 
-          return t;
+              await netiSes.play();
 
-        }
+              netiSes.pause();
 
+              netiSes.currentTime = 0;
 
-        function timerlariTemizle() {
+              netiSes.volume = 1;
 
-          zamanlayicilar.forEach(
-            clearTimeout
-          );
+              sesHazir = true;
 
-          zamanlayicilar = [];
+            } catch (e) {
 
-        }
+              netiSes.volume = 1;
 
-
-
-        function baslat() {
-
-          if (basladi) return;
-
-          basladi = true;
-
-
-          timerlariTemizle();
-
-
-          if (
-            tekHarf.components[
-              'eye-pop-exercise'
-            ]
-          ) {
-
-            tekHarf.components[
-              'eye-pop-exercise'
-            ].stopExercise();
-
-          }
-
-
-
-          /* SESİ BAŞA AL */
-
-          try {
-
-            netiSes.pause();
-
-            netiSes.currentTime = 0;
-
-            netiSes.volume = 1;
-
-          } catch(e) {}
-
-
-
-          /* NETİ BAŞLANGIÇ */
-
-          neti.removeAttribute(
-            'animation__buyume'
-          );
-
-          neti.removeAttribute(
-            'animation__yuksel'
-          );
-
-
-          neti.setAttribute(
-            'scale',
-            '0.05 0.05 0.05'
-          );
-
-
-          neti.setAttribute(
-            'position',
-            '0 -0.25 0.03'
-          );
-
-
-
-          /* =====================================
-             NETİ + SES
-             ===================================== */
-
-          timer(() => {
-
-            neti.setAttribute(
-
-              'animation__buyume',
-
-              'property: scale;' +
-              'from: 0.05 0.05 0.05;' +
-              'to: 1 1 1;' +
-              'dur: 1100;' +
-              'easing: easeOutBack'
-
-            );
-
-
-            neti.setAttribute(
-
-              'animation__yuksel',
-
-              'property: position;' +
-              'from: 0 -0.25 0.03;' +
-              'to: 0 0.08 0.03;' +
-              'dur: 1100;' +
-              'easing: easeOutQuad'
-
-            );
-
-
-            if (sesHazir) {
-
-              try {
-
-                netiSes.pause();
-
-                netiSes.currentTime = 0;
-
-                netiSes.volume = 1;
-
-
-                const oynat =
-                  netiSes.play();
-
-
-                if (oynat !== undefined) {
-
-                  oynat.catch(
-                    err => {
-                      console.log(
-                        'Neti sesi oynatılamadı:',
-                        err
-                      );
-                    }
-                  );
-
-                }
-
-              } catch(e) {
-
-                console.log(e);
-
-              }
+              sesHazir = true;
 
             }
 
-          }, 100);
+
+            startScreen.style.display =
+              'none';
+
+          }
+        );
+
+      }
+    );
 
 
 
-          /* =====================================
-             A / a GELİYOR
-             ===================================== */
+    /* ==========================================
+       ARI UÇUŞU
+       ========================================== */
 
-          harfler.removeAttribute(
-            'animation__harf'
-          );
+    AFRAME.registerComponent(
+      'smooth-bee-flight',
+      {
+
+        init: function () {
+
+          this.active = false;
+
+          this.startTime = 0;
+
+          this.duration = 3700;
 
 
-          harfler.setAttribute(
+          this.points = [
+
+            {x:-0.48, y:-0.30},
+            {x:-0.40, y:-0.18},
+            {x:-0.32, y:-0.03},
+            {x:-0.25, y: 0.08},
+            {x:-0.17, y: 0.03},
+            {x:-0.08, y:-0.13},
+            {x: 0.02, y:-0.23},
+            {x: 0.14, y:-0.22},
+            {x: 0.25, y:-0.12},
+            {x: 0.35, y: 0.02},
+            {x: 0.43, y: 0.18},
+            {x: 0.45, y: 0.35},
+            {x: 0.40, y: 0.50},
+            {x: 0.30, y: 0.62},
+            {x: 0.17, y: 0.70},
+            {x: 0.02, y: 0.75},
+            {x:-0.15, y: 0.78},
+            {x:-0.27, y: 0.79}
+
+          ];
+
+        },
+
+
+        startFlight: function () {
+
+          this.startTime =
+            performance.now();
+
+          this.active = true;
+
+
+          this.el.setAttribute(
             'visible',
-            'false'
+            true
           );
 
 
-          harfler.setAttribute(
-            'position',
-            '0 0.55 0.04'
-          );
-
-
-          harfler.setAttribute(
-            'scale',
-            '0.01 0.01 0.01'
-          );
-
-
-          timer(() => {
-
-            harfler.setAttribute(
-              'visible',
-              'true'
-            );
-
-
-            harfler.setAttribute(
-
-              'animation__harf',
-
-              'property: scale;' +
-              'from: 0.01 0.01 0.01;' +
-              'to: 1 1 1;' +
-              'dur: 550;' +
-              'easing: easeOutBack'
-
-            );
-
-          }, 1500);
-
-
-
-          /* =====================================
-             ARI BAŞLANGIÇ
-             ===================================== */
-
-          ari.setAttribute(
-            'visible',
-            'false'
-          );
-
-
-          ari.object3D.position.set(
-            -0.48,
-            -0.30,
-            0.09
-          );
-
-
-          ari.object3D.scale.set(
+          this.el.object3D.scale.set(
             1,
             1,
             1
           );
 
 
-          ari.object3D.rotation.set(
+          this.el.object3D.rotation.set(
             0,
             0,
             0
           );
 
+        },
+
+
+        catmull: function(
+          p0,
+          p1,
+          p2,
+          p3,
+          t
+        ) {
+
+          const t2 = t * t;
+
+          const t3 = t2 * t;
+
+
+          return {
+
+            x: 0.5 * (
+
+              (2 * p1.x) +
+
+              (-p0.x + p2.x) * t +
+
+              (
+                2*p0.x -
+                5*p1.x +
+                4*p2.x -
+                p3.x
+              ) * t2 +
+
+              (
+                -p0.x +
+                3*p1.x -
+                3*p2.x +
+                p3.x
+              ) * t3
+
+            ),
+
+
+            y: 0.5 * (
+
+              (2 * p1.y) +
+
+              (-p0.y + p2.y) * t +
+
+              (
+                2*p0.y -
+                5*p1.y +
+                4*p2.y -
+                p3.y
+              ) * t2 +
+
+              (
+                -p0.y +
+                3*p1.y -
+                3*p2.y +
+                p3.y
+              ) * t3
+
+            )
+
+          };
+
+        },
+
+
+        tick: function () {
+
+          if (!this.active) return;
+
+
+          const elapsed =
+            performance.now() -
+            this.startTime;
+
+
+          let progress =
+            elapsed /
+            this.duration;
+
+
+          if (progress >= 1) {
+
+            progress = 1;
+
+          }
+
+
+          const segmentCount =
+            this.points.length - 1;
+
+
+          let position =
+            progress *
+            segmentCount;
+
+
+          let index =
+            Math.floor(
+              position
+            );
+
+
+          let localT =
+            position -
+            index;
+
 
           if (
-            ari.components[
-              'smooth-bee-flight'
-            ]
+            index >=
+            segmentCount
           ) {
 
-            ari.components[
-              'smooth-bee-flight'
-            ].active = false;
+            index =
+              segmentCount - 1;
+
+            localT = 1;
+
+          }
+
+
+          const p0 =
+            this.points[
+              Math.max(
+                0,
+                index - 1
+              )
+            ];
+
+
+          const p1 =
+            this.points[
+              index
+            ];
+
+
+          const p2 =
+            this.points[
+              Math.min(
+                this.points.length - 1,
+                index + 1
+              )
+            ];
+
+
+          const p3 =
+            this.points[
+              Math.min(
+                this.points.length - 1,
+                index + 2
+              )
+            ];
+
+
+          const pos =
+            this.catmull(
+              p0,
+              p1,
+              p2,
+              p3,
+              localT
+            );
+
+
+          this.el.object3D.position.set(
+            pos.x,
+            pos.y,
+            0.09
+          );
+
+
+          if (progress >= 1) {
+
+            this.active = false;
+
+
+            this.el.object3D.position.set(
+              -0.27,
+              0.79,
+              0.09
+            );
+
+          }
+
+        }
+
+      }
+    );
+
+
+
+    /* ==========================================
+       14 HEDEFLİ SESLİ GÖZ EGZERSİZİ
+       ========================================== */
+
+    AFRAME.registerComponent(
+      'eye-pop-exercise',
+      {
+
+        init: function () {
+
+          this.running = false;
+
+          this.timers = [];
+
+
+          this.steps = [
+
+            {
+              x:-0.40,
+              y:0.72,
+              letter:'A',
+              show:950,
+              gap:250
+            },
+
+            {
+              x:0.40,
+              y:0.22,
+              letter:'a',
+              show:950,
+              gap:250
+            },
+
+            {
+              x:0.40,
+              y:0.72,
+              letter:'A',
+              show:950,
+              gap:250
+            },
+
+            {
+              x:-0.40,
+              y:0.22,
+              letter:'a',
+              show:950,
+              gap:250
+            },
+
+            {
+              x:0.00,
+              y:0.48,
+              letter:'A',
+              show:900,
+              gap:230
+            },
+
+            {
+              x:-0.46,
+              y:0.48,
+              letter:'a',
+              show:900,
+              gap:230
+            },
+
+            {
+              x:0.46,
+              y:0.48,
+              letter:'A',
+              show:900,
+              gap:230
+            },
+
+            {
+              x:0.00,
+              y:0.80,
+              letter:'a',
+              show:850,
+              gap:220
+            },
+
+            {
+              x:0.00,
+              y:0.16,
+              letter:'A',
+              show:850,
+              gap:220
+            },
+
+            {
+              x:-0.42,
+              y:0.48,
+              letter:'a',
+              show:800,
+              gap:200
+            },
+
+            {
+              x:0.39,
+              y:0.70,
+              letter:'A',
+              show:750,
+              gap:180
+            },
+
+            {
+              x:-0.39,
+              y:0.20,
+              letter:'a',
+              show:750,
+              gap:180
+            },
+
+            {
+              x:0.39,
+              y:0.20,
+              letter:'A',
+              show:700,
+              gap:170
+            },
+
+            {
+              x:0.00,
+              y:0.48,
+              letter:'a',
+              show:900,
+              gap:0
+            }
+
+          ];
+
+        },
+
+
+        clearTimers: function () {
+
+          this.timers.forEach(
+            clearTimeout
+          );
+
+          this.timers = [];
+
+        },
+
+
+        stopExercise: function () {
+
+          this.running = false;
+
+          this.clearTimers();
+
+          fonDurdur();
+
+
+          this.el.setAttribute(
+            'visible',
+            'false'
+          );
+
+        },
+
+
+        drawLetter: function(
+          letter
+        ) {
+
+          const canvas =
+            document.querySelector(
+              '#tekHarfCanvas'
+            );
+
+
+          const ctx =
+            canvas.getContext(
+              '2d'
+            );
+
+
+          canvas.width = 500;
+
+          canvas.height = 500;
+
+
+          ctx.clearRect(
+            0,
+            0,
+            500,
+            500
+          );
+
+
+          ctx.textAlign =
+            'center';
+
+
+          ctx.textBaseline =
+            'middle';
+
+
+          ctx.lineJoin =
+            'round';
+
+
+          ctx.lineCap =
+            'round';
+
+
+          ctx.font =
+            'bold 360px Arial';
+
+
+          ctx.lineWidth =
+            20;
+
+
+          ctx.strokeStyle =
+            '#FFFFFF';
+
+
+          ctx.fillStyle =
+            '#FF6B35';
+
+
+          if (
+            letter === 'A'
+          ) {
+
+            ctx.strokeText(
+              'A',
+              250,
+              255
+            );
+
+
+            ctx.fillText(
+              'A',
+              250,
+              255
+            );
+
+          }
+
+
+          if (
+            letter === 'a'
+          ) {
+
+            ctx.strokeText(
+              'ɑ',
+              250,
+              255
+            );
+
+
+            ctx.fillText(
+              'ɑ',
+              250,
+              255
+            );
+
+          }
+
+
+          const mesh =
+            this.el.getObject3D(
+              'mesh'
+            );
+
+
+          if (
+            mesh &&
+            mesh.material &&
+            mesh.material.map
+          ) {
+
+            mesh.material.map.needsUpdate =
+              true;
+
+          }
+
+        },
+
+
+        startExercise: function () {
+
+          this.stopExercise();
+
+          this.running = true;
+
+
+          /*
+            GÖZ EGZERSİZİ BAŞLADIĞINDA
+            HAFİF FON BAŞLIYOR.
+          */
+
+          fonBaslat();
+
+
+          const self = this;
+
+          let currentTime = 0;
+
+
+          this.steps.forEach(
+            (step) => {
+
+
+              /*
+                HARF BELİRİYOR
+              */
+
+              const showTimer =
+                setTimeout(
+                  () => {
+
+                    if (
+                      !self.running
+                    ) return;
+
+
+                    self.drawLetter(
+                      step.letter
+                    );
+
+
+                    self.el.object3D.position.set(
+                      step.x,
+                      step.y,
+                      0.12
+                    );
+
+
+                    self.el.object3D.scale.set(
+                      1,
+                      1,
+                      1
+                    );
+
+
+                    self.el.setAttribute(
+                      'visible',
+                      'true'
+                    );
+
+
+                    /*
+                      HARFLE AYNI ANDA
+                      MİNİK POP SESİ
+                    */
+
+                    popSesiCal();
+
+                  },
+                  currentTime
+                );
+
+
+              self.timers.push(
+                showTimer
+              );
+
+
+
+              /*
+                HARF KAYBOLUYOR
+              */
+
+              const hideAt =
+                currentTime +
+                step.show;
+
+
+              const hideTimer =
+                setTimeout(
+                  () => {
+
+                    if (
+                      !self.running
+                    ) return;
+
+
+                    self.el.setAttribute(
+                      'visible',
+                      'false'
+                    );
+
+                  },
+                  hideAt
+                );
+
+
+              self.timers.push(
+                hideTimer
+              );
+
+
+              currentTime +=
+                step.show +
+                step.gap;
+
+            }
+          );
+
+
+          /*
+            EGZERSİZ BİTİYOR
+          */
+
+          const finishTimer =
+            setTimeout(
+              () => {
+
+                self.running =
+                  false;
+
+
+                self.el.setAttribute(
+                  'visible',
+                  'false'
+                );
+
+
+                /*
+                  FON DA BİTİYOR
+                */
+
+                fonDurdur();
+
+              },
+              currentTime + 100
+            );
+
+
+          self.timers.push(
+            finishTimer
+          );
+
+        }
+
+      }
+    );
+
+
+
+    /* ==========================================
+       ANA NETİ ANİMASYONU
+       ========================================== */
+
+    AFRAME.registerComponent(
+      'neti-animation',
+      {
+
+        init: function () {
+
+          const target =
+            this.el;
+
+
+          const neti =
+            document.querySelector(
+              '#netiKarakter'
+            );
+
+
+          const harfler =
+            document.querySelector(
+              '#harfler'
+            );
+
+
+          const tekHarf =
+            document.querySelector(
+              '#tekHarf'
+            );
+
+
+          const ari =
+            document.querySelector(
+              '#ariKarakter'
+            );
+
+
+          const netiSes =
+            document.querySelector(
+              '#netiSes'
+            );
+
+
+          let basladi = false;
+
+          let kayipTimer =
+            null;
+
+          let zamanlayicilar =
+            [];
+
+
+          function timer(
+            fn,
+            ms
+          ) {
+
+            const t =
+              setTimeout(
+                fn,
+                ms
+              );
+
+
+            zamanlayicilar.push(
+              t
+            );
+
+
+            return t;
+
+          }
+
+
+          function timerlariTemizle() {
+
+            zamanlayicilar.forEach(
+              clearTimeout
+            );
+
+
+            zamanlayicilar =
+              [];
 
           }
 
 
 
-          /* ARI 1.7 SN'DE BAŞLIYOR */
+          function baslat() {
 
-          timer(() => {
-
-            const flight =
-              ari.components[
-                'smooth-bee-flight'
-              ];
+            if (basladi) return;
 
 
-            if (flight) {
+            basladi = true;
 
-              flight.startFlight();
+
+            timerlariTemizle();
+
+
+            fonDurdur();
+
+
+            if (
+              tekHarf.components[
+                'eye-pop-exercise'
+              ]
+            ) {
+
+              tekHarf.components[
+                'eye-pop-exercise'
+              ].stopExercise();
 
             }
 
-          }, 1700);
+
+
+            /* NETİ SESİNİ SIFIRLA */
+
+            try {
+
+              netiSes.pause();
+
+              netiSes.currentTime =
+                0;
+
+              netiSes.volume =
+                1;
+
+            } catch(e) {}
 
 
 
-          /* =====================================
-             ARI A'YA ULAŞTI.
-             1 SN BEKLİYOR.
+            /* NETİ BAŞLANGIÇ */
 
-             6.4 SN:
-             ARI VE İLK A/a KAYBOLUYOR
-             ===================================== */
+            neti.removeAttribute(
+              'animation__buyume'
+            );
 
-          timer(() => {
+
+            neti.removeAttribute(
+              'animation__yuksel'
+            );
+
+
+            neti.setAttribute(
+              'scale',
+              '0.05 0.05 0.05'
+            );
+
+
+            neti.setAttribute(
+              'position',
+              '0 -0.25 0.03'
+            );
+
+
+
+            /* ==================================
+               NETİ + NETİ SESİ
+               ================================== */
+
+            timer(
+              () => {
+
+                neti.setAttribute(
+
+                  'animation__buyume',
+
+                  'property: scale;' +
+                  'from: 0.05 0.05 0.05;' +
+                  'to: 1 1 1;' +
+                  'dur: 1100;' +
+                  'easing: easeOutBack'
+
+                );
+
+
+                neti.setAttribute(
+
+                  'animation__yuksel',
+
+                  'property: position;' +
+                  'from: 0 -0.25 0.03;' +
+                  'to: 0 0.08 0.03;' +
+                  'dur: 1100;' +
+                  'easing: easeOutQuad'
+
+                );
+
+
+                if (
+                  sesHazir
+                ) {
+
+                  try {
+
+                    netiSes.pause();
+
+                    netiSes.currentTime =
+                      0;
+
+                    netiSes.volume =
+                      1;
+
+
+                    const oynat =
+                      netiSes.play();
+
+
+                    if (
+                      oynat !==
+                      undefined
+                    ) {
+
+                      oynat.catch(
+                        err => {
+
+                          console.log(
+                            'Neti sesi oynatılamadı:',
+                            err
+                          );
+
+                        }
+                      );
+
+                    }
+
+                  } catch(e) {}
+
+                }
+
+              },
+              100
+            );
+
+
+
+            /* ==================================
+               A / a GELİYOR
+               ================================== */
+
+            harfler.removeAttribute(
+              'animation__harf'
+            );
+
+
+            harfler.setAttribute(
+              'visible',
+              'false'
+            );
+
+
+            harfler.setAttribute(
+              'position',
+              '0 0.55 0.04'
+            );
+
+
+            harfler.setAttribute(
+              'scale',
+              '0.01 0.01 0.01'
+            );
+
+
+            timer(
+              () => {
+
+                harfler.setAttribute(
+                  'visible',
+                  'true'
+                );
+
+
+                harfler.setAttribute(
+
+                  'animation__harf',
+
+                  'property: scale;' +
+                  'from: 0.01 0.01 0.01;' +
+                  'to: 1 1 1;' +
+                  'dur: 550;' +
+                  'easing: easeOutBack'
+
+                );
+
+              },
+              1500
+            );
+
+
+
+            /* ==================================
+               ARI
+               ================================== */
 
             ari.setAttribute(
               'visible',
@@ -1080,121 +1411,68 @@
             );
 
 
-            harfler.setAttribute(
-              'visible',
-              'false'
+            ari.object3D.position.set(
+              -0.48,
+              -0.30,
+              0.09
             );
 
-          }, 6400);
+
+            ari.object3D.scale.set(
+              1,
+              1,
+              1
+            );
 
 
-
-          /* =====================================
-             6.7 SN:
-             14 HEDEFLİ GÖZ EGZERSİZİ
-             ===================================== */
-
-          timer(() => {
-
-            const exercise =
-              tekHarf.components[
-                'eye-pop-exercise'
-              ];
+            ari.object3D.rotation.set(
+              0,
+              0,
+              0
+            );
 
 
-            if (exercise) {
+            if (
+              ari.components[
+                'smooth-bee-flight'
+              ]
+            ) {
 
-              exercise.startExercise();
-
-            }
-
-          }, 6700);
-
-        }
-
-
-
-        /* HEDEF BULUNDU */
-
-        target.addEventListener(
-          'targetFound',
-          () => {
-
-            if (kayipTimer) {
-
-              clearTimeout(
-                kayipTimer
-              );
-
-              kayipTimer = null;
+              ari.components[
+                'smooth-bee-flight'
+              ].active =
+                false;
 
             }
 
 
-            baslat();
+            timer(
+              () => {
 
-          }
-        );
-
-
-
-        /* HEDEF KAYBOLDU */
-
-        target.addEventListener(
-          'targetLost',
-          () => {
-
-            if (kayipTimer) {
-
-              clearTimeout(
-                kayipTimer
-              );
-
-            }
-
-
-            kayipTimer =
-              setTimeout(() => {
-
-                basladi = false;
-
-                timerlariTemizle();
-
-
-                try {
-
-                  netiSes.pause();
-
-                  netiSes.currentTime = 0;
-
-                } catch(e) {}
-
-
-                if (
+                const flight =
                   ari.components[
                     'smooth-bee-flight'
-                  ]
-                ) {
+                  ];
 
-                  ari.components[
-                    'smooth-bee-flight'
-                  ].active = false;
+
+                if (flight) {
+
+                  flight.startFlight();
 
                 }
 
+              },
+              1700
+            );
 
-                if (
-                  tekHarf.components[
-                    'eye-pop-exercise'
-                  ]
-                ) {
 
-                  tekHarf.components[
-                    'eye-pop-exercise'
-                  ].stopExercise();
 
-                }
+            /* ==================================
+               ARI + İLK HARFLER KAYBOLUYOR
+               ================================== */
 
+            timer(
+              () => {
 
                 ari.setAttribute(
                   'visible',
@@ -1202,25 +1480,167 @@
                 );
 
 
-                tekHarf.setAttribute(
+                harfler.setAttribute(
                   'visible',
                   'false'
                 );
 
+              },
+              6400
+            );
 
-              }, 2000);
+
+
+            /* ==================================
+               SESLİ GÖZ EGZERSİZİ
+               ================================== */
+
+            timer(
+              () => {
+
+                const exercise =
+                  tekHarf.components[
+                    'eye-pop-exercise'
+                  ];
+
+
+                if (exercise) {
+
+                  exercise.startExercise();
+
+                }
+
+              },
+              6700
+            );
 
           }
-        );
+
+
+
+          /* HEDEF BULUNDU */
+
+          target.addEventListener(
+            'targetFound',
+            () => {
+
+              if (
+                kayipTimer
+              ) {
+
+                clearTimeout(
+                  kayipTimer
+                );
+
+
+                kayipTimer =
+                  null;
+
+              }
+
+
+              baslat();
+
+            }
+          );
+
+
+
+          /* HEDEF KAYBOLDU */
+
+          target.addEventListener(
+            'targetLost',
+            () => {
+
+              if (
+                kayipTimer
+              ) {
+
+                clearTimeout(
+                  kayipTimer
+                );
+
+              }
+
+
+              kayipTimer =
+                setTimeout(
+                  () => {
+
+                    basladi =
+                      false;
+
+
+                    timerlariTemizle();
+
+
+                    fonDurdur();
+
+
+                    try {
+
+                      netiSes.pause();
+
+                      netiSes.currentTime =
+                        0;
+
+                    } catch(e) {}
+
+
+                    if (
+                      ari.components[
+                        'smooth-bee-flight'
+                      ]
+                    ) {
+
+                      ari.components[
+                        'smooth-bee-flight'
+                      ].active =
+                        false;
+
+                    }
+
+
+                    if (
+                      tekHarf.components[
+                        'eye-pop-exercise'
+                      ]
+                    ) {
+
+                      tekHarf.components[
+                        'eye-pop-exercise'
+                      ].stopExercise();
+
+                    }
+
+
+                    ari.setAttribute(
+                      'visible',
+                      'false'
+                    );
+
+
+                    tekHarf.setAttribute(
+                      'visible',
+                      'false'
+                    );
+
+                  },
+                  2000
+                );
+
+            }
+          );
+
+        }
 
       }
-
-    });
+    );
 
 
 
     /* ==========================================
-       ANA A / a GÖRSELİ
+       ANA A / a ÇİZİMİ
        ========================================== */
 
     window.addEventListener(
@@ -1234,11 +1654,16 @@
 
 
         const ctx =
-          canvas.getContext('2d');
+          canvas.getContext(
+            '2d'
+          );
 
 
-        canvas.width = 1200;
-        canvas.height = 600;
+        canvas.width =
+          1200;
+
+        canvas.height =
+          600;
 
 
         ctx.clearRect(
@@ -1341,7 +1766,7 @@
 <body>
 
 
-<!-- NETİ SESİ -->
+<!-- NETİ'NİN KONUŞMA SESİ -->
 
 <audio
   id="netiSes"
@@ -1352,7 +1777,7 @@
 
 
 
-<!-- BAŞLAT -->
+<!-- BAŞLAT EKRANI -->
 
 <div id="startScreen">
 
@@ -1390,7 +1815,9 @@
     antialias: true;
   "
 
-  vr-mode-ui="enabled: false"
+  vr-mode-ui="
+    enabled: false
+  "
 
   device-orientation-permission-ui="
     enabled: false
@@ -1426,7 +1853,9 @@
 
 
   <a-entity
-    mindar-image-target="targetIndex: 0"
+    mindar-image-target="
+      targetIndex: 0
+    "
     neti-animation>
 
 
@@ -1438,13 +1867,17 @@
 
       src="#neti"
 
-      position="0 -0.25 0.03"
+      position="
+        0 -0.25 0.03
+      "
 
       width="0.75"
 
       height="0.75"
 
-      scale="0.05 0.05 0.05"
+      scale="
+        0.05 0.05 0.05
+      "
 
       material="
         shader: flat;
@@ -1462,13 +1895,17 @@
 
       id="harfler"
 
-      position="0 0.55 0.04"
+      position="
+        0 0.55 0.04
+      "
 
       width="0.90"
 
       height="0.45"
 
-      scale="0.01 0.01 0.01"
+      scale="
+        0.01 0.01 0.01
+      "
 
       visible="false"
 
@@ -1482,13 +1919,15 @@
 
 
 
-    <!-- 14 HEDEFLİ GÖZ EGZERSİZİ -->
+    <!-- GÖZ EGZERSİZİ HARFİ -->
 
     <a-plane
 
       id="tekHarf"
 
-      position="0 0.48 0.12"
+      position="
+        0 0.48 0.12
+      "
 
       width="0.33"
 
@@ -1516,15 +1955,21 @@
 
       src="#ariPNG"
 
-      position="-0.48 -0.30 0.09"
+      position="
+        -0.48 -0.30 0.09
+      "
 
       width="0.22"
 
       height="0.22"
 
-      scale="1 1 1"
+      scale="
+        1 1 1
+      "
 
-      rotation="0 0 0"
+      rotation="
+        0 0 0
+      "
 
       visible="false"
 
