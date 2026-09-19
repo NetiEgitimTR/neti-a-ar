@@ -8,66 +8,60 @@
 <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
 <style>
-  body {
-    margin: 0;
-    overflow: hidden;
-    font-family: Arial, sans-serif;
-  }
+body{
+  margin:0;
+  overflow:hidden;
+  font-family:Arial,sans-serif;
+}
 
-  #startScreen {
-    position: fixed;
-    inset: 0;
-    z-index: 99999;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255,248,225,0.97);
-  }
+#startScreen{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,248,225,.97);
+}
 
-  #startButton {
-    border: none;
-    border-radius: 25px;
-    padding: 18px 28px;
-    font-size: 22px;
-    font-weight: bold;
-    background: #ff8a3d;
-    color: white;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.20);
-  }
+#startButton{
+  border:none;
+  border-radius:25px;
+  padding:18px 28px;
+  font-size:22px;
+  font-weight:bold;
+  background:#ff8a3d;
+  color:white;
+  box-shadow:0 6px 16px rgba(0,0,0,.20);
+}
 
-  #startText {
-    margin-top: 15px;
-    padding: 0 30px;
-    font-size: 16px;
-    color: #555;
-    text-align: center;
-  }
+#startText{
+  margin-top:15px;
+  padding:0 30px;
+  font-size:16px;
+  color:#555;
+  text-align:center;
+}
 
-  #yazmaCanvas {
-    display: none;
-  }
+#yazmaCanvas{
+  display:none;
+}
 </style>
 
 <script>
 
 let kullaniciBaslatti = false;
 
+window.addEventListener("DOMContentLoaded",()=>{
 
-/* =========================================
-   BAŞLANGIÇ BUTONU
-========================================= */
+  const button=document.querySelector("#startButton");
+  const screen=document.querySelector("#startScreen");
 
-window.addEventListener("DOMContentLoaded", () => {
+  button.addEventListener("click",()=>{
 
-  const button = document.querySelector("#startButton");
-  const screen = document.querySelector("#startScreen");
-
-  button.addEventListener("click", () => {
-
-    kullaniciBaslatti = true;
-
-    screen.style.display = "none";
+    kullaniciBaslatti=true;
+    screen.style.display="none";
 
     window.dispatchEvent(
       new Event("yazma-baslat")
@@ -78,494 +72,778 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 
-/* =========================================
-   KÜÇÜK a YAZMA
-========================================= */
+AFRAME.registerComponent("kucuk-a-yazma",{
 
-AFRAME.registerComponent("kucuk-a-yazma", {
+init:function(){
 
-  init: function () {
+  const target=this.el;
 
-    const target = this.el;
+  const canvas=
+    document.querySelector("#yazmaCanvas");
 
-    const canvas =
-      document.querySelector("#yazmaCanvas");
+  const ctx=
+    canvas.getContext("2d");
 
-    const ctx =
-      canvas.getContext("2d");
+  const plane=
+    document.querySelector("#yazmaPlane");
 
-    const plane =
-      document.querySelector("#yazmaPlane");
+  const neti=
+    document.querySelector("#netiYazma");
 
-    const neti =
-      document.querySelector("#netiYazma");
+  canvas.width=1000;
+  canvas.height=1000;
 
+  let hedefGorunuyor=false;
+  let basladi=false;
+  let tekrar=1;
 
-    canvas.width = 1000;
-    canvas.height = 1000;
-
-
-    let hedefGorunuyor = false;
-    let basladi = false;
-
-    let animasyonID = null;
-    let timerlar = [];
+  let animasyonID=null;
+  let timerlar=[];
 
 
-    /* =====================================
-       YARDIMCI
-    ===================================== */
+  /* ==============================
+     YARDIMCI
+  ============================== */
 
-    function timer(fn, ms) {
+  function timer(fn,ms){
 
-      const id = setTimeout(fn, ms);
+    const id=setTimeout(fn,ms);
+    timerlar.push(id);
 
-      timerlar.push(id);
+    return id;
+  }
 
-      return id;
+
+  function textureGuncelle(){
+
+    const mesh=
+      plane.getObject3D("mesh");
+
+    if(
+      mesh &&
+      mesh.material &&
+      mesh.material.map
+    ){
+      mesh.material.map.needsUpdate=true;
     }
+  }
 
 
-    function temizleTimerlar() {
+  function temizleCanvas(){
 
-      timerlar.forEach(clearTimeout);
+    ctx.clearRect(
+      0,0,
+      canvas.width,
+      canvas.height
+    );
 
-      timerlar = [];
-
-      if (animasyonID) {
-
-        cancelAnimationFrame(animasyonID);
-
-        animasyonID = null;
-      }
-    }
+    textureGuncelle();
+  }
 
 
-    function textureGuncelle() {
+  /* ==============================
+     YAZI KUTUSU
+  ============================== */
 
-      const mesh =
-        plane.getObject3D("mesh");
+  function yaziYaz(
+    ana,
+    alt=""
+  ){
 
-      if (
-        mesh &&
-        mesh.material &&
-        mesh.material.map
-      ) {
+    /*
+      ÜSTTE BEYAZ YÖNERGE KUTUSU
+    */
 
-        mesh.material.map.needsUpdate = true;
-      }
-    }
+    ctx.save();
+
+    ctx.fillStyle=
+      "rgba(255,255,255,0.94)";
+
+    ctx.strokeStyle=
+      "#ff9f43";
+
+    ctx.lineWidth=7;
+
+    ctx.beginPath();
+
+    ctx.roundRect(
+      105,
+      40,
+      790,
+      145,
+      35
+    );
+
+    ctx.fill();
+    ctx.stroke();
 
 
-    function canvasTemizle() {
+    ctx.fillStyle="#333";
 
-      ctx.clearRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
+    ctx.font=
+      "bold 48px Arial";
+
+    ctx.textAlign="center";
+
+    ctx.fillText(
+      ana,
+      500,
+      100
+    );
+
+
+    if(alt){
+
+      ctx.fillStyle="#666";
+
+      ctx.font=
+        "bold 31px Arial";
+
+      ctx.fillText(
+        alt,
+        500,
+        148
       );
 
-      textureGuncelle();
     }
 
+    ctx.restore();
 
-    /* =====================================
-       YUMUŞAK YOL OLUŞTUR
-    ===================================== */
+    textureGuncelle();
+  }
 
-    function quadraticPoints(p0, p1, p2, adet) {
 
-      const sonuc = [];
+  /* ==============================
+     OK ÇİZ
+  ============================== */
 
-      for (let i = 0; i <= adet; i++) {
+  function okCiz(
+    x1,y1,
+    x2,y2
+  ){
 
-        const t = i / adet;
+    const aci=
+      Math.atan2(
+        y2-y1,
+        x2-x1
+      );
 
-        const mt = 1 - t;
+    const okBoyu=28;
 
-        sonuc.push({
+    ctx.save();
 
-          x:
-            mt * mt * p0.x +
-            2 * mt * t * p1.x +
-            t * t * p2.x,
+    ctx.strokeStyle="#ffd400";
+    ctx.fillStyle="#ffd400";
 
-          y:
-            mt * mt * p0.y +
-            2 * mt * t * p1.y +
-            t * t * p2.y
+    ctx.lineWidth=15;
+    ctx.lineCap="round";
 
-        });
+    ctx.beginPath();
+
+    ctx.moveTo(x1,y1);
+    ctx.lineTo(x2,y2);
+
+    ctx.stroke();
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(x2,y2);
+
+    ctx.lineTo(
+      x2-
+      okBoyu*
+      Math.cos(
+        aci-Math.PI/6
+      ),
+
+      y2-
+      okBoyu*
+      Math.sin(
+        aci-Math.PI/6
+      )
+    );
+
+    ctx.lineTo(
+      x2-
+      okBoyu*
+      Math.cos(
+        aci+Math.PI/6
+      ),
+
+      y2-
+      okBoyu*
+      Math.sin(
+        aci+Math.PI/6
+      )
+    );
+
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+
+  /* ==============================
+     C İÇİN YÖN OKLARI
+  ============================== */
+
+  function cOklariniCiz(){
+
+    okCiz(
+      650,300,
+      565,245
+    );
+
+    okCiz(
+      390,235,
+      305,330
+    );
+
+    okCiz(
+      295,475,
+      345,590
+    );
+
+    okCiz(
+      455,675,
+      590,625
+    );
+
+    textureGuncelle();
+  }
+
+
+  /* ==============================
+     DÜZ ÇİZGİ OKLARI
+  ============================== */
+
+  function duzOklariniCiz(){
+
+    okCiz(
+      650,300,
+      650,405
+    );
+
+    okCiz(
+      650,450,
+      650,565
+    );
+
+    textureGuncelle();
+  }
+
+
+  /* ==============================
+     YUMUŞAK C YOLU
+  ============================== */
+
+  function quadraticPoints(
+    p0,p1,p2,adet
+  ){
+
+    const sonuc=[];
+
+    for(
+      let i=0;
+      i<=adet;
+      i++
+    ){
+
+      const t=i/adet;
+      const mt=1-t;
+
+      sonuc.push({
+
+        x:
+          mt*mt*p0.x+
+          2*mt*t*p1.x+
+          t*t*p2.x,
+
+        y:
+          mt*mt*p0.y+
+          2*mt*t*p1.y+
+          t*t*p2.y
+
+      });
+
+    }
+
+    return sonuc;
+  }
+
+
+  function cYoluOlustur(){
+
+    const yol=[];
+
+    /*
+      BAŞLANGIÇ:
+      SAĞ ÜST
+
+      SON:
+      SAĞ ALT
+
+      AÇIK C
+    */
+
+    yol.push(
+      ...quadraticPoints(
+        {x:650,y:300},
+        {x:565,y:215},
+        {x:470,y:220},
+        35
+      )
+    );
+
+    yol.push(
+      ...quadraticPoints(
+        {x:470,y:220},
+        {x:285,y:220},
+        {x:285,y:430},
+        45
+      )
+    );
+
+    yol.push(
+      ...quadraticPoints(
+        {x:285,y:430},
+        {x:285,y:665},
+        {x:475,y:675},
+        45
+      )
+    );
+
+    yol.push(
+      ...quadraticPoints(
+        {x:475,y:675},
+        {x:585,y:675},
+        {x:650,y:590},
+        35
+      )
+    );
+
+    return yol;
+  }
+
+
+  /* ==============================
+     ANİMASYONLU ÇİZGİ
+  ============================== */
+
+  function yoluCiz(
+    noktalar,
+    sure,
+    tamamlandi
+  ){
+
+    let baslangic=null;
+    let sonIndex=0;
+
+
+    ctx.strokeStyle="#ff3b30";
+    ctx.lineWidth=42;
+    ctx.lineCap="round";
+    ctx.lineJoin="round";
+
+
+    function frame(zaman){
+
+      if(!baslangic){
+        baslangic=zaman;
       }
 
-      return sonuc;
-    }
+      const gecen=
+        zaman-baslangic;
+
+      let ilerleme=
+        gecen/sure;
+
+      if(ilerleme>1){
+        ilerleme=1;
+      }
 
 
-    /* =====================================
-       ÇİZGİYİ ADIM ADIM ÇİZ
-
-       ÇİZGİ KALICI KALIR.
-       KIRMIZI NOKTA = KALEM UCU.
-    ===================================== */
-
-    function yoluCiz(
-      noktalar,
-      sure,
-      tamamlandi
-    ) {
-
-      let baslangicZamani = null;
-      let sonIndex = 0;
-
-      ctx.strokeStyle = "#ff3b30";
-      ctx.lineWidth = 42;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
+      const hedefIndex=
+        Math.min(
+          noktalar.length-1,
+          Math.floor(
+            ilerleme*
+            (noktalar.length-1)
+          )
+        );
 
 
-      function frame(zaman) {
+      while(
+        sonIndex<
+        hedefIndex
+      ){
 
-        if (!baslangicZamani) {
-          baslangicZamani = zaman;
-        }
+        const p1=
+          noktalar[sonIndex];
 
+        const p2=
+          noktalar[sonIndex+1];
 
-        const gecen =
-          zaman - baslangicZamani;
-
-
-        let ilerleme =
-          gecen / sure;
-
-
-        if (ilerleme > 1) {
-          ilerleme = 1;
-        }
-
-
-        const hedefIndex =
-          Math.min(
-            noktalar.length - 1,
-            Math.floor(
-              ilerleme *
-              (noktalar.length - 1)
-            )
-          );
-
-
-        /*
-          SADECE YENİ ÇİZGİ PARÇALARINI ÇİZ
-        */
-
-        while (sonIndex < hedefIndex) {
-
-          const p1 =
-            noktalar[sonIndex];
-
-          const p2 =
-            noktalar[sonIndex + 1];
-
-
-          ctx.beginPath();
-
-          ctx.moveTo(
-            p1.x,
-            p1.y
-          );
-
-          ctx.lineTo(
-            p2.x,
-            p2.y
-          );
-
-          ctx.stroke();
-
-          sonIndex++;
-        }
-
-
-        /*
-          KALEM UCUNU GÖSTER
-        */
-
-        const kalem =
-          noktalar[hedefIndex];
-
-
-        ctx.save();
 
         ctx.beginPath();
 
-        ctx.arc(
-          kalem.x,
-          kalem.y,
-          15,
-          0,
-          Math.PI * 2
+        ctx.moveTo(
+          p1.x,
+          p1.y
         );
 
-        ctx.fillStyle =
-          "#ffcc00";
+        ctx.lineTo(
+          p2.x,
+          p2.y
+        );
 
-        ctx.fill();
+        ctx.stroke();
 
-        ctx.restore();
-
-
-        textureGuncelle();
-
-
-        if (ilerleme < 1) {
-
-          animasyonID =
-            requestAnimationFrame(frame);
-
-        } else {
-
-          animasyonID = null;
-
-          if (tamamlandi) {
-            tamamlandi();
-          }
-        }
+        sonIndex++;
       }
 
 
-      animasyonID =
-        requestAnimationFrame(frame);
+      /*
+        KALEM UCU
+      */
+
+      const p=
+        noktalar[hedefIndex];
+
+      ctx.save();
+
+      ctx.beginPath();
+
+      ctx.arc(
+        p.x,
+        p.y,
+        17,
+        0,
+        Math.PI*2
+      );
+
+      ctx.fillStyle="#ffd400";
+
+      ctx.fill();
+
+      ctx.restore();
+
+
+      textureGuncelle();
+
+
+      if(ilerleme<1){
+
+        animasyonID=
+          requestAnimationFrame(
+            frame
+          );
+
+      }else{
+
+        animasyonID=null;
+
+        if(tamamlandi){
+          tamamlandi();
+        }
+
+      }
+
     }
 
 
-    /* =====================================
-       1. HAREKET
+    animasyonID=
+      requestAnimationFrame(
+        frame
+      );
 
-       KÜÇÜK a'NIN c KISMI
-
-       SAĞ ÜSTTEN BAŞLAR
-
-            ●
-          ╭
-        ╭
-       │
-       │
-        ╰
-          ╰
-
-       SAĞ TARAF AÇIK KALIR.
-    ===================================== */
-
-    function cCiz() {
-
-      const yol = [];
+  }
 
 
-      /*
-        BÖLÜM 1
+  /* ==============================
+     TEKRAR BAŞLIĞI
+  ============================== */
 
-        SAĞ ÜST
-        →
-        ÜST ORTA
-    */
+  function tekrarEkrani(){
 
-    yol.push(
-      ...quadraticPoints(
+    temizleCanvas();
 
-        {x:650, y:300},
+    if(tekrar===1){
 
-        {x:570, y:210},
+      yaziYaz(
+        "1. kez izleyelim!",
+        "Önce c çizgisini takip et."
+      );
 
-        {x:470, y:210},
+    }else{
 
-        25
-      )
-    );
+      yaziYaz(
+        "Bir kez daha!",
+        "Aynı hareketi tekrar izleyelim."
+      );
+
+    }
 
 
     /*
-      BÖLÜM 2
-
-      ÜST ORTA
-      →
-      SOL ORTA
+      OKLAR ÖNCEDEN GÖRÜNSÜN
     */
 
-    yol.push(
-      ...quadraticPoints(
-
-        {x:470, y:210},
-
-        {x:300, y:220},
-
-        {x:285, y:420},
-
-        30
-      )
-    );
+    cOklariniCiz();
 
 
     /*
-      BÖLÜM 3
-
-      SOL ORTA
-      →
-      ALT ORTA
+      ÇOCUK ÖNCE YÖNÜ GÖRSÜN.
+      SONRA ÇİZİM BAŞLASIN.
     */
 
-    yol.push(
-      ...quadraticPoints(
-
-        {x:285, y:420},
-
-        {x:280, y:650},
-
-        {x:475, y:675},
-
-        30
-      )
+    timer(
+      cCiz,
+      1400
     );
+
+  }
+
+
+  /* ==============================
+     1. HAREKET
+     c
+  ============================== */
+
+  function cCiz(){
+
+    /*
+      Yazıyı koruyoruz.
+      Oklar da ekranda kalıyor.
+    */
+
+    const yol=
+      cYoluOlustur();
 
 
     /*
-      BÖLÜM 4
-
-      ALT ORTA
-      →
-      SAĞ ALT
-
-      BURADA DURUR.
-
-      ÜSTE DÖNMEZ.
-      TAM YUVARLAK OLMAZ.
+      YAVAŞ:
+      4 SANİYE
     */
 
-    yol.push(
-      ...quadraticPoints(
+    yoluCiz(
+      yol,
+      4000,
+      ()=>{
 
-        {x:475, y:675},
+        /*
+          c TAMAMLANDI.
 
-        {x:585, y:680},
+          ÇİZGİ İLE DÜZ ÇİZGİ
+          AYRI GÖRÜNMESİN DİYE
+          İKİNCİ ÇİZGİNİN X KONUMU
+          TAM C'NİN SAĞ UCUNDAN GEÇECEK.
+        */
 
-        {x:650, y:590},
+        timer(
+          duzHazirlik,
+          900
+        );
 
-        25
-      )
+      }
     );
 
+  }
+
+
+  /* ==============================
+     2. HAREKET HAZIRLIK
+  ============================== */
+
+  function duzHazirlik(){
+
+    /*
+      c SİLİNMİYOR.
+      EKRANDA KALIYOR.
+    */
+
+    yaziYaz(
+      "2. Düz çizgiyi çiz.",
+      "Yukarıdan aşağı doğru."
+    );
+
+    duzOklariniCiz();
+
+
+    timer(
+      duzCizgi,
+      1200
+    );
+
+  }
+
+
+  /* ==============================
+     2. HAREKET
+     DÜZ ÇİZGİ
+  ============================== */
+
+  function duzCizgi(){
+
+    const yol=[];
+
+    /*
+      ÖNEMLİ:
+
+      C'nin sağ üst başlangıcı:
+      x = 650
+
+      C'nin sağ alt bitişi:
+      x = 650
+
+      Düz çizgi de:
+      x = 650
+
+      Böylece çizgiler
+      BİRBİRİNE TAM TEMAS EDER.
+    */
+
+    const x=650;
+
+    const baslangicY=285;
+    const bitisY=680;
+
+    const adet=70;
+
+
+    for(
+      let i=0;
+      i<=adet;
+      i++
+    ){
+
+      const t=i/adet;
+
+      yol.push({
+
+        x:x,
+
+        y:
+          baslangicY+
+          (
+            bitisY-
+            baslangicY
+          )*t
+
+      });
+
+    }
+
+
+    /*
+      YAVAŞ:
+      2.6 SANİYE
+    */
 
     yoluCiz(
       yol,
       2600,
-      () => {
+      ()=>{
 
         /*
-          c BİTTİ.
-
-          KALEM KALKIYOR.
-          700 MS BEKLİYOR.
+          TAMAMLANMIŞ a
+          1.4 SANİYE EKRANDA KALSIN
         */
 
         timer(
-          duzCizgi,
-          700
+          tekrarKontrol,
+          1400
         );
 
       }
     );
+
   }
 
 
-  /* =====================================
-     2. HAREKET
+  /* ==============================
+     İKİNCİ TEKRAR
+  ============================== */
 
-     SAĞ ÜSTTEN
-     AŞAĞI DÜZ ÇİZGİ
+  function tekrarKontrol(){
 
-             ↓
-  ===================================== */
+    if(tekrar===1){
 
-  function duzCizgi() {
+      tekrar=2;
 
-    const yol = [];
+      /*
+        İLK HARFİ SİLİP
+        AYNI YERDE BAŞTAN
+        BİR KEZ DAHA GÖSTER.
+      */
 
-    const x = 650;
+      timer(
+        tekrarEkrani,
+        500
+      );
 
-    const baslangicY = 280;
-    const bitisY = 675;
+    }else{
 
-    const adet = 45;
+      bitir();
 
-
-    for (let i = 0; i <= adet; i++) {
-
-      const t =
-        i / adet;
-
-      yol.push({
-
-        x: x,
-
-        y:
-          baslangicY +
-          (
-            bitisY -
-            baslangicY
-          ) * t
-
-      });
     }
 
-
-    yoluCiz(
-      yol,
-      1300,
-      () => {
-
-        /*
-          KÜÇÜK a TAMAMLANDI
-        */
-
-        neti.removeAttribute(
-          "animation__tebrik"
-        );
-
-
-        neti.setAttribute(
-          "animation__tebrik",
-
-          "property: scale;" +
-          "from: 1 1 1;" +
-          "to: 1.12 1.12 1.12;" +
-          "dir: alternate;" +
-          "loop: 2;" +
-          "dur: 350;" +
-          "easing: easeInOutQuad"
-        );
-
-      }
-    );
   }
 
 
-  /* =====================================
+  /* ==============================
+     SON
+  ============================== */
+
+  function bitir(){
+
+    /*
+      HARF EKRANDA KALSIN.
+      ÜSTÜNE SON YAZI GELSİN.
+    */
+
+    yaziYaz(
+      "Harika! Şimdi sıra sende! ✏️",
+      "Kitabındaki küçük a harflerini yaz."
+    );
+
+
+    neti.removeAttribute(
+      "animation__tebrik"
+    );
+
+
+    neti.setAttribute(
+      "animation__tebrik",
+
+      "property: scale;" +
+      "from: 1 1 1;" +
+      "to: 1.12 1.12 1.12;" +
+      "dir: alternate;" +
+      "loop: 2;" +
+      "dur: 350;" +
+      "easing: easeInOutQuad"
+    );
+
+  }
+
+
+  /* ==============================
      BAŞLAT
-  ===================================== */
+  ============================== */
 
-  function baslat() {
+  function baslat(){
 
-    if (basladi) return;
+    if(basladi) return;
+    if(!hedefGorunuyor) return;
+    if(!kullaniciBaslatti) return;
 
-    if (!hedefGorunuyor) return;
+    basladi=true;
+    tekrar=1;
 
-    if (!kullaniciBaslatti) return;
-
-
-    basladi = true;
-
-    temizleTimerlar();
-
-    canvasTemizle();
+    temizleCanvas();
 
 
     plane.setAttribute(
@@ -575,37 +853,22 @@ AFRAME.registerComponent("kucuk-a-yazma", {
 
 
     /*
-      NETİ GELİR
+      NETİ
     */
-
-    neti.removeAttribute(
-      "animation__buyume"
-    );
-
-    neti.removeAttribute(
-      "animation__yuksel"
-    );
-
-    neti.removeAttribute(
-      "animation__tebrik"
-    );
-
 
     neti.setAttribute(
       "visible",
       "true"
     );
 
-
     neti.setAttribute(
       "scale",
       "0.05 0.05 0.05"
     );
 
-
     neti.setAttribute(
       "position",
-      "-0.38 0.58 0.05"
+      "-0.40 0.59 0.06"
     );
 
 
@@ -624,8 +887,8 @@ AFRAME.registerComponent("kucuk-a-yazma", {
       "animation__yuksel",
 
       "property: position;" +
-      "from: -0.38 0.40 0.05;" +
-      "to: -0.38 0.58 0.05;" +
+      "from: -0.40 0.42 0.06;" +
+      "to: -0.40 0.59 0.06;" +
       "dur: 900;" +
       "easing: easeOutQuad"
     );
@@ -633,53 +896,43 @@ AFRAME.registerComponent("kucuk-a-yazma", {
 
     /*
       NETİ GELDİKTEN SONRA
-      c BAŞLAR
     */
 
     timer(
-      cCiz,
-      1400
+      tekrarEkrani,
+      1200
     );
+
   }
 
 
-  /* =====================================
-     HEDEF BULUNDU
-  ===================================== */
-
   target.addEventListener(
     "targetFound",
-    () => {
+    ()=>{
 
-      hedefGorunuyor = true;
-
+      hedefGorunuyor=true;
       baslat();
+
     }
   );
 
-
-  /* =====================================
-     HEDEF KAYBOLDU
-  ===================================== */
 
   target.addEventListener(
     "targetLost",
-    () => {
+    ()=>{
 
-      hedefGorunuyor = false;
+      hedefGorunuyor=false;
+
     }
   );
 
 
-  /* =====================================
-     BUTONA BASILDI
-  ===================================== */
-
   window.addEventListener(
     "yazma-baslat",
-    () => {
+    ()=>{
 
       baslat();
+
     }
   );
 
@@ -692,9 +945,6 @@ AFRAME.registerComponent("kucuk-a-yazma", {
 
 
 <body>
-
-
-<!-- BAŞLANGIÇ -->
 
 <div id="startScreen">
 
@@ -709,109 +959,85 @@ AFRAME.registerComponent("kucuk-a-yazma", {
 </div>
 
 
-<!-- ÇİZİM CANVASI -->
-
 <canvas id="yazmaCanvas"></canvas>
 
 
-<!-- AR -->
-
 <a-scene
 
-  mindar-image="
-    imageTargetSrc: ./targets%202.mind;
-    filterMinCF: 0.0001;
-    filterBeta: 0.01;
-  "
+mindar-image="
+imageTargetSrc: ./targets%202.mind;
+filterMinCF: 0.0001;
+filterBeta: 0.01;
+"
 
-  color-space="sRGB"
+color-space="sRGB"
 
-  renderer="
-    colorManagement: true;
-    alpha: true;
-    antialias: true;
-  "
+renderer="
+colorManagement: true;
+alpha: true;
+antialias: true;
+"
 
-  vr-mode-ui="enabled: false"
+vr-mode-ui="enabled: false"
 
-  device-orientation-permission-ui="
-    enabled: false;
-  ">
-
-
-  <a-assets>
-
-    <img
-      id="netiAsset"
-      src="./72509361-9673-4AB6-8739-B7646C5522E4.png"
-      crossorigin="anonymous"
-    >
-
-  </a-assets>
+device-orientation-permission-ui="
+enabled: false;
+">
 
 
-  <a-camera
-    position="0 0 0"
-    look-controls="enabled: false">
-  </a-camera>
+<a-assets>
+
+<img
+id="netiAsset"
+src="./72509361-9673-4AB6-8739-B7646C5522E4.png"
+crossorigin="anonymous">
+
+</a-assets>
 
 
-  <a-entity
-    mindar-image-target="targetIndex: 0"
-    kucuk-a-yazma>
+<a-camera
+position="0 0 0"
+look-controls="enabled: false">
+</a-camera>
 
 
-    <!-- NETİ -->
-
-    <a-image
-
-      id="netiYazma"
-
-      src="#netiAsset"
-
-      position="-0.38 0.58 0.05"
-
-      width="0.34"
-      height="0.34"
-
-      visible="false"
-
-      material="
-        shader: flat;
-        transparent: true;
-        alphaTest: 0.01;
-      ">
-
-    </a-image>
+<a-entity
+mindar-image-target="targetIndex: 0"
+kucuk-a-yazma>
 
 
-    <!-- KÜÇÜK a -->
-
-    <a-plane
-
-      id="yazmaPlane"
-
-      position="0 0.02 0.08"
-
-      width="1.15"
-      height="1.15"
-
-      visible="false"
-
-      material="
-        src: #yazmaCanvas;
-        transparent: true;
-        shader: flat;
-      ">
-
-    </a-plane>
+<a-image
+id="netiYazma"
+src="#netiAsset"
+position="-0.40 0.59 0.06"
+width="0.32"
+height="0.32"
+visible="false"
+material="
+shader: flat;
+transparent: true;
+alphaTest: 0.01;
+">
+</a-image>
 
 
-  </a-entity>
+<a-plane
+id="yazmaPlane"
+position="0 0.02 0.08"
+width="1.15"
+height="1.15"
+visible="false"
+material="
+src: #yazmaCanvas;
+transparent: true;
+shader: flat;
+">
+</a-plane>
 
+
+</a-entity>
 
 </a-scene>
-
 
 </body>
 </html>
