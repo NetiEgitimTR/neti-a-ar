@@ -2,550 +2,529 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
 <style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+  }
 
-body{
-  margin:0;
-  overflow:hidden;
-  font-family:Arial,sans-serif;
-}
+  #startScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,248,225,0.97);
+  }
 
-#startScreen{
-  position:fixed;
-  inset:0;
-  z-index:99999;
+  #startButton {
+    border: none;
+    border-radius: 25px;
+    padding: 18px 28px;
+    font-size: 22px;
+    font-weight: bold;
+    background: #ff8a3d;
+    color: white;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.20);
+  }
 
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+  #startText {
+    margin-top: 15px;
+    padding: 0 30px;
+    font-size: 16px;
+    color: #555;
+    text-align: center;
+  }
 
-  background:rgba(255,248,225,0.97);
-}
-
-#startButton{
-  border:none;
-  border-radius:25px;
-
-  padding:18px 28px;
-
-  font-size:22px;
-  font-weight:bold;
-
-  background:#ff8a3d;
-  color:white;
-
-  box-shadow:0 6px 16px rgba(0,0,0,0.20);
-}
-
-#startText{
-  margin-top:15px;
-  padding:0 30px;
-
-  font-size:16px;
-  color:#555;
-
-  text-align:center;
-}
-
+  #yazmaCanvas {
+    display: none;
+  }
 </style>
 
-
 <script>
-
-/* =========================================
-   BAŞLANGIÇ
-========================================= */
 
 let kullaniciBaslatti = false;
 
 
-window.addEventListener(
-  "DOMContentLoaded",
-  () => {
+/* =========================================
+   BAŞLANGIÇ BUTONU
+========================================= */
 
-    const button =
-      document.querySelector("#startButton");
+window.addEventListener("DOMContentLoaded", () => {
 
-    const screen =
-      document.querySelector("#startScreen");
+  const button = document.querySelector("#startButton");
+  const screen = document.querySelector("#startScreen");
+
+  button.addEventListener("click", () => {
+
+    kullaniciBaslatti = true;
+
+    screen.style.display = "none";
+
+    window.dispatchEvent(
+      new Event("yazma-baslat")
+    );
+
+  });
+
+});
 
 
-    button.addEventListener(
-      "click",
+/* =========================================
+   KÜÇÜK a YAZMA
+========================================= */
+
+AFRAME.registerComponent("kucuk-a-yazma", {
+
+  init: function () {
+
+    const target = this.el;
+
+    const canvas =
+      document.querySelector("#yazmaCanvas");
+
+    const ctx =
+      canvas.getContext("2d");
+
+    const plane =
+      document.querySelector("#yazmaPlane");
+
+    const neti =
+      document.querySelector("#netiYazma");
+
+
+    canvas.width = 1000;
+    canvas.height = 1000;
+
+
+    let hedefGorunuyor = false;
+    let basladi = false;
+
+    let animasyonID = null;
+    let timerlar = [];
+
+
+    /* =====================================
+       YARDIMCI
+    ===================================== */
+
+    function timer(fn, ms) {
+
+      const id = setTimeout(fn, ms);
+
+      timerlar.push(id);
+
+      return id;
+    }
+
+
+    function temizleTimerlar() {
+
+      timerlar.forEach(clearTimeout);
+
+      timerlar = [];
+
+      if (animasyonID) {
+
+        cancelAnimationFrame(animasyonID);
+
+        animasyonID = null;
+      }
+    }
+
+
+    function textureGuncelle() {
+
+      const mesh =
+        plane.getObject3D("mesh");
+
+      if (
+        mesh &&
+        mesh.material &&
+        mesh.material.map
+      ) {
+
+        mesh.material.map.needsUpdate = true;
+      }
+    }
+
+
+    function canvasTemizle() {
+
+      ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+      textureGuncelle();
+    }
+
+
+    /* =====================================
+       YUMUŞAK YOL OLUŞTUR
+    ===================================== */
+
+    function quadraticPoints(p0, p1, p2, adet) {
+
+      const sonuc = [];
+
+      for (let i = 0; i <= adet; i++) {
+
+        const t = i / adet;
+
+        const mt = 1 - t;
+
+        sonuc.push({
+
+          x:
+            mt * mt * p0.x +
+            2 * mt * t * p1.x +
+            t * t * p2.x,
+
+          y:
+            mt * mt * p0.y +
+            2 * mt * t * p1.y +
+            t * t * p2.y
+
+        });
+      }
+
+      return sonuc;
+    }
+
+
+    /* =====================================
+       ÇİZGİYİ ADIM ADIM ÇİZ
+
+       ÇİZGİ KALICI KALIR.
+       KIRMIZI NOKTA = KALEM UCU.
+    ===================================== */
+
+    function yoluCiz(
+      noktalar,
+      sure,
+      tamamlandi
+    ) {
+
+      let baslangicZamani = null;
+      let sonIndex = 0;
+
+      ctx.strokeStyle = "#ff3b30";
+      ctx.lineWidth = 42;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+
+
+      function frame(zaman) {
+
+        if (!baslangicZamani) {
+          baslangicZamani = zaman;
+        }
+
+
+        const gecen =
+          zaman - baslangicZamani;
+
+
+        let ilerleme =
+          gecen / sure;
+
+
+        if (ilerleme > 1) {
+          ilerleme = 1;
+        }
+
+
+        const hedefIndex =
+          Math.min(
+            noktalar.length - 1,
+            Math.floor(
+              ilerleme *
+              (noktalar.length - 1)
+            )
+          );
+
+
+        /*
+          SADECE YENİ ÇİZGİ PARÇALARINI ÇİZ
+        */
+
+        while (sonIndex < hedefIndex) {
+
+          const p1 =
+            noktalar[sonIndex];
+
+          const p2 =
+            noktalar[sonIndex + 1];
+
+
+          ctx.beginPath();
+
+          ctx.moveTo(
+            p1.x,
+            p1.y
+          );
+
+          ctx.lineTo(
+            p2.x,
+            p2.y
+          );
+
+          ctx.stroke();
+
+          sonIndex++;
+        }
+
+
+        /*
+          KALEM UCUNU GÖSTER
+        */
+
+        const kalem =
+          noktalar[hedefIndex];
+
+
+        ctx.save();
+
+        ctx.beginPath();
+
+        ctx.arc(
+          kalem.x,
+          kalem.y,
+          15,
+          0,
+          Math.PI * 2
+        );
+
+        ctx.fillStyle =
+          "#ffcc00";
+
+        ctx.fill();
+
+        ctx.restore();
+
+
+        textureGuncelle();
+
+
+        if (ilerleme < 1) {
+
+          animasyonID =
+            requestAnimationFrame(frame);
+
+        } else {
+
+          animasyonID = null;
+
+          if (tamamlandi) {
+            tamamlandi();
+          }
+        }
+      }
+
+
+      animasyonID =
+        requestAnimationFrame(frame);
+    }
+
+
+    /* =====================================
+       1. HAREKET
+
+       KÜÇÜK a'NIN c KISMI
+
+       SAĞ ÜSTTEN BAŞLAR
+
+            ●
+          ╭
+        ╭
+       │
+       │
+        ╰
+          ╰
+
+       SAĞ TARAF AÇIK KALIR.
+    ===================================== */
+
+    function cCiz() {
+
+      const yol = [];
+
+
+      /*
+        BÖLÜM 1
+
+        SAĞ ÜST
+        →
+        ÜST ORTA
+    */
+
+    yol.push(
+      ...quadraticPoints(
+
+        {x:650, y:300},
+
+        {x:570, y:210},
+
+        {x:470, y:210},
+
+        25
+      )
+    );
+
+
+    /*
+      BÖLÜM 2
+
+      ÜST ORTA
+      →
+      SOL ORTA
+    */
+
+    yol.push(
+      ...quadraticPoints(
+
+        {x:470, y:210},
+
+        {x:300, y:220},
+
+        {x:285, y:420},
+
+        30
+      )
+    );
+
+
+    /*
+      BÖLÜM 3
+
+      SOL ORTA
+      →
+      ALT ORTA
+    */
+
+    yol.push(
+      ...quadraticPoints(
+
+        {x:285, y:420},
+
+        {x:280, y:650},
+
+        {x:475, y:675},
+
+        30
+      )
+    );
+
+
+    /*
+      BÖLÜM 4
+
+      ALT ORTA
+      →
+      SAĞ ALT
+
+      BURADA DURUR.
+
+      ÜSTE DÖNMEZ.
+      TAM YUVARLAK OLMAZ.
+    */
+
+    yol.push(
+      ...quadraticPoints(
+
+        {x:475, y:675},
+
+        {x:585, y:680},
+
+        {x:650, y:590},
+
+        25
+      )
+    );
+
+
+    yoluCiz(
+      yol,
+      2600,
       () => {
 
-        kullaniciBaslatti = true;
+        /*
+          c BİTTİ.
 
-        screen.style.display = "none";
+          KALEM KALKIYOR.
+          700 MS BEKLİYOR.
+        */
 
-        window.dispatchEvent(
-          new Event("yazma-baslat")
+        timer(
+          duzCizgi,
+          700
         );
 
       }
     );
-
   }
-);
 
 
+  /* =====================================
+     2. HAREKET
 
-/* =========================================
-   KÜÇÜK a YAZMA ANİMASYONU
-========================================= */
+     SAĞ ÜSTTEN
+     AŞAĞI DÜZ ÇİZGİ
 
-AFRAME.registerComponent(
-  "kucuk-a-yazma",
-  {
+             ↓
+  ===================================== */
 
-    init:function(){
+  function duzCizgi() {
 
-      const target = this.el;
+    const yol = [];
 
-      const canvas =
-        document.querySelector("#yazmaCanvas");
+    const x = 650;
 
-      const ctx =
-        canvas.getContext("2d");
+    const baslangicY = 280;
+    const bitisY = 675;
 
-      const plane =
-        document.querySelector("#yazmaPlane");
+    const adet = 45;
 
-      const neti =
-        document.querySelector("#netiYazma");
 
+    for (let i = 0; i <= adet; i++) {
 
-      canvas.width = 800;
-      canvas.height = 800;
+      const t =
+        i / adet;
 
+      yol.push({
 
-      let hedefGorunuyor = false;
-      let basladi = false;
+        x: x,
 
-      let animationFrame = null;
-      let timers = [];
+        y:
+          baslangicY +
+          (
+            bitisY -
+            baslangicY
+          ) * t
 
+      });
+    }
 
-      /* =====================================
-         YARDIMCI
-      ===================================== */
 
-      function timer(fn,ms){
-
-        const id =
-          setTimeout(fn,ms);
-
-        timers.push(id);
-
-        return id;
-      }
-
-
-      function temizle(){
-
-        timers.forEach(clearTimeout);
-        timers = [];
-
-        if(animationFrame){
-
-          cancelAnimationFrame(
-            animationFrame
-          );
-
-          animationFrame = null;
-        }
-
-      }
-
-
-      function textureGuncelle(){
-
-        const mesh =
-          plane.getObject3D("mesh");
-
-        if(
-          mesh &&
-          mesh.material &&
-          mesh.material.map
-        ){
-
-          mesh.material.map.needsUpdate =
-            true;
-        }
-      }
-
-
-      function canvasTemizle(){
-
-        ctx.clearRect(
-          0,
-          0,
-          canvas.width,
-          canvas.height
-        );
-
-        textureGuncelle();
-      }
-
-
-
-      /* =====================================
-         KALICI ÇİZGİ ÇİZİMİ
-
-         Önceki sürümde çizim her karede
-         tekrar tekrar oluşturuluyordu.
-
-         Şimdi sadece bir önceki noktadan
-         yeni noktaya çiziyoruz.
-         Böylece c net biçimde kalıyor.
-      ===================================== */
-
-      function yoluCiz(
-        noktalar,
-        sure,
-        tamamlandi
-      ){
-
-        let baslangicZamani = null;
-
-        let sonCizilenIndex = 0;
-
-
-        ctx.strokeStyle = "#ff3b30";
-
-        ctx.lineWidth = 34;
-
-        ctx.lineCap = "round";
-
-        ctx.lineJoin = "round";
-
-
-        function frame(zaman){
-
-          if(!baslangicZamani){
-
-            baslangicZamani = zaman;
-          }
-
-
-          const gecen =
-            zaman - baslangicZamani;
-
-
-          let progress =
-            gecen / sure;
-
-
-          if(progress > 1){
-
-            progress = 1;
-          }
-
-
-          const hedefIndex =
-            Math.floor(
-              progress *
-              (noktalar.length - 1)
-            );
-
-
-          /*
-             SADECE YENİ KISMI ÇİZ
-          */
-
-          while(
-            sonCizilenIndex <
-            hedefIndex
-          ){
-
-            const p1 =
-              noktalar[
-                sonCizilenIndex
-              ];
-
-            const p2 =
-              noktalar[
-                sonCizilenIndex + 1
-              ];
-
-
-            ctx.beginPath();
-
-            ctx.moveTo(
-              p1.x,
-              p1.y
-            );
-
-            ctx.lineTo(
-              p2.x,
-              p2.y
-            );
-
-            ctx.stroke();
-
-
-            sonCizilenIndex++;
-
-          }
-
-
-          textureGuncelle();
-
-
-          if(progress < 1){
-
-            animationFrame =
-              requestAnimationFrame(
-                frame
-              );
-
-          }else{
-
-            animationFrame = null;
-
-            if(tamamlandi){
-
-              tamamlandi();
-            }
-          }
-        }
-
-
-        animationFrame =
-          requestAnimationFrame(frame);
-      }
-
-
-
-      /* =====================================
-         1. HAREKET
-
-               c
-
-         BAŞLANGIÇ:
-         SAĞ ÜST
-
-         SONRA:
-         SOL ÜST
-         SOL
-         SOL ALT
-         ALT
-         SAĞ ALT
-
-         ÖNEMLİ:
-         ÇEMBERİ KAPATMIYORUZ.
-      ===================================== */
-
-      function cCiz(){
-
-        const noktalar = [];
-
-
-        const cx = 390;
-        const cy = 390;
-
-        const rx = 170;
-        const ry = 170;
-
+    yoluCiz(
+      yol,
+      1300,
+      () => {
 
         /*
-          Sağ üstten başlıyoruz.
-
-          315° → 45°
-
-          Fakat uzun yoldan:
-          315 → 270 → 180 →
-          90 → 45
-
-          Canvas koordinatında
-          bu bize açık bir c verir.
+          KÜÇÜK a TAMAMLANDI
         */
-
-
-        const baslangicDerece = -45;
-
-        const bitisDerece = -315;
-
-        const toplamNokta = 100;
-
-
-        for(
-          let i=0;
-          i<=toplamNokta;
-          i++
-        ){
-
-          const t =
-            i / toplamNokta;
-
-
-          const derece =
-            baslangicDerece +
-            (
-              bitisDerece -
-              baslangicDerece
-            ) * t;
-
-
-          const aci =
-            derece *
-            Math.PI / 180;
-
-
-          noktalar.push({
-
-            x:
-              cx +
-              Math.cos(aci) *
-              rx,
-
-            y:
-              cy +
-              Math.sin(aci) *
-              ry
-
-          });
-        }
-
-
-        yoluCiz(
-          noktalar,
-          2200,
-          () => {
-
-            /*
-              c TAMAMLANDI.
-
-              KALEM KALKIYOR.
-
-              700 ms BEKLE.
-            */
-
-            timer(
-              duzCizgi,
-              700
-            );
-
-          }
-        );
-      }
-
-
-
-      /* =====================================
-         2. HAREKET
-
-         SAĞ TARAFTA
-
-                ↓
-
-         YUKARIDAN AŞAĞIYA
-         DÜZ ÇİZGİ
-      ===================================== */
-
-      function duzCizgi(){
-
-        const noktalar = [
-
-          {x:560,y:220},
-
-          {x:560,y:260},
-
-          {x:560,y:300},
-
-          {x:560,y:340},
-
-          {x:560,y:380},
-
-          {x:560,y:420},
-
-          {x:560,y:460},
-
-          {x:560,y:500},
-
-          {x:560,y:540},
-
-          {x:560,y:560}
-
-        ];
-
-
-        yoluCiz(
-          noktalar,
-          1200,
-          () => {
-
-            /*
-              KÜÇÜK a TAMAMLANDI
-            */
-
-            neti.removeAttribute(
-              "animation__tebrik"
-            );
-
-
-            neti.setAttribute(
-              "animation__tebrik",
-
-              "property: scale;" +
-              "from: 1 1 1;" +
-              "to: 1.12 1.12 1.12;" +
-              "dir: alternate;" +
-              "loop: 2;" +
-              "dur: 350;" +
-              "easing: easeInOutQuad"
-            );
-
-          }
-        );
-      }
-
-
-
-      /* =====================================
-         BAŞLAT
-      ===================================== */
-
-      function baslat(){
-
-        if(basladi) return;
-
-        if(!hedefGorunuyor) return;
-
-        if(!kullaniciBaslatti) return;
-
-
-        basladi = true;
-
-        temizle();
-
-        canvasTemizle();
-
-
-        plane.setAttribute(
-          "visible",
-          "true"
-        );
-
-
-        /* NETİ */
-
-        neti.removeAttribute(
-          "animation__buyume"
-        );
-
-        neti.removeAttribute(
-          "animation__yuksel"
-        );
 
         neti.removeAttribute(
           "animation__tebrik"
@@ -553,118 +532,169 @@ AFRAME.registerComponent(
 
 
         neti.setAttribute(
-          "visible",
-          "true"
-        );
-
-
-        neti.setAttribute(
-          "scale",
-          "0.05 0.05 0.05"
-        );
-
-
-        neti.setAttribute(
-          "position",
-          "-0.38 0.58 0.05"
-        );
-
-
-        neti.setAttribute(
-          "animation__buyume",
+          "animation__tebrik",
 
           "property: scale;" +
-          "from: 0.05 0.05 0.05;" +
-          "to: 1 1 1;" +
-          "dur: 900;" +
-          "easing: easeOutBack"
-        );
-
-
-        neti.setAttribute(
-          "animation__yuksel",
-
-          "property: position;" +
-          "from: -0.38 0.40 0.05;" +
-          "to: -0.38 0.58 0.05;" +
-          "dur: 900;" +
-          "easing: easeOutQuad"
-        );
-
-
-        /*
-          NETİ GELDİKTEN SONRA
-          c ÇİZİMİ BAŞLASIN
-        */
-
-        timer(
-          cCiz,
-          1400
+          "from: 1 1 1;" +
+          "to: 1.12 1.12 1.12;" +
+          "dir: alternate;" +
+          "loop: 2;" +
+          "dur: 350;" +
+          "easing: easeInOutQuad"
         );
 
       }
-
-
-
-      /* =====================================
-         TARGET FOUND
-      ===================================== */
-
-      target.addEventListener(
-        "targetFound",
-        () => {
-
-          hedefGorunuyor = true;
-
-          baslat();
-
-        }
-      );
-
-
-
-      /* =====================================
-         TARGET LOST
-      ===================================== */
-
-      target.addEventListener(
-        "targetLost",
-        () => {
-
-          hedefGorunuyor = false;
-
-        }
-      );
-
-
-
-      /* =====================================
-         BUTON
-      ===================================== */
-
-      window.addEventListener(
-        "yazma-baslat",
-        () => {
-
-          baslat();
-
-        }
-      );
-
-    }
-
+    );
   }
-);
+
+
+  /* =====================================
+     BAŞLAT
+  ===================================== */
+
+  function baslat() {
+
+    if (basladi) return;
+
+    if (!hedefGorunuyor) return;
+
+    if (!kullaniciBaslatti) return;
+
+
+    basladi = true;
+
+    temizleTimerlar();
+
+    canvasTemizle();
+
+
+    plane.setAttribute(
+      "visible",
+      "true"
+    );
+
+
+    /*
+      NETİ GELİR
+    */
+
+    neti.removeAttribute(
+      "animation__buyume"
+    );
+
+    neti.removeAttribute(
+      "animation__yuksel"
+    );
+
+    neti.removeAttribute(
+      "animation__tebrik"
+    );
+
+
+    neti.setAttribute(
+      "visible",
+      "true"
+    );
+
+
+    neti.setAttribute(
+      "scale",
+      "0.05 0.05 0.05"
+    );
+
+
+    neti.setAttribute(
+      "position",
+      "-0.38 0.58 0.05"
+    );
+
+
+    neti.setAttribute(
+      "animation__buyume",
+
+      "property: scale;" +
+      "from: 0.05 0.05 0.05;" +
+      "to: 1 1 1;" +
+      "dur: 900;" +
+      "easing: easeOutBack"
+    );
+
+
+    neti.setAttribute(
+      "animation__yuksel",
+
+      "property: position;" +
+      "from: -0.38 0.40 0.05;" +
+      "to: -0.38 0.58 0.05;" +
+      "dur: 900;" +
+      "easing: easeOutQuad"
+    );
+
+
+    /*
+      NETİ GELDİKTEN SONRA
+      c BAŞLAR
+    */
+
+    timer(
+      cCiz,
+      1400
+    );
+  }
+
+
+  /* =====================================
+     HEDEF BULUNDU
+  ===================================== */
+
+  target.addEventListener(
+    "targetFound",
+    () => {
+
+      hedefGorunuyor = true;
+
+      baslat();
+    }
+  );
+
+
+  /* =====================================
+     HEDEF KAYBOLDU
+  ===================================== */
+
+  target.addEventListener(
+    "targetLost",
+    () => {
+
+      hedefGorunuyor = false;
+    }
+  );
+
+
+  /* =====================================
+     BUTONA BASILDI
+  ===================================== */
+
+  window.addEventListener(
+    "yazma-baslat",
+    () => {
+
+      baslat();
+    }
+  );
+
+}
+
+});
 
 </script>
-
 </head>
 
 
 <body>
 
 
-<!-- BAŞLANGIÇ EKRANI -->
+<!-- BAŞLANGIÇ -->
 
 <div id="startScreen">
 
@@ -679,14 +709,9 @@ AFRAME.registerComponent(
 </div>
 
 
-
 <!-- ÇİZİM CANVASI -->
 
-<canvas
-  id="yazmaCanvas"
-  style="display:none;">
-</canvas>
-
+<canvas id="yazmaCanvas"></canvas>
 
 
 <!-- AR -->
@@ -707,12 +732,10 @@ AFRAME.registerComponent(
     antialias: true;
   "
 
-  vr-mode-ui="
-    enabled: false
-  "
+  vr-mode-ui="enabled: false"
 
   device-orientation-permission-ui="
-    enabled: false
+    enabled: false;
   ">
 
 
@@ -727,20 +750,14 @@ AFRAME.registerComponent(
   </a-assets>
 
 
-
   <a-camera
     position="0 0 0"
     look-controls="enabled: false">
   </a-camera>
 
 
-
   <a-entity
-
-    mindar-image-target="
-      targetIndex: 0
-    "
-
+    mindar-image-target="targetIndex: 0"
     kucuk-a-yazma>
 
 
@@ -754,8 +771,8 @@ AFRAME.registerComponent(
 
       position="-0.38 0.58 0.05"
 
-      width="0.36"
-      height="0.36"
+      width="0.34"
+      height="0.34"
 
       visible="false"
 
@@ -768,14 +785,13 @@ AFRAME.registerComponent(
     </a-image>
 
 
-
-    <!-- KÜÇÜK a ÇİZİM ALANI -->
+    <!-- KÜÇÜK a -->
 
     <a-plane
 
       id="yazmaPlane"
 
-      position="0 0.08 0.08"
+      position="0 0.02 0.08"
 
       width="1.15"
       height="1.15"
