@@ -13,7 +13,8 @@
       overflow: hidden;
     }
 
-    #harfCanvas {
+    #harfCanvas,
+    #ariCanvas {
       display: none;
     }
   </style>
@@ -25,23 +26,40 @@
         const target = this.el;
         const neti = document.querySelector('#netiKarakter');
         const harfler = document.querySelector('#harfler');
+        const ari = document.querySelector('#ari');
+
+        let timer1;
+        let timer2;
+        let timer3;
 
         target.addEventListener('targetFound', () => {
 
-          // Animasyonları temizle
+          clearTimeout(timer1);
+          clearTimeout(timer2);
+          clearTimeout(timer3);
+
           neti.removeAttribute('animation__buyume');
           neti.removeAttribute('animation__yuksel');
+
           harfler.removeAttribute('animation__harf');
 
-          // Başlangıç konumları
+          ari.removeAttribute('animation__ariBuyume');
+          ari.removeAttribute('animation__ariUcus');
+
+          // BAŞLANGIÇ
           neti.setAttribute('scale', '0.05 0.05 0.05');
           neti.setAttribute('position', '0 -0.25 0.03');
 
           harfler.setAttribute('scale', '0.01 0.01 0.01');
           harfler.setAttribute('visible', 'false');
 
-          // NETİ ÇIKIYOR
-          setTimeout(() => {
+          ari.setAttribute('scale', '0.01 0.01 0.01');
+          ari.setAttribute('position', '-0.35 0.30 0.06');
+          ari.setAttribute('visible', 'false');
+
+
+          // 1 — NETİ ORTAYA ÇIKIYOR
+          timer1 = setTimeout(() => {
 
             neti.setAttribute(
               'animation__buyume',
@@ -55,25 +73,54 @@
 
           }, 100);
 
-          // A a HARFLERİ ÇIKIYOR
-          setTimeout(() => {
+
+          // 2 — A a HARFLERİ GELİYOR
+          timer2 = setTimeout(() => {
 
             harfler.setAttribute('visible', 'true');
 
             harfler.setAttribute(
               'animation__harf',
-              'property: scale; from: 0.01 0.01 0.01; to: 1 1 1; dur: 900; easing: easeOutBack'
+              'property: scale; from: 0.01 0.01 0.01; to: 1 1 1; dur: 800; easing: easeOutBack'
             );
 
           }, 1700);
 
+
+          // 3 — ARI GELİYOR
+          timer3 = setTimeout(() => {
+
+            ari.setAttribute('visible', 'true');
+
+            ari.setAttribute(
+              'animation__ariBuyume',
+              'property: scale; from: 0.01 0.01 0.01; to: 1 1 1; dur: 700; easing: easeOutBack'
+            );
+
+            // Arı soldan sağa doğru uçar
+            ari.setAttribute(
+              'animation__ariUcus',
+              'property: position; from: -0.35 0.30 0.06; to: 0.35 0.30 0.06; dur: 2200; easing: easeInOutSine'
+            );
+
+          }, 2800);
+
         });
+
 
         target.addEventListener('targetLost', () => {
 
+          clearTimeout(timer1);
+          clearTimeout(timer2);
+          clearTimeout(timer3);
+
           neti.removeAttribute('animation__buyume');
           neti.removeAttribute('animation__yuksel');
+
           harfler.removeAttribute('animation__harf');
+
+          ari.removeAttribute('animation__ariBuyume');
+          ari.removeAttribute('animation__ariUcus');
 
           neti.setAttribute('scale', '0.05 0.05 0.05');
           neti.setAttribute('position', '0 -0.25 0.03');
@@ -81,21 +128,28 @@
           harfler.setAttribute('scale', '0.01 0.01 0.01');
           harfler.setAttribute('visible', 'false');
 
+          ari.setAttribute('scale', '0.01 0.01 0.01');
+          ari.setAttribute('visible', 'false');
+
         });
 
       }
     });
 
+
     window.addEventListener('DOMContentLoaded', () => {
 
-      // A ve a harflerini canvas üzerine çiz
-      const canvas = document.querySelector('#harfCanvas');
-      const ctx = canvas.getContext('2d');
+      // --------------------
+      // A a HARFLERİ
+      // --------------------
 
-      canvas.width = 1024;
-      canvas.height = 512;
+      const harfCanvas = document.querySelector('#harfCanvas');
+      const ctx = harfCanvas.getContext('2d');
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      harfCanvas.width = 1024;
+      harfCanvas.height = 512;
+
+      ctx.clearRect(0, 0, 1024, 512);
 
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -103,34 +157,129 @@
       ctx.font = 'bold 330px Arial';
       ctx.lineWidth = 18;
 
-      // Beyaz dış çizgi
       ctx.strokeStyle = '#FFFFFF';
       ctx.strokeText('A a', 512, 255);
 
-      // Turuncu harf
       ctx.fillStyle = '#FF6B35';
       ctx.fillText('A a', 512, 255);
 
-      // A-Frame dokusunu yenile
-      setTimeout(() => {
-        const material = document.querySelector('#harfler').getObject3D('mesh');
-        if (
-          material &&
-          material.material &&
-          material.material.map
-        ) {
-          material.material.map.needsUpdate = true;
-        }
-      }, 1000);
+
+      // --------------------
+      // SEVİMLİ ARI 🐝
+      // --------------------
+
+      const ariCanvas = document.querySelector('#ariCanvas');
+      const a = ariCanvas.getContext('2d');
+
+      ariCanvas.width = 512;
+      ariCanvas.height = 512;
+
+      a.clearRect(0, 0, 512, 512);
+
+      // Kanatlar
+      a.fillStyle = 'rgba(210,240,255,0.90)';
+
+      a.beginPath();
+      a.ellipse(180, 175, 75, 110, -0.5, 0, Math.PI * 2);
+      a.fill();
+
+      a.beginPath();
+      a.ellipse(330, 175, 75, 110, 0.5, 0, Math.PI * 2);
+      a.fill();
+
+
+      // Arının gövdesi
+      a.fillStyle = '#FFD43B';
+
+      a.beginPath();
+      a.ellipse(256, 290, 125, 105, 0, 0, Math.PI * 2);
+      a.fill();
+
+
+      // Siyah çizgiler
+      a.fillStyle = '#333333';
+
+      a.fillRect(170, 245, 172, 25);
+      a.fillRect(150, 305, 212, 25);
+
+
+      // Baş
+      a.fillStyle = '#FFD43B';
+
+      a.beginPath();
+      a.arc(256, 185, 85, 0, Math.PI * 2);
+      a.fill();
+
+
+      // Gözler
+      a.fillStyle = '#222222';
+
+      a.beginPath();
+      a.arc(225, 175, 12, 0, Math.PI * 2);
+      a.fill();
+
+      a.beginPath();
+      a.arc(287, 175, 12, 0, Math.PI * 2);
+      a.fill();
+
+
+      // Göz parıltısı
+      a.fillStyle = '#FFFFFF';
+
+      a.beginPath();
+      a.arc(229, 171, 4, 0, Math.PI * 2);
+      a.fill();
+
+      a.beginPath();
+      a.arc(291, 171, 4, 0, Math.PI * 2);
+      a.fill();
+
+
+      // Gülümseme
+      a.strokeStyle = '#333333';
+      a.lineWidth = 8;
+
+      a.beginPath();
+      a.arc(256, 195, 35, 0.15, Math.PI - 0.15);
+      a.stroke();
+
+
+      // Antenler
+      a.lineWidth = 8;
+
+      a.beginPath();
+      a.moveTo(220, 120);
+      a.lineTo(190, 70);
+      a.stroke();
+
+      a.beginPath();
+      a.moveTo(292, 120);
+      a.lineTo(322, 70);
+      a.stroke();
+
+
+      // Anten uçları
+      a.fillStyle = '#333333';
+
+      a.beginPath();
+      a.arc(187, 66, 12, 0, Math.PI * 2);
+      a.fill();
+
+      a.beginPath();
+      a.arc(325, 66, 12, 0, Math.PI * 2);
+      a.fill();
 
     });
   </script>
 
 </head>
 
+
 <body>
 
 <canvas id="harfCanvas"></canvas>
+<canvas id="ariCanvas"></canvas>
+
 
 <a-scene
   mindar-image="imageTargetSrc: ./targets.mind;"
@@ -139,6 +288,7 @@
   vr-mode-ui="enabled: false"
   device-orientation-permission-ui="enabled: false">
 
+
   <a-assets>
 
     <img
@@ -146,20 +296,22 @@
       src="./72509361-9673-4AB6-8739-B7646C5522E4.png"
       crossorigin="anonymous">
 
-    <canvas id="harfTexture"></canvas>
-
   </a-assets>
+
 
   <a-camera
     position="0 0 0"
     look-controls="enabled: false">
   </a-camera>
 
+
   <a-entity
     mindar-image-target="targetIndex: 0"
     neti-animation>
 
+
     <!-- NETİ -->
+
     <a-image
       id="netiKarakter"
       src="#neti"
@@ -170,7 +322,9 @@
       material="shader: flat; transparent: true; alphaTest: 0.01">
     </a-image>
 
+
     <!-- A a -->
+
     <a-plane
       id="harfler"
       position="0 0.55 0.04"
@@ -180,6 +334,20 @@
       visible="false"
       material="src: #harfCanvas; transparent: true; shader: flat;">
     </a-plane>
+
+
+    <!-- ARI -->
+
+    <a-plane
+      id="ari"
+      position="-0.35 0.30 0.06"
+      width="0.28"
+      height="0.28"
+      scale="0.01 0.01 0.01"
+      visible="false"
+      material="src: #ariCanvas; transparent: true; shader: flat;">
+    </a-plane>
+
 
   </a-entity>
 
