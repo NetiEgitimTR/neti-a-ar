@@ -53,16 +53,13 @@
   <script>
 
     let sesHazir = false;
-
     let audioContext = null;
-
     let fonTimer = null;
-
     let fonAktif = false;
 
 
     /* ==========================================
-       SES SİSTEMİNİ HAZIRLA
+       SES SİSTEMİ
        ========================================== */
 
     function sesSisteminiAc() {
@@ -78,12 +75,8 @@
 
       }
 
-      if (
-        audioContext.state === 'suspended'
-      ) {
-
+      if (audioContext.state === 'suspended') {
         audioContext.resume();
-
       }
 
     }
@@ -91,60 +84,50 @@
 
 
     /* ==========================================
-       YUMUŞAK POP SESİ
-
-       Her harf belirdiğinde çalacak.
+       DAHA BELİRGİN PIT SESİ - v13
        ========================================== */
 
     function popSesiCal() {
 
       if (!audioContext) return;
 
-
       const now =
         audioContext.currentTime;
 
-
       const oscillator =
         audioContext.createOscillator();
-
 
       const gain =
         audioContext.createGain();
 
 
-      oscillator.type =
-        'sine';
+      oscillator.type = 'sine';
 
 
-      /*
-        Hafif parlak ama rahatsız etmeyen
-        kısa ses.
-      */
+      /* DAHA PARLAK */
 
       oscillator.frequency.setValueAtTime(
-        620,
+        720,
         now
       );
 
-
       oscillator.frequency.exponentialRampToValueAtTime(
-        820,
+        980,
         now + 0.07
       );
 
+
+      /* DAHA YÜKSEK */
 
       gain.gain.setValueAtTime(
         0.0001,
         now
       );
 
-
       gain.gain.exponentialRampToValueAtTime(
-        0.055,
+        0.13,
         now + 0.015
       );
-
 
       gain.gain.exponentialRampToValueAtTime(
         0.0001,
@@ -171,9 +154,6 @@
 
     /* ==========================================
        HAFİF FON SESİ
-
-       Göz egzersizi sırasında çok hafif
-       müzikal tonlar çalıyor.
        ========================================== */
 
     function fonNotasiCal(
@@ -183,22 +163,17 @@
 
       if (!audioContext) return;
 
-
       const now =
         audioContext.currentTime;
 
-
       const oscillator =
         audioContext.createOscillator();
-
 
       const gain =
         audioContext.createGain();
 
 
-      oscillator.type =
-        'sine';
-
+      oscillator.type = 'sine';
 
       oscillator.frequency.setValueAtTime(
         frequency,
@@ -206,22 +181,15 @@
       );
 
 
-      /*
-        Fon özellikle çok düşük.
-        Pop sesinden daha geride kalıyor.
-      */
-
       gain.gain.setValueAtTime(
         0.0001,
         now
       );
 
-
       gain.gain.exponentialRampToValueAtTime(
         0.018,
         now + 0.08
       );
-
 
       gain.gain.exponentialRampToValueAtTime(
         0.0001,
@@ -252,13 +220,8 @@
 
       if (!audioContext) return;
 
-
       fonAktif = true;
 
-
-      /*
-        Sakin, sevimli küçük nota dizisi.
-      */
 
       const notalar = [
         261.63,
@@ -338,12 +301,10 @@
             '#startButton'
           );
 
-
         const startScreen =
           document.querySelector(
             '#startScreen'
           );
-
 
         const netiSes =
           document.querySelector(
@@ -355,18 +316,8 @@
           'click',
           async () => {
 
-            /*
-              Web Audio'yu kullanıcının
-              dokunuşuyla açıyoruz.
-            */
-
             sesSisteminiAc();
 
-
-            /*
-              Neti MP3'ünü Safari için
-              kullanıma hazır hale getiriyoruz.
-            */
 
             try {
 
@@ -413,9 +364,7 @@
         init: function () {
 
           this.active = false;
-
           this.startTime = 0;
-
           this.duration = 3700;
 
 
@@ -458,18 +407,12 @@
             true
           );
 
-
           this.el.object3D.scale.set(
-            1,
-            1,
-            1
+            1, 1, 1
           );
 
-
           this.el.object3D.rotation.set(
-            0,
-            0,
-            0
+            0, 0, 0
           );
 
         },
@@ -484,7 +427,6 @@
         ) {
 
           const t2 = t * t;
-
           const t3 = t2 * t;
 
 
@@ -556,9 +498,7 @@
 
 
           if (progress >= 1) {
-
             progress = 1;
-
           }
 
 
@@ -572,20 +512,14 @@
 
 
           let index =
-            Math.floor(
-              position
-            );
+            Math.floor(position);
 
 
           let localT =
-            position -
-            index;
+            position - index;
 
 
-          if (
-            index >=
-            segmentCount
-          ) {
+          if (index >= segmentCount) {
 
             index =
               segmentCount - 1;
@@ -605,9 +539,7 @@
 
 
           const p1 =
-            this.points[
-              index
-            ];
+            this.points[index];
 
 
           const p2 =
@@ -666,7 +598,7 @@
 
 
     /* ==========================================
-       14 HEDEFLİ SESLİ GÖZ EGZERSİZİ
+       14 HEDEFLİ GÖZ EGZERSİZİ
        ========================================== */
 
     AFRAME.registerComponent(
@@ -676,7 +608,6 @@
         init: function () {
 
           this.running = false;
-
           this.timers = [];
 
 
@@ -827,9 +758,7 @@
         },
 
 
-        drawLetter: function(
-          letter
-        ) {
+        drawLetter: function(letter) {
 
           const canvas =
             document.querySelector(
@@ -844,7 +773,6 @@
 
 
           canvas.width = 500;
-
           canvas.height = 500;
 
 
@@ -859,45 +787,35 @@
           ctx.textAlign =
             'center';
 
-
           ctx.textBaseline =
             'middle';
-
 
           ctx.lineJoin =
             'round';
 
-
           ctx.lineCap =
             'round';
-
 
           ctx.font =
             'bold 360px Arial';
 
-
           ctx.lineWidth =
             20;
 
-
           ctx.strokeStyle =
             '#FFFFFF';
-
 
           ctx.fillStyle =
             '#FF6B35';
 
 
-          if (
-            letter === 'A'
-          ) {
+          if (letter === 'A') {
 
             ctx.strokeText(
               'A',
               250,
               255
             );
-
 
             ctx.fillText(
               'A',
@@ -908,16 +826,13 @@
           }
 
 
-          if (
-            letter === 'a'
-          ) {
+          if (letter === 'a') {
 
             ctx.strokeText(
               'ɑ',
               250,
               255
             );
-
 
             ctx.fillText(
               'ɑ',
@@ -955,10 +870,7 @@
           this.running = true;
 
 
-          /*
-            GÖZ EGZERSİZİ BAŞLADIĞINDA
-            HAFİF FON BAŞLIYOR.
-          */
+          /* FON BAŞLIYOR */
 
           fonBaslat();
 
@@ -972,17 +884,15 @@
             (step) => {
 
 
-              /*
-                HARF BELİRİYOR
-              */
+              /* HARF BELİRİYOR */
 
               const showTimer =
                 setTimeout(
                   () => {
 
-                    if (
-                      !self.running
-                    ) return;
+                    if (!self.running) {
+                      return;
+                    }
 
 
                     self.drawLetter(
@@ -1011,8 +921,7 @@
 
 
                     /*
-                      HARFLE AYNI ANDA
-                      MİNİK POP SESİ
+                      YÜKSELTİLMİŞ PIT SESİ
                     */
 
                     popSesiCal();
@@ -1028,9 +937,7 @@
 
 
 
-              /*
-                HARF KAYBOLUYOR
-              */
+              /* HARF KAYBOLUYOR */
 
               const hideAt =
                 currentTime +
@@ -1041,9 +948,9 @@
                 setTimeout(
                   () => {
 
-                    if (
-                      !self.running
-                    ) return;
+                    if (!self.running) {
+                      return;
+                    }
 
 
                     self.el.setAttribute(
@@ -1069,9 +976,8 @@
           );
 
 
-          /*
-            EGZERSİZ BİTİYOR
-          */
+
+          /* EGZERSİZ SONU */
 
           const finishTimer =
             setTimeout(
@@ -1086,10 +992,6 @@
                   'false'
                 );
 
-
-                /*
-                  FON DA BİTİYOR
-                */
 
                 fonDurdur();
 
@@ -1154,12 +1056,8 @@
 
 
           let basladi = false;
-
-          let kayipTimer =
-            null;
-
-          let zamanlayicilar =
-            [];
+          let kayipTimer = null;
+          let zamanlayicilar = [];
 
 
           function timer(
@@ -1191,8 +1089,7 @@
             );
 
 
-            zamanlayicilar =
-              [];
+            zamanlayicilar = [];
 
           }
 
@@ -1202,12 +1099,10 @@
 
             if (basladi) return;
 
-
             basladi = true;
 
 
             timerlariTemizle();
-
 
             fonDurdur();
 
@@ -1232,11 +1127,9 @@
 
               netiSes.pause();
 
-              netiSes.currentTime =
-                0;
+              netiSes.currentTime = 0;
 
-              netiSes.volume =
-                1;
+              netiSes.volume = 1;
 
             } catch(e) {}
 
@@ -1268,7 +1161,7 @@
 
 
             /* ==================================
-               NETİ + NETİ SESİ
+               NETİ + SES
                ================================== */
 
             timer(
@@ -1300,19 +1193,15 @@
                 );
 
 
-                if (
-                  sesHazir
-                ) {
+                if (sesHazir) {
 
                   try {
 
                     netiSes.pause();
 
-                    netiSes.currentTime =
-                      0;
+                    netiSes.currentTime = 0;
 
-                    netiSes.volume =
-                      1;
+                    netiSes.volume = 1;
 
 
                     const oynat =
@@ -1320,8 +1209,7 @@
 
 
                     if (
-                      oynat !==
-                      undefined
+                      oynat !== undefined
                     ) {
 
                       oynat.catch(
@@ -1440,8 +1328,7 @@
 
               ari.components[
                 'smooth-bee-flight'
-              ].active =
-                false;
+              ].active = false;
 
             }
 
@@ -1468,7 +1355,7 @@
 
 
             /* ==================================
-               ARI + İLK HARFLER KAYBOLUYOR
+               ARI + A/a KAYBOLUYOR
                ================================== */
 
             timer(
@@ -1492,7 +1379,7 @@
 
 
             /* ==================================
-               SESLİ GÖZ EGZERSİZİ
+               GÖZ EGZERSİZİ
                ================================== */
 
             timer(
@@ -1524,17 +1411,13 @@
             'targetFound',
             () => {
 
-              if (
-                kayipTimer
-              ) {
+              if (kayipTimer) {
 
                 clearTimeout(
                   kayipTimer
                 );
 
-
-                kayipTimer =
-                  null;
+                kayipTimer = null;
 
               }
 
@@ -1552,9 +1435,7 @@
             'targetLost',
             () => {
 
-              if (
-                kayipTimer
-              ) {
+              if (kayipTimer) {
 
                 clearTimeout(
                   kayipTimer
@@ -1567,12 +1448,9 @@
                 setTimeout(
                   () => {
 
-                    basladi =
-                      false;
-
+                    basladi = false;
 
                     timerlariTemizle();
-
 
                     fonDurdur();
 
@@ -1581,8 +1459,7 @@
 
                       netiSes.pause();
 
-                      netiSes.currentTime =
-                        0;
+                      netiSes.currentTime = 0;
 
                     } catch(e) {}
 
@@ -1595,8 +1472,7 @@
 
                       ari.components[
                         'smooth-bee-flight'
-                      ].active =
-                        false;
+                      ].active = false;
 
                     }
 
@@ -1659,11 +1535,8 @@
           );
 
 
-        canvas.width =
-          1200;
-
-        canvas.height =
-          600;
+        canvas.width = 1200;
+        canvas.height = 600;
 
 
         ctx.clearRect(
@@ -1677,14 +1550,11 @@
         ctx.textAlign =
           'center';
 
-
         ctx.textBaseline =
           'middle';
 
-
         ctx.lineJoin =
           'round';
-
 
         ctx.lineCap =
           'round';
@@ -1696,10 +1566,8 @@
         ctx.font =
           'bold 390px Arial';
 
-
         ctx.lineWidth =
           22;
-
 
         ctx.strokeStyle =
           '#FFFFFF';
@@ -1729,10 +1597,8 @@
         ctx.font =
           'bold 390px Arial';
 
-
         ctx.lineWidth =
           22;
-
 
         ctx.strokeStyle =
           '#FFFFFF';
@@ -1766,8 +1632,6 @@
 <body>
 
 
-<!-- NETİ'NİN KONUŞMA SESİ -->
-
 <audio
   id="netiSes"
   src="./Merhaba%20Ben%20Neti%20A%20s.mp3"
@@ -1776,8 +1640,6 @@
 </audio>
 
 
-
-<!-- BAŞLAT EKRANI -->
 
 <div id="startScreen">
 
@@ -1815,9 +1677,7 @@
     antialias: true;
   "
 
-  vr-mode-ui="
-    enabled: false
-  "
+  vr-mode-ui="enabled: false"
 
   device-orientation-permission-ui="
     enabled: false
@@ -1826,20 +1686,17 @@
 
   <a-assets>
 
-
     <img
       id="neti"
       src="./72509361-9673-4AB6-8739-B7646C5522E4.png"
       crossorigin="anonymous"
     >
 
-
     <img
       id="ariPNG"
       src="./831FD224-0476-409E-B2D5-24D2A8AD424E.png"
       crossorigin="anonymous"
     >
-
 
   </a-assets>
 
@@ -1853,134 +1710,73 @@
 
 
   <a-entity
-    mindar-image-target="
-      targetIndex: 0
-    "
+    mindar-image-target="targetIndex: 0"
     neti-animation>
 
 
-    <!-- NETİ -->
-
     <a-image
-
       id="netiKarakter"
-
       src="#neti"
-
-      position="
-        0 -0.25 0.03
-      "
-
+      position="0 -0.25 0.03"
       width="0.75"
-
       height="0.75"
-
-      scale="
-        0.05 0.05 0.05
-      "
-
+      scale="0.05 0.05 0.05"
       material="
         shader: flat;
         transparent: true;
         alphaTest: 0.01;
       ">
-
     </a-image>
 
 
 
-    <!-- BAŞLANGIÇ A / a -->
-
     <a-plane
-
       id="harfler"
-
-      position="
-        0 0.55 0.04
-      "
-
+      position="0 0.55 0.04"
       width="0.90"
-
       height="0.45"
-
-      scale="
-        0.01 0.01 0.01
-      "
-
+      scale="0.01 0.01 0.01"
       visible="false"
-
       material="
         src: #harfCanvas;
         transparent: true;
         shader: flat;
       ">
-
     </a-plane>
 
 
 
-    <!-- GÖZ EGZERSİZİ HARFİ -->
-
     <a-plane
-
       id="tekHarf"
-
-      position="
-        0 0.48 0.12
-      "
-
+      position="0 0.48 0.12"
       width="0.33"
-
       height="0.33"
-
       visible="false"
-
       eye-pop-exercise
-
       material="
         src: #tekHarfCanvas;
         transparent: true;
         shader: flat;
       ">
-
     </a-plane>
 
 
 
-    <!-- ARI -->
-
     <a-image
-
       id="ariKarakter"
-
       src="#ariPNG"
-
-      position="
-        -0.48 -0.30 0.09
-      "
-
+      position="-0.48 -0.30 0.09"
       width="0.22"
-
       height="0.22"
-
-      scale="
-        1 1 1
-      "
-
-      rotation="
-        0 0 0
-      "
-
+      scale="1 1 1"
+      rotation="0 0 0"
       visible="false"
-
       smooth-bee-flight
-
       material="
         shader: flat;
         transparent: true;
         alphaTest: 0.01;
       ">
-
     </a-image>
 
 
