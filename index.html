@@ -14,7 +14,8 @@
       font-family: Arial, sans-serif;
     }
 
-    #harfCanvas {
+    #harfCanvas,
+    #tekHarfCanvas {
       display: none;
     }
 
@@ -55,9 +56,9 @@
     let sesHazir = false;
 
 
-    /* =====================================
-       SESİ iPHONE'DA AKTİF ET
-       ===================================== */
+    /* ==========================================
+       iPHONE / SAFARI SES İZNİ
+       ========================================== */
 
     window.addEventListener('DOMContentLoaded', () => {
 
@@ -103,9 +104,9 @@
 
 
 
-    /* =====================================
-       ARININ AKICI UÇUŞU
-       ===================================== */
+    /* ==========================================
+       ARI UÇUŞU
+       ========================================== */
 
     AFRAME.registerComponent('smooth-bee-flight', {
 
@@ -117,6 +118,8 @@
 
         this.duration = 3700;
 
+
+        /* AYNI BEĞENDİĞİMİZ ROTA */
 
         this.points = [
 
@@ -167,11 +170,18 @@
 
         this.active = true;
 
-        this.el.setAttribute('visible', true);
+        this.el.setAttribute(
+          'visible',
+          true
+        );
 
-        this.el.object3D.scale.set(1, 1, 1);
+        this.el.object3D.scale.set(
+          1, 1, 1
+        );
 
-        this.el.object3D.rotation.set(0, 0, 0);
+        this.el.object3D.rotation.set(
+          0, 0, 0
+        );
 
       },
 
@@ -332,20 +342,6 @@
             0.09
           );
 
-
-          this.el.object3D.rotation.set(
-            0,
-            0,
-            0
-          );
-
-
-          this.el.object3D.scale.set(
-            1,
-            1,
-            1
-          );
-
         }
 
       }
@@ -354,202 +350,368 @@
 
 
 
-    /* =========================================
-       GÖZ EGZERSİZİ
-       ========================================= */
+    /* ==========================================
+       YENİ GÖZ EGZERSİZİ
 
-    AFRAME.registerComponent('eye-exercise', {
+       Harfler hareket etmiyor.
+       Farklı noktalarda belirip kayboluyor.
+       ========================================== */
+
+    AFRAME.registerComponent('eye-pop-exercise', {
 
       init: function () {
 
-        this.active = false;
+        this.running = false;
 
-        this.startTime = 0;
-
-
-        /*
-          GÖZ EGZERSİZİNİN TOPLAM SÜRESİ
-
-          10 SANİYE
-        */
-
-        this.duration = 10000;
+        this.timers = [];
 
 
         /*
-          A/a'NIN İZLEYECEĞİ YOL
+          HARFLERİN ÇIKACAĞI NOKTALAR
 
-          ORTA
-          SAĞ
-          SOL
-          ORTA
-          YUKARI
-          AŞAĞI
-          ORTA
+          Sol üst
+          Sağ üst
+          Sol alt
+          Sağ alt
+          Orta
+          Üst orta
+          Alt orta
         */
 
-        this.points = [
+        this.steps = [
 
-          {x: 0.00, y: 0.55},
+          {
+            x:-0.38,
+            y: 0.67,
+            letter:'A'
+          },
 
-          {x: 0.38, y: 0.55},
+          {
+            x: 0.38,
+            y: 0.67,
+            letter:'a'
+          },
 
-          {x:-0.38, y: 0.55},
+          {
+            x:-0.38,
+            y: 0.25,
+            letter:'A'
+          },
 
-          {x: 0.00, y: 0.55},
+          {
+            x: 0.38,
+            y: 0.25,
+            letter:'a'
+          },
 
-          {x: 0.00, y: 0.82},
+          {
+            x: 0.00,
+            y: 0.48,
+            letter:'A'
+          },
 
-          {x: 0.00, y: 0.28},
+          {
+            x: 0.00,
+            y: 0.78,
+            letter:'a'
+          },
 
-          {x: 0.00, y: 0.55}
+          {
+            x: 0.00,
+            y: 0.18,
+            letter:'A'
+          }
 
         ];
 
       },
 
 
-      startExercise: function () {
+      clearTimers: function () {
 
-        this.startTime =
-          performance.now();
+        this.timers.forEach(
+          clearTimeout
+        );
 
-        this.active = true;
+        this.timers = [];
 
+      },
+
+
+      stopExercise: function () {
+
+        this.running = false;
+
+        this.clearTimers();
 
         this.el.setAttribute(
           'visible',
-          true
-        );
-
-
-        /*
-          BOYUT SABİT
-        */
-
-        this.el.object3D.scale.set(
-          1,
-          1,
-          1
+          'false'
         );
 
       },
 
 
-      /*
-        YUMUŞAK HAREKET
-      */
+      drawLetter: function(letter) {
 
-      ease: function(t) {
-
-        return t * t * (3 - 2 * t);
-
-      },
+        const canvas =
+          document.querySelector(
+            '#tekHarfCanvas'
+          );
 
 
-      tick: function () {
-
-        if (!this.active) return;
-
-
-        const elapsed =
-          performance.now() -
-          this.startTime;
+        const ctx =
+          canvas.getContext('2d');
 
 
-        let progress =
-          elapsed / this.duration;
+        canvas.width = 500;
+
+        canvas.height = 500;
 
 
-        if (progress >= 1) {
-
-          progress = 1;
-
-        }
-
-
-        const segmentCount =
-          this.points.length - 1;
-
-
-        let segmentPosition =
-          progress * segmentCount;
-
-
-        let index =
-          Math.floor(segmentPosition);
-
-
-        let localT =
-          segmentPosition - index;
-
-
-        if (index >= segmentCount) {
-
-          index =
-            segmentCount - 1;
-
-          localT = 1;
-
-        }
-
-
-        /*
-          HIZLANIP YAVAŞLAYAN
-          AKICI GEÇİŞ
-        */
-
-        localT =
-          this.ease(localT);
-
-
-        const start =
-          this.points[index];
-
-
-        const end =
-          this.points[index + 1];
-
-
-        const x =
-          start.x +
-          (end.x - start.x) *
-          localT;
-
-
-        const y =
-          start.y +
-          (end.y - start.y) *
-          localT;
-
-
-        this.el.object3D.position.set(
-          x,
-          y,
-          0.04
+        ctx.clearRect(
+          0,
+          0,
+          canvas.width,
+          canvas.height
         );
 
 
+        ctx.textAlign =
+          'center';
+
+
+        ctx.textBaseline =
+          'middle';
+
+
+        ctx.lineJoin =
+          'round';
+
+
+        ctx.lineCap =
+          'round';
+
+
         /*
-          EGZERSİZ BİTTİ
+          BÜYÜK A
         */
 
-        if (progress >= 1) {
+        if (letter === 'A') {
 
-          this.active = false;
+          ctx.font =
+            'bold 360px Arial';
 
+          ctx.lineWidth = 20;
 
-          /*
-            HARFLER TEKRAR ORTADA
-          */
+          ctx.strokeStyle =
+            '#FFFFFF';
 
-          this.el.object3D.position.set(
-            0,
-            0.55,
-            0.04
+          ctx.strokeText(
+            'A',
+            250,
+            255
+          );
+
+          ctx.fillStyle =
+            '#FF6B35';
+
+          ctx.fillText(
+            'A',
+            250,
+            255
           );
 
         }
+
+
+        /*
+          KÜÇÜK a
+
+          İlkokul tipi tek katlı a için
+          kullandığımız karakter.
+        */
+
+        if (letter === 'a') {
+
+          ctx.font =
+            'bold 360px Arial';
+
+          ctx.lineWidth = 20;
+
+          ctx.strokeStyle =
+            '#FFFFFF';
+
+          ctx.strokeText(
+            'ɑ',
+            250,
+            255
+          );
+
+          ctx.fillStyle =
+            '#FF6B35';
+
+          ctx.fillText(
+            'ɑ',
+            250,
+            255
+          );
+
+        }
+
+
+        /*
+          Canvas dokusunu yenile
+        */
+
+        const mesh =
+          this.el.getObject3D('mesh');
+
+
+        if (
+          mesh &&
+          mesh.material &&
+          mesh.material.map
+        ) {
+
+          mesh.material.map.needsUpdate =
+            true;
+
+        }
+
+      },
+
+
+      startExercise: function () {
+
+        this.stopExercise();
+
+        this.running = true;
+
+
+        const self = this;
+
+
+        /*
+          Her harf yaklaşık
+          0.9 saniye görünecek.
+
+          Arada 0.25 saniye boşluk.
+        */
+
+        const gorunmeSuresi = 900;
+
+        const bosluk = 250;
+
+        const adimSuresi =
+          gorunmeSuresi + bosluk;
+
+
+        this.steps.forEach(
+          (step, index) => {
+
+
+            /*
+              HARF BELİRİR
+            */
+
+            const showTimer =
+              setTimeout(() => {
+
+                if (!self.running) return;
+
+
+                self.drawLetter(
+                  step.letter
+                );
+
+
+                self.el.object3D.position.set(
+                  step.x,
+                  step.y,
+                  0.12
+                );
+
+
+                self.el.object3D.scale.set(
+                  1,
+                  1,
+                  1
+                );
+
+
+                self.el.setAttribute(
+                  'visible',
+                  'true'
+                );
+
+
+              }, index * adimSuresi);
+
+
+            self.timers.push(
+              showTimer
+            );
+
+
+
+            /*
+              HARF KAYBOLUR
+            */
+
+            const hideTimer =
+              setTimeout(() => {
+
+                if (!self.running) return;
+
+
+                self.el.setAttribute(
+                  'visible',
+                  'false'
+                );
+
+
+              },
+
+              index * adimSuresi +
+              gorunmeSuresi
+            );
+
+
+            self.timers.push(
+              hideTimer
+            );
+
+          }
+        );
+
+
+
+        /*
+          EGZERSİZ BİTİŞ
+        */
+
+        const finishTimer =
+          setTimeout(() => {
+
+            self.running = false;
+
+            self.el.setAttribute(
+              'visible',
+              'false'
+            );
+
+
+          },
+
+          this.steps.length *
+          adimSuresi
+        );
+
+
+        this.timers.push(
+          finishTimer
+        );
 
       }
 
@@ -557,9 +719,9 @@
 
 
 
-    /* =====================================
-       ANA AR ANİMASYONU
-       ===================================== */
+    /* ==========================================
+       ANA NETİ ANİMASYONU
+       ========================================== */
 
     AFRAME.registerComponent('neti-animation', {
 
@@ -578,6 +740,12 @@
         const harfler =
           document.querySelector(
             '#harfler'
+          );
+
+
+        const tekHarf =
+          document.querySelector(
+            '#tekHarf'
           );
 
 
@@ -634,16 +802,31 @@
           timerlariTemizle();
 
 
+          /* GÖZ EGZERSİZİNİ SIFIRLA */
 
-          /* =====================================
-             SESİ BAŞA AL
-             ===================================== */
+          if (
+            tekHarf.components[
+              'eye-pop-exercise'
+            ]
+          ) {
+
+            tekHarf.components[
+              'eye-pop-exercise'
+            ].stopExercise();
+
+          }
+
+
+
+          /* SESİ BAŞA AL */
 
           try {
 
             netiSes.pause();
 
             netiSes.currentTime = 0;
+
+            netiSes.volume = 1;
 
           } catch(e) {}
 
@@ -676,7 +859,7 @@
 
 
           /* =====================================
-             NETİ + SES
+             NETİ ÇIKIYOR + SES BAŞLIYOR
              ===================================== */
 
           timer(() => {
@@ -707,25 +890,43 @@
             );
 
 
+            /*
+              NETİ SESİ
+            */
+
             if (sesHazir) {
 
-              netiSes.currentTime = 0;
+              try {
+
+                netiSes.pause();
+
+                netiSes.currentTime = 0;
+
+                netiSes.volume = 1;
 
 
-              const oynat =
-                netiSes.play();
+                const oynat =
+                  netiSes.play();
 
 
-              if (oynat !== undefined) {
+                if (oynat !== undefined) {
 
-                oynat.catch(
-                  err => {
-                    console.log(
-                      'Ses oynatılamadı:',
-                      err
-                    );
-                  }
-                );
+                  oynat.catch(
+                    err => {
+
+                      console.log(
+                        'Neti sesi oynatılamadı:',
+                        err
+                      );
+
+                    }
+                  );
+
+                }
+
+              } catch(e) {
+
+                console.log(e);
 
               }
 
@@ -736,30 +937,12 @@
 
 
           /* =====================================
-             A a GELİYOR
+             A / a BİRLİKTE GELİYOR
              ===================================== */
 
           harfler.removeAttribute(
             'animation__harf'
           );
-
-
-          /*
-            Göz egzersizi eski bir çalışmadan
-            aktif kaldıysa durdur.
-          */
-
-          if (
-            harfler.components[
-              'eye-exercise'
-            ]
-          ) {
-
-            harfler.components[
-              'eye-exercise'
-            ].active = false;
-
-          }
 
 
           harfler.setAttribute(
@@ -805,7 +988,7 @@
 
 
           /* =====================================
-             ARI BAŞLANGIÇ
+             ARI
              ===================================== */
 
           ari.setAttribute(
@@ -821,17 +1004,17 @@
           );
 
 
-          ari.object3D.rotation.set(
-            0,
-            0,
-            0
-          );
-
-
           ari.object3D.scale.set(
             1,
             1,
             1
+          );
+
+
+          ari.object3D.rotation.set(
+            0,
+            0,
+            0
           );
 
 
@@ -849,9 +1032,7 @@
 
 
 
-          /* =====================================
-             1.7 SN → ARI UÇUYOR
-             ===================================== */
+          /* 1.7 SN → ARI UÇUYOR */
 
           timer(() => {
 
@@ -872,12 +1053,10 @@
 
 
           /* =====================================
-             ARI 5.4 SN'DE A'YA ULAŞIYOR.
+             6.4 SN
 
-             1 SANİYE A'NIN ÜSTÜNDE
-             BEKLİYOR.
-
-             6.4 SN → ARI KAYBOLUYOR.
+             ARI KAYBOLUYOR
+             İLK A/a DA KAYBOLUYOR
              ===================================== */
 
           timer(() => {
@@ -887,19 +1066,27 @@
               'false'
             );
 
+
+            harfler.setAttribute(
+              'visible',
+              'false'
+            );
+
           }, 6400);
 
 
 
           /* =====================================
-             6.6 SN → GÖZ EGZERSİZİ BAŞLIYOR
+             6.7 SN
+
+             YENİ GÖZ EGZERSİZİ BAŞLIYOR
              ===================================== */
 
           timer(() => {
 
             const exercise =
-              harfler.components[
-                'eye-exercise'
+              tekHarf.components[
+                'eye-pop-exercise'
               ];
 
 
@@ -909,7 +1096,7 @@
 
             }
 
-          }, 6600);
+          }, 6700);
 
         }
 
@@ -932,6 +1119,7 @@
               kayipTimer = null;
 
             }
+
 
             baslat();
 
@@ -956,11 +1144,6 @@
 
             }
 
-
-            /*
-              KISA KAMERA KAYIPLARINDA
-              HER ŞEYİ YENİDEN BAŞLATMIYORUZ.
-            */
 
             kayipTimer =
               setTimeout(() => {
@@ -993,14 +1176,14 @@
 
 
                 if (
-                  harfler.components[
-                    'eye-exercise'
+                  tekHarf.components[
+                    'eye-pop-exercise'
                   ]
                 ) {
 
-                  harfler.components[
-                    'eye-exercise'
-                  ].active = false;
+                  tekHarf.components[
+                    'eye-pop-exercise'
+                  ].stopExercise();
 
                 }
 
@@ -1011,11 +1194,11 @@
                 );
 
 
-                harfler.object3D.position.set(
-                  0,
-                  0.55,
-                  0.04
+                tekHarf.setAttribute(
+                  'visible',
+                  'false'
                 );
+
 
               }, 2000);
 
@@ -1028,9 +1211,9 @@
 
 
 
-    /* =====================================
-       A ve küçük a
-       ===================================== */
+    /* ==========================================
+       A / a ANA GÖRSELİ
+       ========================================== */
 
     window.addEventListener(
       'DOMContentLoaded',
@@ -1151,7 +1334,9 @@
 <body>
 
 
-<!-- NETİ SESİ -->
+<!-- ==========================================
+     NETİ SES DOSYASI
+     ========================================== -->
 
 <audio
   id="netiSes"
@@ -1162,7 +1347,9 @@
 
 
 
-<!-- BAŞLAT EKRANI -->
+<!-- ==========================================
+     BAŞLAT BUTONU
+     ========================================== -->
 
 <div id="startScreen">
 
@@ -1178,7 +1365,14 @@
 
 
 
+<!-- ANA A/a -->
+
 <canvas id="harfCanvas"></canvas>
+
+
+<!-- GÖZ EGZERSİZİNDE TEK HARF -->
+
+<canvas id="tekHarfCanvas"></canvas>
 
 
 
@@ -1198,9 +1392,7 @@
     antialias: true;
   "
 
-  vr-mode-ui="
-    enabled: false
-  "
+  vr-mode-ui="enabled: false"
 
   device-orientation-permission-ui="
     enabled: false
@@ -1217,7 +1409,6 @@
       src="./72509361-9673-4AB6-8739-B7646C5522E4.png"
       crossorigin="anonymous"
     >
-
 
 
     <!-- ARI -->
@@ -1271,7 +1462,7 @@
 
 
 
-    <!-- A a -->
+    <!-- BAŞTA GÖRÜNEN A / a -->
 
     <a-plane
 
@@ -1287,10 +1478,36 @@
 
       visible="false"
 
-      eye-exercise
-
       material="
         src: #harfCanvas;
+        transparent: true;
+        shader: flat;
+      ">
+
+    </a-plane>
+
+
+
+    <!-- ======================================
+         GÖZ EGZERSİZİNDEKİ TEK HARF
+         ====================================== -->
+
+    <a-plane
+
+      id="tekHarf"
+
+      position="0 0.48 0.12"
+
+      width="0.33"
+
+      height="0.33"
+
+      visible="false"
+
+      eye-pop-exercise
+
+      material="
+        src: #tekHarfCanvas;
         transparent: true;
         shader: flat;
       ">
