@@ -23,34 +23,56 @@
 
         target.addEventListener('targetFound', () => {
 
+          // Her taramada animasyonu baştan başlat
+          neti.removeAttribute('animation__buyume');
+          neti.removeAttribute('animation__yuksel');
+          neti.removeAttribute('animation__sallan');
+
           neti.setAttribute('scale', '0.05 0.05 0.05');
           neti.setAttribute('position', '0 -0.25 0.03');
           neti.setAttribute('rotation', '0 0 0');
 
-          neti.removeAttribute('animation__buyume');
-          neti.removeAttribute('animation__yuksel');
-
           setTimeout(() => {
 
+            // Neti büyüyerek ortaya çıkar
             neti.setAttribute(
               'animation__buyume',
               'property: scale; from: 0.05 0.05 0.05; to: 1 1 1; dur: 1800; easing: easeOutBack'
             );
 
+            // Aynı anda biraz yukarı yükselir
             neti.setAttribute(
               'animation__yuksel',
               'property: position; from: 0 -0.25 0.03; to: 0 0.08 0.03; dur: 1800; easing: easeOutQuad'
             );
 
           }, 100);
+
+          // Çıkış tamamlandıktan sonra
+          // sevimli şekilde sağa-sola sallanır
+          setTimeout(() => {
+
+            neti.setAttribute(
+              'animation__sallan',
+              'property: rotation; from: 0 0 -4; to: 0 0 4; dur: 900; dir: alternate; loop: true; easing: easeInOutSine'
+            );
+
+          }, 2000);
+
         });
 
         target.addEventListener('targetLost', () => {
+
           neti.removeAttribute('animation__buyume');
           neti.removeAttribute('animation__yuksel');
+          neti.removeAttribute('animation__sallan');
+
           neti.setAttribute('scale', '0.05 0.05 0.05');
           neti.setAttribute('position', '0 -0.25 0.03');
+          neti.setAttribute('rotation', '0 0 0');
+
         });
+
       }
     });
   </script>
@@ -67,10 +89,12 @@
   device-orientation-permission-ui="enabled: false">
 
   <a-assets>
+
     <img
       id="neti"
       src="./72509361-9673-4AB6-8739-B7646C5522E4.png"
       crossorigin="anonymous">
+
   </a-assets>
 
   <a-camera
