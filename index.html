@@ -58,9 +58,9 @@
     let fonAktif = false;
 
 
-    /* ==========================================
+    /* =========================
        SES SİSTEMİ
-       ========================================== */
+       ========================= */
 
     function sesSisteminiAc() {
 
@@ -78,21 +78,18 @@
       if (audioContext.state === 'suspended') {
         audioContext.resume();
       }
-
     }
 
 
-
-    /* ==========================================
-       DAHA BELİRGİN PIT SESİ - v13
-       ========================================== */
+    /* =========================
+       PIT SESİ
+       ========================= */
 
     function popSesiCal() {
 
       if (!audioContext) return;
 
-      const now =
-        audioContext.currentTime;
+      const now = audioContext.currentTime;
 
       const oscillator =
         audioContext.createOscillator();
@@ -100,11 +97,7 @@
       const gain =
         audioContext.createGain();
 
-
       oscillator.type = 'sine';
-
-
-      /* DAHA PARLAK */
 
       oscillator.frequency.setValueAtTime(
         720,
@@ -115,9 +108,6 @@
         980,
         now + 0.07
       );
-
-
-      /* DAHA YÜKSEK */
 
       gain.gain.setValueAtTime(
         0.0001,
@@ -134,27 +124,23 @@
         now + 0.16
       );
 
-
       oscillator.connect(gain);
 
       gain.connect(
         audioContext.destination
       );
 
-
       oscillator.start(now);
 
       oscillator.stop(
         now + 0.18
       );
-
     }
 
 
-
-    /* ==========================================
-       HAFİF FON SESİ
-       ========================================== */
+    /* =========================
+       FON SESİ
+       ========================= */
 
     function fonNotasiCal(
       frequency,
@@ -172,14 +158,12 @@
       const gain =
         audioContext.createGain();
 
-
       oscillator.type = 'sine';
 
       oscillator.frequency.setValueAtTime(
         frequency,
         now
       );
-
 
       gain.gain.setValueAtTime(
         0.0001,
@@ -196,22 +180,18 @@
         now + duration
       );
 
-
       oscillator.connect(gain);
 
       gain.connect(
         audioContext.destination
       );
 
-
       oscillator.start(now);
 
       oscillator.stop(
         now + duration + 0.05
       );
-
     }
-
 
 
     function fonBaslat() {
@@ -221,7 +201,6 @@
       if (!audioContext) return;
 
       fonAktif = true;
-
 
       const notalar = [
         261.63,
@@ -234,63 +213,48 @@
         329.63
       ];
 
-
       let notaIndex = 0;
-
 
       function notaCal() {
 
         if (!fonAktif) return;
-
 
         fonNotasiCal(
           notalar[notaIndex],
           0.55
         );
 
-
         notaIndex =
           (notaIndex + 1) %
           notalar.length;
-
 
         fonTimer =
           setTimeout(
             notaCal,
             750
           );
-
       }
 
-
       notaCal();
-
     }
-
 
 
     function fonDurdur() {
 
       fonAktif = false;
 
-
       if (fonTimer) {
 
-        clearTimeout(
-          fonTimer
-        );
+        clearTimeout(fonTimer);
 
         fonTimer = null;
-
       }
-
     }
 
 
-
-    /* ==========================================
-       iPHONE / SAFARI SES İZNİ
-       ========================================== */
+    /* =========================
+       BAŞLATMA / iPHONE SES
+       ========================= */
 
     window.addEventListener(
       'DOMContentLoaded',
@@ -311,6 +275,11 @@
             '#netiSes'
           );
 
+        const gorevSes =
+          document.querySelector(
+            '#gorevSes'
+          );
+
 
         startButton.addEventListener(
           'click',
@@ -318,8 +287,9 @@
 
             sesSisteminiAc();
 
-
             try {
+
+              /* İlk Neti sesini aç */
 
               netiSes.volume = 0;
 
@@ -331,31 +301,41 @@
 
               netiSes.volume = 1;
 
+
+              /* Görev sesini de Safari için hazırla */
+
+              gorevSes.volume = 0;
+
+              await gorevSes.play();
+
+              gorevSes.pause();
+
+              gorevSes.currentTime = 0;
+
+              gorevSes.volume = 1;
+
+
               sesHazir = true;
 
             } catch (e) {
 
               netiSes.volume = 1;
+              gorevSes.volume = 1;
 
               sesHazir = true;
-
             }
-
 
             startScreen.style.display =
               'none';
-
           }
         );
-
       }
     );
 
 
-
-    /* ==========================================
+    /* =========================
        ARI UÇUŞU
-       ========================================== */
+       ========================= */
 
     AFRAME.registerComponent(
       'smooth-bee-flight',
@@ -367,30 +347,28 @@
           this.startTime = 0;
           this.duration = 3700;
 
-
           this.points = [
 
             {x:-0.48, y:-0.30},
             {x:-0.40, y:-0.18},
             {x:-0.32, y:-0.03},
-            {x:-0.25, y: 0.08},
-            {x:-0.17, y: 0.03},
+            {x:-0.25, y:0.08},
+            {x:-0.17, y:0.03},
             {x:-0.08, y:-0.13},
-            {x: 0.02, y:-0.23},
-            {x: 0.14, y:-0.22},
-            {x: 0.25, y:-0.12},
-            {x: 0.35, y: 0.02},
-            {x: 0.43, y: 0.18},
-            {x: 0.45, y: 0.35},
-            {x: 0.40, y: 0.50},
-            {x: 0.30, y: 0.62},
-            {x: 0.17, y: 0.70},
-            {x: 0.02, y: 0.75},
-            {x:-0.15, y: 0.78},
-            {x:-0.27, y: 0.79}
+            {x:0.02, y:-0.23},
+            {x:0.14, y:-0.22},
+            {x:0.25, y:-0.12},
+            {x:0.35, y:0.02},
+            {x:0.43, y:0.18},
+            {x:0.45, y:0.35},
+            {x:0.40, y:0.50},
+            {x:0.30, y:0.62},
+            {x:0.17, y:0.70},
+            {x:0.02, y:0.75},
+            {x:-0.15, y:0.78},
+            {x:-0.27, y:0.79}
 
           ];
-
         },
 
 
@@ -401,84 +379,72 @@
 
           this.active = true;
 
-
           this.el.setAttribute(
             'visible',
             true
           );
 
           this.el.object3D.scale.set(
-            1, 1, 1
+            1,1,1
           );
 
           this.el.object3D.rotation.set(
-            0, 0, 0
+            0,0,0
           );
-
         },
 
 
         catmull: function(
-          p0,
-          p1,
-          p2,
-          p3,
-          t
+          p0,p1,p2,p3,t
         ) {
 
-          const t2 = t * t;
-          const t3 = t2 * t;
-
+          const t2 = t*t;
+          const t3 = t2*t;
 
           return {
 
-            x: 0.5 * (
+            x:0.5*(
 
-              (2 * p1.x) +
+              (2*p1.x)+
 
-              (-p0.x + p2.x) * t +
-
-              (
-                2*p0.x -
-                5*p1.x +
-                4*p2.x -
-                p3.x
-              ) * t2 +
+              (-p0.x+p2.x)*t+
 
               (
-                -p0.x +
-                3*p1.x -
-                3*p2.x +
+                2*p0.x-
+                5*p1.x+
+                4*p2.x-
                 p3.x
-              ) * t3
+              )*t2+
 
+              (
+                -p0.x+
+                3*p1.x-
+                3*p2.x+
+                p3.x
+              )*t3
             ),
 
+            y:0.5*(
 
-            y: 0.5 * (
+              (2*p1.y)+
 
-              (2 * p1.y) +
-
-              (-p0.y + p2.y) * t +
-
-              (
-                2*p0.y -
-                5*p1.y +
-                4*p2.y -
-                p3.y
-              ) * t2 +
+              (-p0.y+p2.y)*t+
 
               (
-                -p0.y +
-                3*p1.y -
-                3*p2.y +
+                2*p0.y-
+                5*p1.y+
+                4*p2.y-
                 p3.y
-              ) * t3
+              )*t2+
 
+              (
+                -p0.y+
+                3*p1.y-
+                3*p2.y+
+                p3.y
+              )*t3
             )
-
           };
-
         },
 
 
@@ -486,38 +452,30 @@
 
           if (!this.active) return;
 
-
           const elapsed =
             performance.now() -
             this.startTime;
-
 
           let progress =
             elapsed /
             this.duration;
 
-
           if (progress >= 1) {
             progress = 1;
           }
 
-
           const segmentCount =
             this.points.length - 1;
-
 
           let position =
             progress *
             segmentCount;
 
-
           let index =
             Math.floor(position);
 
-
           let localT =
             position - index;
-
 
           if (index >= segmentCount) {
 
@@ -525,40 +483,34 @@
               segmentCount - 1;
 
             localT = 1;
-
           }
-
 
           const p0 =
             this.points[
               Math.max(
                 0,
-                index - 1
+                index-1
               )
             ];
-
 
           const p1 =
             this.points[index];
 
-
           const p2 =
             this.points[
               Math.min(
-                this.points.length - 1,
-                index + 1
+                this.points.length-1,
+                index+1
               )
             ];
-
 
           const p3 =
             this.points[
               Math.min(
-                this.points.length - 1,
-                index + 2
+                this.points.length-1,
+                index+2
               )
             ];
-
 
           const pos =
             this.catmull(
@@ -569,37 +521,30 @@
               localT
             );
 
-
           this.el.object3D.position.set(
             pos.x,
             pos.y,
             0.09
           );
 
-
           if (progress >= 1) {
 
             this.active = false;
-
 
             this.el.object3D.position.set(
               -0.27,
               0.79,
               0.09
             );
-
           }
-
         }
-
       }
     );
 
 
-
-    /* ==========================================
-       14 HEDEFLİ GÖZ EGZERSİZİ
-       ========================================== */
+    /* =========================
+       GÖZ EGZERSİZİ
+       ========================= */
 
     AFRAME.registerComponent(
       'eye-pop-exercise',
@@ -610,123 +555,30 @@
           this.running = false;
           this.timers = [];
 
-
           this.steps = [
 
-            {
-              x:-0.40,
-              y:0.72,
-              letter:'A',
-              show:950,
-              gap:250
-            },
+            {x:-0.40,y:0.72,letter:'A',show:950,gap:250},
+            {x:0.40,y:0.22,letter:'a',show:950,gap:250},
+            {x:0.40,y:0.72,letter:'A',show:950,gap:250},
+            {x:-0.40,y:0.22,letter:'a',show:950,gap:250},
 
-            {
-              x:0.40,
-              y:0.22,
-              letter:'a',
-              show:950,
-              gap:250
-            },
+            {x:0.00,y:0.48,letter:'A',show:900,gap:230},
+            {x:-0.46,y:0.48,letter:'a',show:900,gap:230},
+            {x:0.46,y:0.48,letter:'A',show:900,gap:230},
 
-            {
-              x:0.40,
-              y:0.72,
-              letter:'A',
-              show:950,
-              gap:250
-            },
+            {x:0.00,y:0.80,letter:'a',show:850,gap:220},
+            {x:0.00,y:0.16,letter:'A',show:850,gap:220},
 
-            {
-              x:-0.40,
-              y:0.22,
-              letter:'a',
-              show:950,
-              gap:250
-            },
+            {x:-0.42,y:0.48,letter:'a',show:800,gap:200},
 
-            {
-              x:0.00,
-              y:0.48,
-              letter:'A',
-              show:900,
-              gap:230
-            },
+            {x:0.39,y:0.70,letter:'A',show:750,gap:180},
+            {x:-0.39,y:0.20,letter:'a',show:750,gap:180},
 
-            {
-              x:-0.46,
-              y:0.48,
-              letter:'a',
-              show:900,
-              gap:230
-            },
+            {x:0.39,y:0.20,letter:'A',show:700,gap:170},
 
-            {
-              x:0.46,
-              y:0.48,
-              letter:'A',
-              show:900,
-              gap:230
-            },
-
-            {
-              x:0.00,
-              y:0.80,
-              letter:'a',
-              show:850,
-              gap:220
-            },
-
-            {
-              x:0.00,
-              y:0.16,
-              letter:'A',
-              show:850,
-              gap:220
-            },
-
-            {
-              x:-0.42,
-              y:0.48,
-              letter:'a',
-              show:800,
-              gap:200
-            },
-
-            {
-              x:0.39,
-              y:0.70,
-              letter:'A',
-              show:750,
-              gap:180
-            },
-
-            {
-              x:-0.39,
-              y:0.20,
-              letter:'a',
-              show:750,
-              gap:180
-            },
-
-            {
-              x:0.39,
-              y:0.20,
-              letter:'A',
-              show:700,
-              gap:170
-            },
-
-            {
-              x:0.00,
-              y:0.48,
-              letter:'a',
-              show:900,
-              gap:0
-            }
+            {x:0.00,y:0.48,letter:'a',show:900,gap:0}
 
           ];
-
         },
 
 
@@ -737,7 +589,6 @@
           );
 
           this.timers = [];
-
         },
 
 
@@ -749,12 +600,10 @@
 
           fonDurdur();
 
-
           this.el.setAttribute(
             'visible',
             'false'
           );
-
         },
 
 
@@ -765,42 +614,26 @@
               '#tekHarfCanvas'
             );
 
-
           const ctx =
-            canvas.getContext(
-              '2d'
-            );
-
+            canvas.getContext('2d');
 
           canvas.width = 500;
           canvas.height = 500;
 
-
           ctx.clearRect(
-            0,
-            0,
-            500,
-            500
+            0,0,500,500
           );
 
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
 
-          ctx.textAlign =
-            'center';
-
-          ctx.textBaseline =
-            'middle';
-
-          ctx.lineJoin =
-            'round';
-
-          ctx.lineCap =
-            'round';
+          ctx.lineJoin = 'round';
+          ctx.lineCap = 'round';
 
           ctx.font =
             'bold 360px Arial';
 
-          ctx.lineWidth =
-            20;
+          ctx.lineWidth = 20;
 
           ctx.strokeStyle =
             '#FFFFFF';
@@ -822,7 +655,6 @@
               250,
               255
             );
-
           }
 
 
@@ -839,7 +671,6 @@
               250,
               255
             );
-
           }
 
 
@@ -847,7 +678,6 @@
             this.el.getObject3D(
               'mesh'
             );
-
 
           if (
             mesh &&
@@ -857,9 +687,7 @@
 
             mesh.material.map.needsUpdate =
               true;
-
           }
-
         },
 
 
@@ -869,11 +697,7 @@
 
           this.running = true;
 
-
-          /* FON BAŞLIYOR */
-
           fonBaslat();
-
 
           const self = this;
 
@@ -883,22 +707,15 @@
           this.steps.forEach(
             (step) => {
 
-
-              /* HARF BELİRİYOR */
-
               const showTimer =
                 setTimeout(
                   () => {
 
-                    if (!self.running) {
-                      return;
-                    }
-
+                    if (!self.running) return;
 
                     self.drawLetter(
                       step.letter
                     );
-
 
                     self.el.object3D.position.set(
                       step.x,
@@ -906,23 +723,14 @@
                       0.12
                     );
 
-
                     self.el.object3D.scale.set(
-                      1,
-                      1,
-                      1
+                      1,1,1
                     );
-
 
                     self.el.setAttribute(
                       'visible',
                       'true'
                     );
-
-
-                    /*
-                      YÜKSELTİLMİŞ PIT SESİ
-                    */
 
                     popSesiCal();
 
@@ -930,14 +738,10 @@
                   currentTime
                 );
 
-
               self.timers.push(
                 showTimer
               );
 
-
-
-              /* HARF KAYBOLUYOR */
 
               const hideAt =
                 currentTime +
@@ -948,10 +752,7 @@
                 setTimeout(
                   () => {
 
-                    if (!self.running) {
-                      return;
-                    }
-
+                    if (!self.running) return;
 
                     self.el.setAttribute(
                       'visible',
@@ -961,7 +762,6 @@
                   },
                   hideAt
                 );
-
 
               self.timers.push(
                 hideTimer
@@ -976,44 +776,57 @@
           );
 
 
-
-          /* EGZERSİZ SONU */
+          /*
+             GÖZ EGZERSİZİ BİTİYOR
+          */
 
           const finishTimer =
             setTimeout(
               () => {
 
-                self.running =
-                  false;
-
+                self.running = false;
 
                 self.el.setAttribute(
                   'visible',
                   'false'
                 );
 
-
                 fonDurdur();
+
+
+                /*
+                  YENİ:
+                  NETİ GÖREV VERİYOR
+                */
+
+                setTimeout(
+                  () => {
+
+                    window.dispatchEvent(
+                      new Event(
+                        'neti-gorev-baslat'
+                      )
+                    );
+
+                  },
+                  600
+                );
 
               },
               currentTime + 100
             );
 
-
           self.timers.push(
             finishTimer
           );
-
         }
-
       }
     );
 
 
-
-    /* ==========================================
+    /* =========================
        ANA NETİ ANİMASYONU
-       ========================================== */
+       ========================= */
 
     AFRAME.registerComponent(
       'neti-animation',
@@ -1021,37 +834,36 @@
 
         init: function () {
 
-          const target =
-            this.el;
-
+          const target = this.el;
 
           const neti =
             document.querySelector(
               '#netiKarakter'
             );
 
-
           const harfler =
             document.querySelector(
               '#harfler'
             );
-
 
           const tekHarf =
             document.querySelector(
               '#tekHarf'
             );
 
-
           const ari =
             document.querySelector(
               '#ariKarakter'
             );
 
-
           const netiSes =
             document.querySelector(
               '#netiSes'
+            );
+
+          const gorevSes =
+            document.querySelector(
+              '#gorevSes'
             );
 
 
@@ -1060,25 +872,14 @@
           let zamanlayicilar = [];
 
 
-          function timer(
-            fn,
-            ms
-          ) {
+          function timer(fn,ms) {
 
             const t =
-              setTimeout(
-                fn,
-                ms
-              );
+              setTimeout(fn,ms);
 
-
-            zamanlayicilar.push(
-              t
-            );
-
+            zamanlayicilar.push(t);
 
             return t;
-
           }
 
 
@@ -1088,11 +889,83 @@
               clearTimeout
             );
 
-
             zamanlayicilar = [];
-
           }
 
+
+          /*
+             YENİ:
+             GÖZ EGZERSİZİ BİTİNCE
+             NETİ TEKRAR DİKKAT ÇEKİYOR
+          */
+
+          window.addEventListener(
+            'neti-gorev-baslat',
+            () => {
+
+              /*
+                 Neti hafifçe büyüyüp
+                 tekrar küçülüyor.
+              */
+
+              neti.removeAttribute(
+                'animation__gorev'
+              );
+
+              neti.setAttribute(
+                'scale',
+                '1 1 1'
+              );
+
+              neti.setAttribute(
+                'animation__gorev',
+                'property: scale;' +
+                'from: 1 1 1;' +
+                'to: 1.12 1.12 1.12;' +
+                'dir: alternate;' +
+                'loop: 2;' +
+                'dur: 350;' +
+                'easing: easeInOutQuad'
+              );
+
+
+              /*
+                 Görev sesi
+              */
+
+              if (sesHazir) {
+
+                try {
+
+                  gorevSes.pause();
+
+                  gorevSes.currentTime = 0;
+
+                  gorevSes.volume = 1;
+
+                  const oynat =
+                    gorevSes.play();
+
+                  if (
+                    oynat !== undefined
+                  ) {
+
+                    oynat.catch(
+                      err => {
+
+                        console.log(
+                          'Görev sesi oynatılamadı:',
+                          err
+                        );
+
+                      }
+                    );
+                  }
+
+                } catch(e) {}
+              }
+            }
+          );
 
 
           function baslat() {
@@ -1100,7 +973,6 @@
             if (basladi) return;
 
             basladi = true;
-
 
             timerlariTemizle();
 
@@ -1116,42 +988,38 @@
               tekHarf.components[
                 'eye-pop-exercise'
               ].stopExercise();
-
             }
 
-
-
-            /* NETİ SESİNİ SIFIRLA */
 
             try {
 
               netiSes.pause();
-
               netiSes.currentTime = 0;
-
               netiSes.volume = 1;
+
+              gorevSes.pause();
+              gorevSes.currentTime = 0;
+              gorevSes.volume = 1;
 
             } catch(e) {}
 
-
-
-            /* NETİ BAŞLANGIÇ */
 
             neti.removeAttribute(
               'animation__buyume'
             );
 
-
             neti.removeAttribute(
               'animation__yuksel'
             );
 
+            neti.removeAttribute(
+              'animation__gorev'
+            );
 
             neti.setAttribute(
               'scale',
               '0.05 0.05 0.05'
             );
-
 
             neti.setAttribute(
               'position',
@@ -1159,37 +1027,27 @@
             );
 
 
-
-            /* ==================================
-               NETİ + SES
-               ================================== */
+            /* NETİ GELİYOR */
 
             timer(
               () => {
 
                 neti.setAttribute(
-
                   'animation__buyume',
-
                   'property: scale;' +
                   'from: 0.05 0.05 0.05;' +
                   'to: 1 1 1;' +
                   'dur: 1100;' +
                   'easing: easeOutBack'
-
                 );
 
-
                 neti.setAttribute(
-
                   'animation__yuksel',
-
                   'property: position;' +
                   'from: 0 -0.25 0.03;' +
                   'to: 0 0.08 0.03;' +
                   'dur: 1100;' +
                   'easing: easeOutQuad'
-
                 );
 
 
@@ -1203,10 +1061,8 @@
 
                     netiSes.volume = 1;
 
-
                     const oynat =
                       netiSes.play();
-
 
                     if (
                       oynat !== undefined
@@ -1222,11 +1078,9 @@
 
                         }
                       );
-
                     }
 
                   } catch(e) {}
-
                 }
 
               },
@@ -1234,27 +1088,21 @@
             );
 
 
-
-            /* ==================================
-               A / a GELİYOR
-               ================================== */
+            /* A/a */
 
             harfler.removeAttribute(
               'animation__harf'
             );
-
 
             harfler.setAttribute(
               'visible',
               'false'
             );
 
-
             harfler.setAttribute(
               'position',
               '0 0.55 0.04'
             );
-
 
             harfler.setAttribute(
               'scale',
@@ -1270,17 +1118,13 @@
                   'true'
                 );
 
-
                 harfler.setAttribute(
-
                   'animation__harf',
-
                   'property: scale;' +
                   'from: 0.01 0.01 0.01;' +
                   'to: 1 1 1;' +
                   'dur: 550;' +
                   'easing: easeOutBack'
-
                 );
 
               },
@@ -1288,16 +1132,12 @@
             );
 
 
-
-            /* ==================================
-               ARI
-               ================================== */
+            /* ARI */
 
             ari.setAttribute(
               'visible',
               'false'
             );
-
 
             ari.object3D.position.set(
               -0.48,
@@ -1305,18 +1145,12 @@
               0.09
             );
 
-
             ari.object3D.scale.set(
-              1,
-              1,
-              1
+              1,1,1
             );
 
-
             ari.object3D.rotation.set(
-              0,
-              0,
-              0
+              0,0,0
             );
 
 
@@ -1329,7 +1163,6 @@
               ari.components[
                 'smooth-bee-flight'
               ].active = false;
-
             }
 
 
@@ -1341,11 +1174,8 @@
                     'smooth-bee-flight'
                   ];
 
-
                 if (flight) {
-
                   flight.startFlight();
-
                 }
 
               },
@@ -1353,10 +1183,7 @@
             );
 
 
-
-            /* ==================================
-               ARI + A/a KAYBOLUYOR
-               ================================== */
+            /* ARI + A/a KAYBOLUR */
 
             timer(
               () => {
@@ -1365,7 +1192,6 @@
                   'visible',
                   'false'
                 );
-
 
                 harfler.setAttribute(
                   'visible',
@@ -1377,10 +1203,7 @@
             );
 
 
-
-            /* ==================================
-               GÖZ EGZERSİZİ
-               ================================== */
+            /* GÖZ EGZERSİZİ */
 
             timer(
               () => {
@@ -1390,22 +1213,15 @@
                     'eye-pop-exercise'
                   ];
 
-
                 if (exercise) {
-
                   exercise.startExercise();
-
                 }
 
               },
               6700
             );
-
           }
 
-
-
-          /* HEDEF BULUNDU */
 
           target.addEventListener(
             'targetFound',
@@ -1418,18 +1234,12 @@
                 );
 
                 kayipTimer = null;
-
               }
 
-
               baslat();
-
             }
           );
 
-
-
-          /* HEDEF KAYBOLDU */
 
           target.addEventListener(
             'targetLost',
@@ -1440,7 +1250,6 @@
                 clearTimeout(
                   kayipTimer
                 );
-
               }
 
 
@@ -1458,8 +1267,10 @@
                     try {
 
                       netiSes.pause();
-
                       netiSes.currentTime = 0;
+
+                      gorevSes.pause();
+                      gorevSes.currentTime = 0;
 
                     } catch(e) {}
 
@@ -1473,7 +1284,6 @@
                       ari.components[
                         'smooth-bee-flight'
                       ].active = false;
-
                     }
 
 
@@ -1486,7 +1296,6 @@
                       tekHarf.components[
                         'eye-pop-exercise'
                       ].stopExercise();
-
                     }
 
 
@@ -1494,7 +1303,6 @@
                       'visible',
                       'false'
                     );
-
 
                     tekHarf.setAttribute(
                       'visible',
@@ -1504,20 +1312,16 @@
                   },
                   2000
                 );
-
             }
           );
-
         }
-
       }
     );
 
 
-
-    /* ==========================================
-       ANA A / a ÇİZİMİ
-       ========================================== */
+    /* =========================
+       A / a ÇİZİMİ
+       ========================= */
 
     window.addEventListener(
       'DOMContentLoaded',
@@ -1528,50 +1332,26 @@
             '#harfCanvas'
           );
 
-
         const ctx =
-          canvas.getContext(
-            '2d'
-          );
-
+          canvas.getContext('2d');
 
         canvas.width = 1200;
         canvas.height = 600;
 
-
         ctx.clearRect(
-          0,
-          0,
-          1200,
-          600
+          0,0,1200,600
         );
 
-
-        ctx.textAlign =
-          'center';
-
-        ctx.textBaseline =
-          'middle';
-
-        ctx.lineJoin =
-          'round';
-
-        ctx.lineCap =
-          'round';
-
-
-
-        /* BÜYÜK A */
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
 
         ctx.font =
           'bold 390px Arial';
 
-        ctx.lineWidth =
-          22;
-
-        ctx.strokeStyle =
-          '#FFFFFF';
-
+        ctx.lineWidth = 22;
+        ctx.strokeStyle = '#FFFFFF';
 
         ctx.strokeText(
           'A',
@@ -1579,10 +1359,7 @@
           300
         );
 
-
-        ctx.fillStyle =
-          '#FF6B35';
-
+        ctx.fillStyle = '#FF6B35';
 
         ctx.fillText(
           'A',
@@ -1591,18 +1368,11 @@
         );
 
 
-
-        /* KÜÇÜK a */
-
         ctx.font =
           'bold 390px Arial';
 
-        ctx.lineWidth =
-          22;
-
-        ctx.strokeStyle =
-          '#FFFFFF';
-
+        ctx.lineWidth = 22;
+        ctx.strokeStyle = '#FFFFFF';
 
         ctx.strokeText(
           'ɑ',
@@ -1610,27 +1380,24 @@
           300
         );
 
-
-        ctx.fillStyle =
-          '#FF6B35';
-
+        ctx.fillStyle = '#FF6B35';
 
         ctx.fillText(
           'ɑ',
           790,
           300
         );
-
       }
     );
 
   </script>
-
 </head>
 
 
 <body>
 
+
+<!-- İLK NETİ SESİ -->
 
 <audio
   id="netiSes"
@@ -1639,6 +1406,15 @@
   playsinline>
 </audio>
 
+
+<!-- YENİ GÖREV SESİ -->
+
+<audio
+  id="gorevSes"
+  src="./neti-gorev.mp3"
+  preload="auto"
+  playsinline>
+</audio>
 
 
 <div id="startScreen">
@@ -1654,11 +1430,8 @@
 </div>
 
 
-
 <canvas id="harfCanvas"></canvas>
-
 <canvas id="tekHarfCanvas"></canvas>
-
 
 
 <a-scene
@@ -1701,12 +1474,10 @@
   </a-assets>
 
 
-
   <a-camera
     position="0 0 0"
     look-controls="enabled: false">
   </a-camera>
-
 
 
   <a-entity
@@ -1729,7 +1500,6 @@
     </a-image>
 
 
-
     <a-plane
       id="harfler"
       position="0 0.55 0.04"
@@ -1745,7 +1515,6 @@
     </a-plane>
 
 
-
     <a-plane
       id="tekHarf"
       position="0 0.48 0.12"
@@ -1759,7 +1528,6 @@
         shader: flat;
       ">
     </a-plane>
-
 
 
     <a-image
@@ -1781,7 +1549,6 @@
 
 
   </a-entity>
-
 
 </a-scene>
 
