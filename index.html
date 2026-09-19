@@ -11,21 +11,114 @@
     body {
       margin: 0;
       overflow: hidden;
+      font-family: Arial, sans-serif;
     }
 
     #harfCanvas {
       display: none;
     }
+
+    /* BAŞLAT EKRANI */
+    #startScreen {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+
+      background: rgba(255, 248, 225, 0.96);
+    }
+
+    #startButton {
+      border: none;
+      border-radius: 25px;
+
+      padding: 18px 28px;
+
+      font-size: 22px;
+      font-weight: bold;
+
+      background: #ff8a3d;
+      color: white;
+
+      box-shadow: 0 6px 16px rgba(0,0,0,0.20);
+    }
+
+    #startText {
+      margin-top: 15px;
+      font-size: 16px;
+      color: #555;
+      text-align: center;
+      padding: 0 30px;
+    }
   </style>
+
 
   <script>
 
     /* =========================================
+       SES İZNİ
+       ========================================= */
+
+    let sesHazir = false;
+
+    window.addEventListener('DOMContentLoaded', () => {
+
+      const startButton =
+        document.querySelector('#startButton');
+
+      const startScreen =
+        document.querySelector('#startScreen');
+
+      const netiSes =
+        document.querySelector('#netiSes');
+
+
+      startButton.addEventListener('click', async () => {
+
+        /*
+          iPhone / Safari için sesi
+          kullanıcı dokunuşuyla aktif ediyoruz.
+        */
+
+        try {
+
+          netiSes.volume = 0;
+
+          await netiSes.play();
+
+          netiSes.pause();
+          netiSes.currentTime = 0;
+
+          netiSes.volume = 1;
+
+          sesHazir = true;
+
+        } catch (e) {
+
+          /*
+            Bazı Safari sürümlerinde sessiz
+            ön oynatma reddedilebilir.
+            Yine de devam ediyoruz.
+          */
+
+          sesHazir = true;
+
+        }
+
+        startScreen.style.display = 'none';
+
+      });
+
+    });
+
+
+
+    /* =========================================
        ARININ AKICI UÇUŞU
-       - Tek tur
-       - Büyüyüp küçülme YOK
-       - Sallanma YOK
-       - Dur-kalk YOK
        ========================================= */
 
     AFRAME.registerComponent('smooth-bee-flight', {
@@ -35,18 +128,16 @@
         this.active = false;
         this.startTime = 0;
 
-        /* Normal hız: yaklaşık 6 saniye */
+        /*
+          TEK TUR
+          NORMAL HIZ
+        */
+
         this.duration = 6000;
 
-        /*
-          SENİN ÇİZDİĞİN YOLA BENZER ROTA
 
-          Sol alt →
-          hafif yukarı →
-          aşağı →
-          sağa →
-          sağdan yukarı →
-          A'nın üstü
+        /*
+          ARININ ROTASI
         */
 
         this.points = [
@@ -92,10 +183,6 @@
       },
 
 
-      /* =========================================
-         UÇUŞU BAŞLAT
-         ========================================= */
-
       startFlight: function () {
 
         this.startTime = performance.now();
@@ -111,27 +198,28 @@
           ARININ BOYUTU SABİT
         */
 
-        this.el.setAttribute(
-          'scale',
-          '1 1 1'
+        this.el.object3D.scale.set(
+          1,
+          1,
+          1
         );
 
         /*
-          ARI SABİT AÇIDA
-          KENDİSİ SALLANMAYACAK
+          ARI SALLANMIYOR
         */
 
-        this.el.setAttribute(
-          'rotation',
-          '0 0 0'
+        this.el.object3D.rotation.set(
+          0,
+          0,
+          0
         );
 
       },
 
 
-      /* =========================================
-         YUMUŞAK EĞRİ HESABI
-         ========================================= */
+      /*
+        YUMUŞAK EĞRİ
+      */
 
       catmull: function(p0, p1, p2, p3, t) {
 
@@ -147,16 +235,16 @@
             (-p0.x + p2.x) * t +
 
             (
-              2 * p0.x -
-              5 * p1.x +
-              4 * p2.x -
+              2*p0.x -
+              5*p1.x +
+              4*p2.x -
               p3.x
             ) * t2 +
 
             (
               -p0.x +
-              3 * p1.x -
-              3 * p2.x +
+              3*p1.x -
+              3*p2.x +
               p3.x
             ) * t3
 
@@ -170,16 +258,16 @@
             (-p0.y + p2.y) * t +
 
             (
-              2 * p0.y -
-              5 * p1.y +
-              4 * p2.y -
+              2*p0.y -
+              5*p1.y +
+              4*p2.y -
               p3.y
             ) * t2 +
 
             (
               -p0.y +
-              3 * p1.y -
-              3 * p2.y +
+              3*p1.y -
+              3*p2.y +
               p3.y
             ) * t3
 
@@ -189,10 +277,6 @@
 
       },
 
-
-      /* =========================================
-         HER KAREDE POZİSYONU HESAPLA
-         ========================================= */
 
       tick: function () {
 
@@ -212,16 +296,6 @@
           progress = 1;
 
         }
-
-
-        /*
-          DİKKAT:
-
-          Burada ekstra sağ-sol sallanma,
-          büyüyüp küçülme veya zıplama YOK.
-
-          Arı yalnızca rota üzerinde ilerliyor.
-        */
 
 
         const segmentCount =
@@ -293,7 +367,7 @@
 
         /*
           SADECE KONUM DEĞİŞİYOR.
-          Rotation ve scale değişmiyor.
+          Sallanma ve büyüyüp küçülme YOK.
         */
 
         this.el.object3D.position.set(
@@ -303,16 +377,19 @@
         );
 
 
-        /* =====================================
-           UÇUŞ BİTTİ
-           Büyük A'nın üstünde dur.
-           A'yı kapatma.
-           ===================================== */
+        /*
+          UÇUŞ BİTTİ
+        */
 
         if (progress >= 1) {
 
           this.active = false;
 
+
+          /*
+            BÜYÜK A'NIN ÜSTÜNDE DUR
+            A'YI KAPATMA
+          */
 
           this.el.object3D.position.set(
             -0.27,
@@ -343,14 +420,15 @@
 
 
     /* =========================================
-       ANA SAHNE
+       ANA AR SAHNESİ
        ========================================= */
 
     AFRAME.registerComponent('neti-animation', {
 
       init: function () {
 
-        const target = this.el;
+        const target =
+          this.el;
 
 
         const neti =
@@ -371,9 +449,41 @@
           );
 
 
+        const netiSes =
+          document.querySelector(
+            '#netiSes'
+          );
+
+
         let basladi = false;
 
         let kayipTimer = null;
+
+        let zamanlayicilar = [];
+
+
+        function timer(fn, ms) {
+
+          const t =
+            setTimeout(fn, ms);
+
+          zamanlayicilar.push(t);
+
+          return t;
+
+        }
+
+
+        function timerlariTemizle() {
+
+          zamanlayicilar.forEach(
+            clearTimeout
+          );
+
+          zamanlayicilar = [];
+
+        }
+
 
 
         function baslat() {
@@ -383,9 +493,26 @@
           basladi = true;
 
 
-          /* ==============================
-             NETİ
-             ============================== */
+          timerlariTemizle();
+
+
+          /* =====================================
+             SESİ BAŞA AL
+             ===================================== */
+
+          try {
+
+            netiSes.pause();
+
+            netiSes.currentTime = 0;
+
+          } catch(e) {}
+
+
+
+          /* =====================================
+             NETİ BAŞLANGIÇ
+             ===================================== */
 
           neti.removeAttribute(
             'animation__buyume'
@@ -408,7 +535,12 @@
           );
 
 
-          setTimeout(() => {
+
+          /*
+            NETİ ÇIKIYOR
+          */
+
+          timer(() => {
 
             neti.setAttribute(
 
@@ -435,13 +567,41 @@
 
             );
 
+
+            /* ==============================
+               NETİ'NİN SESİ BAŞLIYOR
+               ============================== */
+
+            if (sesHazir) {
+
+              netiSes.currentTime = 0;
+
+              const oynat =
+                netiSes.play();
+
+
+              if (oynat !== undefined) {
+
+                oynat.catch(
+                  err => {
+                    console.log(
+                      'Ses oynatılamadı:',
+                      err
+                    );
+                  }
+                );
+
+              }
+
+            }
+
           }, 100);
 
 
 
-          /* ==============================
+          /* =====================================
              A a
-             ============================== */
+             ===================================== */
 
           harfler.removeAttribute(
             'animation__harf'
@@ -460,7 +620,7 @@
           );
 
 
-          setTimeout(() => {
+          timer(() => {
 
             harfler.setAttribute(
               'visible',
@@ -484,9 +644,9 @@
 
 
 
-          /* ==============================
+          /* =====================================
              ARI
-             ============================== */
+             ===================================== */
 
           ari.setAttribute(
             'visible',
@@ -494,30 +654,32 @@
           );
 
 
-          ari.setAttribute(
-            'position',
-            '-0.48 -0.30 0.09'
+          ari.object3D.position.set(
+            -0.48,
+            -0.30,
+            0.09
           );
 
 
-          ari.setAttribute(
-            'rotation',
-            '0 0 0'
+          ari.object3D.rotation.set(
+            0,
+            0,
+            0
           );
 
 
-          ari.setAttribute(
-            'scale',
-            '1 1 1'
+          ari.object3D.scale.set(
+            1,
+            1,
+            1
           );
 
 
           /*
-            A/a çıktıktan sonra
-            arı uçmaya başlıyor.
+            ARI UÇMAYA BAŞLIYOR
           */
 
-          setTimeout(() => {
+          timer(() => {
 
             const flight =
               ari.components[
@@ -537,9 +699,9 @@
 
 
 
-        /* ==============================
-           SAYFA BULUNDU
-           ============================== */
+        /* =====================================
+           HEDEF BULUNDU
+           ===================================== */
 
         target.addEventListener(
 
@@ -566,9 +728,9 @@
 
 
 
-        /* ==============================
-           SAYFA KAYBOLDU
-           ============================== */
+        /* =====================================
+           HEDEF KAYBOLDU
+           ===================================== */
 
         target.addEventListener(
 
@@ -586,14 +748,23 @@
 
 
             /*
-              Kamera hedefi anlık kaybederse
-              hemen yeniden başlamasın.
+              Kısa kamera kayıplarında
+              animasyonu yeniden başlatma.
             */
 
             kayipTimer =
               setTimeout(() => {
 
                 basladi = false;
+
+                timerlariTemizle();
+
+                try {
+
+                  netiSes.pause();
+                  netiSes.currentTime = 0;
+
+                } catch(e) {}
 
               }, 2000);
 
@@ -627,9 +798,12 @@
           canvas.getContext('2d');
 
 
-        canvas.width = 1200;
+        canvas.width =
+          1200;
 
-        canvas.height = 600;
+
+        canvas.height =
+          600;
 
 
         ctx.clearRect(
@@ -733,7 +907,39 @@
 <body>
 
 
+<!-- =========================================
+     SES DOSYASI
+     GitHub'a yüklediğin dosyanın adı
+     ========================================= -->
+
+<audio
+  id="netiSes"
+  src="./Merhaba%20Ben%20Neti%20A%20s.mp3"
+  preload="auto">
+</audio>
+
+
+
+<!-- =========================================
+     İLK AÇILIŞ BUTONU
+     ========================================= -->
+
+<div id="startScreen">
+
+  <button id="startButton">
+    🔊 Neti ile Başla
+  </button>
+
+  <div id="startText">
+    Dokun ve A sayfasını kameraya göster.
+  </div>
+
+</div>
+
+
+
 <canvas id="harfCanvas"></canvas>
+
 
 
 <a-scene
@@ -767,13 +973,11 @@
     <!-- NETİ -->
 
     <img
-
       id="neti"
 
       src="./72509361-9673-4AB6-8739-B7646C5522E4.png"
 
       crossorigin="anonymous"
-
     >
 
 
@@ -781,13 +985,11 @@
     <!-- ARI -->
 
     <img
-
       id="ariPNG"
 
       src="./831FD224-0476-409E-B2D5-24D2A8AD424E.png"
 
       crossorigin="anonymous"
-
     >
 
 
