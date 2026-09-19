@@ -50,7 +50,6 @@
     }
   </style>
 
-
   <script>
 
     let sesHazir = false;
@@ -113,50 +112,28 @@
       init: function () {
 
         this.active = false;
-
         this.startTime = 0;
-
         this.duration = 3700;
-
-
-        /* AYNI BEĞENDİĞİMİZ ROTA */
 
         this.points = [
 
           {x:-0.48, y:-0.30},
-
           {x:-0.40, y:-0.18},
-
           {x:-0.32, y:-0.03},
-
           {x:-0.25, y: 0.08},
-
           {x:-0.17, y: 0.03},
-
           {x:-0.08, y:-0.13},
-
           {x: 0.02, y:-0.23},
-
           {x: 0.14, y:-0.22},
-
           {x: 0.25, y:-0.12},
-
           {x: 0.35, y: 0.02},
-
           {x: 0.43, y: 0.18},
-
           {x: 0.45, y: 0.35},
-
           {x: 0.40, y: 0.50},
-
           {x: 0.30, y: 0.62},
-
           {x: 0.17, y: 0.70},
-
           {x: 0.02, y: 0.75},
-
           {x:-0.15, y: 0.78},
-
           {x:-0.27, y: 0.79}
 
         ];
@@ -167,7 +144,6 @@
       startFlight: function () {
 
         this.startTime = performance.now();
-
         this.active = true;
 
         this.el.setAttribute(
@@ -254,9 +230,7 @@
 
 
         if (progress >= 1) {
-
           progress = 1;
-
         }
 
 
@@ -335,7 +309,6 @@
 
           this.active = false;
 
-
           this.el.object3D.position.set(
             -0.27,
             0.79,
@@ -351,10 +324,13 @@
 
 
     /* ==========================================
-       YENİ GÖZ EGZERSİZİ
+       GÖZ EGZERSİZİ - v11
 
-       Harfler hareket etmiyor.
-       Farklı noktalarda belirip kayboluyor.
+       14 HEDEF
+       A / a DÖNÜŞÜMLÜ
+
+       Önce sakin,
+       sonlara doğru biraz daha hızlı.
        ========================================== */
 
     AFRAME.registerComponent('eye-pop-exercise', {
@@ -362,64 +338,144 @@
       init: function () {
 
         this.running = false;
-
         this.timers = [];
 
 
         /*
-          HARFLERİN ÇIKACAĞI NOKTALAR
-
-          Sol üst
-          Sağ üst
-          Sol alt
-          Sağ alt
-          Orta
-          Üst orta
-          Alt orta
+          Her hedefin:
+          x = yatay konumu
+          y = dikey konumu
+          letter = gösterilecek harf
+          show = görünme süresi
+          gap = kaybolduktan sonraki boşluk
         */
 
         this.steps = [
 
+          /* 1 - SOL ÜST */
           {
-            x:-0.38,
-            y: 0.67,
-            letter:'A'
+            x:-0.40,
+            y: 0.72,
+            letter:'A',
+            show:950,
+            gap:250
           },
 
+          /* 2 - SAĞ ALT */
           {
-            x: 0.38,
-            y: 0.67,
-            letter:'a'
+            x: 0.40,
+            y: 0.22,
+            letter:'a',
+            show:950,
+            gap:250
           },
 
+          /* 3 - SAĞ ÜST */
           {
-            x:-0.38,
-            y: 0.25,
-            letter:'A'
+            x: 0.40,
+            y: 0.72,
+            letter:'A',
+            show:950,
+            gap:250
           },
 
+          /* 4 - SOL ALT */
           {
-            x: 0.38,
-            y: 0.25,
-            letter:'a'
+            x:-0.40,
+            y: 0.22,
+            letter:'a',
+            show:950,
+            gap:250
           },
 
+          /* 5 - ORTA */
           {
             x: 0.00,
             y: 0.48,
-            letter:'A'
+            letter:'A',
+            show:900,
+            gap:230
           },
 
+          /* 6 - EN SOL */
           {
-            x: 0.00,
-            y: 0.78,
-            letter:'a'
+            x:-0.46,
+            y: 0.48,
+            letter:'a',
+            show:900,
+            gap:230
           },
 
+          /* 7 - EN SAĞ */
+          {
+            x: 0.46,
+            y: 0.48,
+            letter:'A',
+            show:900,
+            gap:230
+          },
+
+          /* 8 - ÜST ORTA */
           {
             x: 0.00,
-            y: 0.18,
-            letter:'A'
+            y: 0.80,
+            letter:'a',
+            show:850,
+            gap:220
+          },
+
+          /* 9 - ALT ORTA */
+          {
+            x: 0.00,
+            y: 0.16,
+            letter:'A',
+            show:850,
+            gap:220
+          },
+
+          /* 10 - SOL ORTA */
+          {
+            x:-0.42,
+            y: 0.48,
+            letter:'a',
+            show:800,
+            gap:200
+          },
+
+          /* 11 - SAĞ ÜST */
+          {
+            x: 0.39,
+            y: 0.70,
+            letter:'A',
+            show:750,
+            gap:180
+          },
+
+          /* 12 - SOL ALT */
+          {
+            x:-0.39,
+            y: 0.20,
+            letter:'a',
+            show:750,
+            gap:180
+          },
+
+          /* 13 - SAĞ ALT */
+          {
+            x: 0.39,
+            y: 0.20,
+            letter:'A',
+            show:700,
+            gap:170
+          },
+
+          /* 14 - ORTA BİTİŞ */
+          {
+            x: 0.00,
+            y: 0.48,
+            letter:'a',
+            show:900,
+            gap:0
           }
 
         ];
@@ -465,7 +521,6 @@
 
 
         canvas.width = 500;
-
         canvas.height = 500;
 
 
@@ -493,28 +548,29 @@
           'round';
 
 
-        /*
-          BÜYÜK A
-        */
+        ctx.font =
+          'bold 360px Arial';
+
+
+        ctx.lineWidth =
+          20;
+
+
+        ctx.strokeStyle =
+          '#FFFFFF';
+
+
+        ctx.fillStyle =
+          '#FF6B35';
+
 
         if (letter === 'A') {
 
-          ctx.font =
-            'bold 360px Arial';
-
-          ctx.lineWidth = 20;
-
-          ctx.strokeStyle =
-            '#FFFFFF';
-
           ctx.strokeText(
             'A',
             250,
             255
           );
-
-          ctx.fillStyle =
-            '#FF6B35';
 
           ctx.fillText(
             'A',
@@ -524,32 +580,14 @@
 
         }
 
-
-        /*
-          KÜÇÜK a
-
-          İlkokul tipi tek katlı a için
-          kullandığımız karakter.
-        */
 
         if (letter === 'a') {
 
-          ctx.font =
-            'bold 360px Arial';
-
-          ctx.lineWidth = 20;
-
-          ctx.strokeStyle =
-            '#FFFFFF';
-
           ctx.strokeText(
             'ɑ',
             250,
             255
           );
-
-          ctx.fillStyle =
-            '#FF6B35';
 
           ctx.fillText(
             'ɑ',
@@ -559,10 +597,6 @@
 
         }
 
-
-        /*
-          Canvas dokusunu yenile
-        */
 
         const mesh =
           this.el.getObject3D('mesh');
@@ -591,29 +625,18 @@
 
         const self = this;
 
+        let currentTime = 0;
+
 
         /*
-          Her harf yaklaşık
-          0.9 saniye görünecek.
-
-          Arada 0.25 saniye boşluk.
+          14 HARFİ TEK TEK PLANLA
         */
-
-        const gorunmeSuresi = 900;
-
-        const bosluk = 250;
-
-        const adimSuresi =
-          gorunmeSuresi + bosluk;
-
 
         this.steps.forEach(
           (step, index) => {
 
 
-            /*
-              HARF BELİRİR
-            */
+            /* HARF BELİRİR */
 
             const showTimer =
               setTimeout(() => {
@@ -646,7 +669,7 @@
                 );
 
 
-              }, index * adimSuresi);
+              }, currentTime);
 
 
             self.timers.push(
@@ -655,9 +678,12 @@
 
 
 
-            /*
-              HARF KAYBOLUR
-            */
+            /* HARF KAYBOLUR */
+
+            const hideAt =
+              currentTime +
+              step.show;
+
 
             const hideTimer =
               setTimeout(() => {
@@ -671,24 +697,24 @@
                 );
 
 
-              },
-
-              index * adimSuresi +
-              gorunmeSuresi
-            );
+              }, hideAt);
 
 
             self.timers.push(
               hideTimer
             );
 
+
+            currentTime +=
+              step.show +
+              step.gap;
+
           }
         );
 
 
-
         /*
-          EGZERSİZ BİTİŞ
+          EGZERSİZİN SONU
         */
 
         const finishTimer =
@@ -702,14 +728,10 @@
             );
 
 
-          },
-
-          this.steps.length *
-          adimSuresi
-        );
+          }, currentTime + 100);
 
 
-        this.timers.push(
+        self.timers.push(
           finishTimer
         );
 
@@ -802,8 +824,6 @@
           timerlariTemizle();
 
 
-          /* GÖZ EGZERSİZİNİ SIFIRLA */
-
           if (
             tekHarf.components[
               'eye-pop-exercise'
@@ -832,9 +852,7 @@
 
 
 
-          /* =====================================
-             NETİ BAŞLANGIÇ
-             ===================================== */
+          /* NETİ BAŞLANGIÇ */
 
           neti.removeAttribute(
             'animation__buyume'
@@ -859,7 +877,7 @@
 
 
           /* =====================================
-             NETİ ÇIKIYOR + SES BAŞLIYOR
+             NETİ + SES
              ===================================== */
 
           timer(() => {
@@ -890,10 +908,6 @@
             );
 
 
-            /*
-              NETİ SESİ
-            */
-
             if (sesHazir) {
 
               try {
@@ -913,12 +927,10 @@
 
                   oynat.catch(
                     err => {
-
                       console.log(
                         'Neti sesi oynatılamadı:',
                         err
                       );
-
                     }
                   );
 
@@ -937,7 +949,7 @@
 
 
           /* =====================================
-             A / a BİRLİKTE GELİYOR
+             A / a GELİYOR
              ===================================== */
 
           harfler.removeAttribute(
@@ -988,7 +1000,7 @@
 
 
           /* =====================================
-             ARI
+             ARI BAŞLANGIÇ
              ===================================== */
 
           ari.setAttribute(
@@ -1032,7 +1044,7 @@
 
 
 
-          /* 1.7 SN → ARI UÇUYOR */
+          /* ARI 1.7 SN'DE BAŞLIYOR */
 
           timer(() => {
 
@@ -1053,10 +1065,11 @@
 
 
           /* =====================================
-             6.4 SN
+             ARI A'YA ULAŞTI.
+             1 SN BEKLİYOR.
 
-             ARI KAYBOLUYOR
-             İLK A/a DA KAYBOLUYOR
+             6.4 SN:
+             ARI VE İLK A/a KAYBOLUYOR
              ===================================== */
 
           timer(() => {
@@ -1077,9 +1090,8 @@
 
 
           /* =====================================
-             6.7 SN
-
-             YENİ GÖZ EGZERSİZİ BAŞLIYOR
+             6.7 SN:
+             14 HEDEFLİ GÖZ EGZERSİZİ
              ===================================== */
 
           timer(() => {
@@ -1102,9 +1114,7 @@
 
 
 
-        /* =====================================
-           HEDEF BULUNDU
-           ===================================== */
+        /* HEDEF BULUNDU */
 
         target.addEventListener(
           'targetFound',
@@ -1128,9 +1138,7 @@
 
 
 
-        /* =====================================
-           HEDEF KAYBOLDU
-           ===================================== */
+        /* HEDEF KAYBOLDU */
 
         target.addEventListener(
           'targetLost',
@@ -1212,7 +1220,7 @@
 
 
     /* ==========================================
-       A / a ANA GÖRSELİ
+       ANA A / a GÖRSELİ
        ========================================== */
 
     window.addEventListener(
@@ -1230,7 +1238,6 @@
 
 
         canvas.width = 1200;
-
         canvas.height = 600;
 
 
@@ -1334,9 +1341,7 @@
 <body>
 
 
-<!-- ==========================================
-     NETİ SES DOSYASI
-     ========================================== -->
+<!-- NETİ SESİ -->
 
 <audio
   id="netiSes"
@@ -1347,9 +1352,7 @@
 
 
 
-<!-- ==========================================
-     BAŞLAT BUTONU
-     ========================================== -->
+<!-- BAŞLAT -->
 
 <div id="startScreen">
 
@@ -1365,12 +1368,7 @@
 
 
 
-<!-- ANA A/a -->
-
 <canvas id="harfCanvas"></canvas>
-
-
-<!-- GÖZ EGZERSİZİNDE TEK HARF -->
 
 <canvas id="tekHarfCanvas"></canvas>
 
@@ -1402,16 +1400,12 @@
   <a-assets>
 
 
-    <!-- NETİ -->
-
     <img
       id="neti"
       src="./72509361-9673-4AB6-8739-B7646C5522E4.png"
       crossorigin="anonymous"
     >
 
-
-    <!-- ARI -->
 
     <img
       id="ariPNG"
@@ -1462,7 +1456,7 @@
 
 
 
-    <!-- BAŞTA GÖRÜNEN A / a -->
+    <!-- BAŞLANGIÇ A / a -->
 
     <a-plane
 
@@ -1488,9 +1482,7 @@
 
 
 
-    <!-- ======================================
-         GÖZ EGZERSİZİNDEKİ TEK HARF
-         ====================================== -->
+    <!-- 14 HEDEFLİ GÖZ EGZERSİZİ -->
 
     <a-plane
 
