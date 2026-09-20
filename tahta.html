@@ -2,95 +2,88 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-
-<title>Neti Akıllı Tahta | A Sesi</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neti Akıllı Tahta - A Sesi</title>
 
 <style>
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
+*{box-sizing:border-box}
 
 body{
   margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:linear-gradient(135deg,#effcff,#fffbed);
+  font-family:Arial,sans-serif;
+  background:linear-gradient(135deg,#effcff,#fff9e9);
   color:#292929;
-  min-height:100vh;
 }
 
 button{
   font-family:inherit;
   cursor:pointer;
+  touch-action:manipulation;
 }
 
-/* ---------- ÜST MENÜ ---------- */
+/* ÜST */
 
 header{
-  height:90px;
+  height:82px;
   background:white;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:10px 28px;
-  box-shadow:0 3px 12px rgba(0,0,0,.10);
-  position:relative;
-  z-index:10;
+  padding:8px 25px;
+  box-shadow:0 3px 12px #0002;
 }
 
 .brand{
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:10px;
+  font-size:29px;
+  font-weight:900;
+  color:#ef7d43;
 }
 
 .brand img{
-  width:68px;
-  height:68px;
+  width:62px;
+  height:62px;
   object-fit:contain;
 }
 
-.brand-name{
-  font-size:32px;
-  font-weight:900;
-  color:#f07c45;
-}
-
-.sound-toggle{
+#soundToggle{
   border:0;
-  border-radius:18px;
-  background:#e9f7ff;
-  color:#398bc5;
-  font-size:21px;
-  font-weight:800;
-  padding:15px 22px;
+  border-radius:16px;
+  background:#e7f6ff;
+  color:#328bc8;
+  font-size:20px;
+  font-weight:bold;
+  padding:13px 18px;
 }
 
-/* ---------- ANA SAYFA ---------- */
+/* SAYFALAR */
 
 .page{
   display:none;
-  min-height:calc(100vh - 90px);
+  min-height:calc(100vh - 82px);
 }
 
 .page.active{
   display:block;
 }
 
+/* ANA MENÜ */
+
 #home{
-  padding:28px 30px 45px;
   text-align:center;
+  padding:25px;
 }
 
-.home-title{
-  font-size:48px;
+h1{
   color:#3888c7;
+  font-size:45px;
   margin:5px 0;
 }
 
-.home-subtitle{
-  font-size:25px;
+.subtitle{
+  font-size:23px;
   color:#666;
   margin-bottom:20px;
 }
@@ -98,249 +91,210 @@ header{
 .letters{
   display:flex;
   justify-content:center;
-  gap:30px;
-  margin:15px 0 25px;
+  gap:25px;
+  margin:15px;
 }
 
-.letter-card{
-  width:135px;
-  height:135px;
+.letter{
+  width:120px;
+  height:120px;
   background:white;
-  border:7px solid #ff9b43;
-  border-radius:30px;
+  border:6px solid #ff9c43;
+  border-radius:25px;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:92px;
-  font-weight:900;
-  color:#f17039;
-  box-shadow:0 8px 20px rgba(0,0,0,.10);
+  font-size:82px;
+  font-weight:bold;
+  color:#ef7038;
 }
 
-.letter-card.blue{
-  border-color:#59b8dc;
-  color:#3d8dca;
-}
-
-.menu{
-  max-width:1180px;
-  margin:auto;
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:22px;
-}
-
-.menu-card{
-  border:0;
-  border-radius:28px;
-  padding:25px 18px;
-  min-height:210px;
-  box-shadow:0 8px 18px rgba(0,0,0,.10);
-}
-
-.menu-card:nth-child(1){background:#fff1a9;}
-.menu-card:nth-child(2){background:#dff6ff;}
-.menu-card:nth-child(3){background:#ffe2ef;}
-
-.menu-icon{
-  display:block;
-  font-size:62px;
-  margin-bottom:10px;
-}
-
-.menu-title{
-  display:block;
-  font-size:27px;
-  font-weight:900;
-}
-
-.menu-desc{
-  display:block;
-  font-size:17px;
-  color:#666;
-  margin-top:10px;
-}
-
-/* ---------- ETKİNLİK ORTAK ---------- */
-
-.activity{
-  padding:22px 28px 105px;
-  text-align:center;
-}
-
-.activity-title{
-  margin:5px 0 15px;
-  font-size:43px;
+.letter.small{
+  border-color:#59b7dc;
   color:#3888c7;
 }
 
-.noti{
-  min-height:44px;
-  font-size:27px;
-  font-weight:900;
-  margin:12px auto;
+.menu{
+  max-width:1100px;
+  margin:25px auto;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
 }
 
-.green-button{
+.menu button{
   border:0;
-  border-radius:20px;
-  background:#65c77d;
+  border-radius:27px;
+  min-height:190px;
+  padding:20px;
+  box-shadow:0 7px 18px #0002;
+}
+
+.menu button:nth-child(1){background:#fff0a5}
+.menu button:nth-child(2){background:#dff6ff}
+.menu button:nth-child(3){background:#ffe1ee}
+
+.icon{
+  display:block;
+  font-size:55px;
+}
+
+.menu strong{
+  display:block;
+  font-size:26px;
+  margin:10px;
+}
+
+.menu small{
+  font-size:17px;
+  color:#666;
+}
+
+/* ETKİNLİK */
+
+.activity{
+  text-align:center;
+  padding:20px 25px 100px;
+}
+
+.activity h2{
+  font-size:40px;
+  color:#3888c7;
+  margin:5px 0 15px;
+}
+
+.mainBtn{
+  border:0;
+  border-radius:18px;
+  background:#65c77c;
   color:white;
-  padding:17px 30px;
+  padding:16px 30px;
   font-size:23px;
-  font-weight:900;
-  margin:8px;
-  box-shadow:0 5px 10px rgba(0,0,0,.12);
+  font-weight:bold;
+  margin:10px;
 }
 
-.orange-button{
-  background:#ff9f43;
+.repeatBtn{
+  background:#ff9e43;
 }
 
-.home-button{
+.homeBtn{
   position:fixed;
-  bottom:20px;
-  left:22px;
+  left:20px;
+  bottom:18px;
   border:0;
-  border-radius:20px;
-  padding:16px 25px;
-  background:#ff9f43;
+  border-radius:18px;
+  background:#ff9e43;
   color:white;
-  font-size:21px;
-  font-weight:900;
-  z-index:30;
+  padding:15px 23px;
+  font-size:20px;
+  font-weight:bold;
+  z-index:20;
 }
 
-/* ---------- SES TANIMA ---------- */
+/* SES TANIMA */
 
-.sound-stage{
-  width:min(1100px,94vw);
-  min-height:570px;
+.soundBox{
+  width:min(1000px,94vw);
+  height:540px;
   margin:auto;
   background:white;
-  border:5px solid #f2d76b;
-  border-radius:35px;
-  position:relative;
-  overflow:hidden;
-  box-shadow:0 8px 20px rgba(0,0,0,.10);
-}
-
-.neti-box{
-  position:absolute;
-  left:35px;
-  bottom:25px;
-  width:220px;
-}
-
-.neti-box img{
-  width:100%;
-  display:block;
-}
-
-.aa{
-  font-size:155px;
-  font-weight:900;
-  color:#f16e35;
-  padding-top:35px;
-}
-
-.eye-path{
-  position:absolute;
-  left:270px;
-  right:40px;
-  top:245px;
-  height:170px;
-  border-top:4px dashed #a8a8a8;
-  border-radius:50%;
-}
-
-.bee{
-  position:absolute;
-  font-size:76px;
-  left:300px;
-  top:215px;
-}
-
-.bee.fly{
-  animation:beeMove 5s ease-in-out infinite;
-}
-
-@keyframes beeMove{
-  0%{
-    left:28%;
-    top:220px;
-    transform:rotate(-8deg);
-  }
-  25%{
-    left:48%;
-    top:300px;
-    transform:rotate(5deg);
-  }
-  50%{
-    left:75%;
-    top:210px;
-    transform:rotate(10deg);
-  }
-  75%{
-    left:53%;
-    top:150px;
-    transform:rotate(-4deg);
-  }
-  100%{
-    left:28%;
-    top:220px;
-    transform:rotate(-8deg);
-  }
-}
-
-.sound-text{
-  position:absolute;
-  left:300px;
-  right:30px;
-  bottom:40px;
-  font-size:32px;
-  font-weight:900;
-}
-
-/* ---------- YAZI TAHTASI ---------- */
-
-.writing-stage{
-  width:min(1000px,94vw);
-  height:530px;
-  margin:10px auto;
-  background:white;
-  border:6px solid #57b7db;
+  border:5px solid #f3d66b;
   border-radius:32px;
   position:relative;
   overflow:hidden;
-  box-shadow:0 8px 20px rgba(0,0,0,.10);
 }
 
-/*
-  1. sınıf yazı alanı:
-  üst ve alt çizgi düz,
-  orta çizgi kesikli.
-*/
+.soundLetters{
+  font-size:135px;
+  font-weight:bold;
+  color:#ef7038;
+  padding-top:25px;
+}
 
-.school-line{
+.neti{
   position:absolute;
-  left:7%;
-  width:86%;
+  width:210px;
+  left:25px;
+  bottom:15px;
 }
 
-.school-top{
-  top:19%;
-  border-top:3px solid #efacd0;
+.neti img{
+  width:100%;
 }
 
-.school-middle{
+.beePath{
+  position:absolute;
+  left:250px;
+  right:40px;
+  top:270px;
+  border-top:4px dashed #999;
+}
+
+#bee{
+  position:absolute;
+  left:270px;
+  top:220px;
+  font-size:75px;
+}
+
+#bee.fly{
+  animation:fly 5s ease-in-out infinite;
+}
+
+@keyframes fly{
+  0%{left:28%;top:220px}
+  25%{left:45%;top:300px}
+  50%{left:75%;top:220px}
+  75%{left:55%;top:155px}
+  100%{left:28%;top:220px}
+}
+
+.eyeText{
+  position:absolute;
+  left:250px;
+  right:20px;
+  bottom:40px;
+  font-size:29px;
+  font-weight:bold;
+}
+
+/* YAZIM */
+
+.board{
+  width:min(920px,94vw);
+  height:500px;
+  margin:10px auto;
+  background:white;
+  border:6px solid #58b6da;
+  border-radius:30px;
+  position:relative;
+  overflow:hidden;
+}
+
+/* 1. sınıf satırı */
+
+.topLine,
+.midLine,
+.bottomLine{
+  position:absolute;
+  left:6%;
+  width:88%;
+}
+
+.topLine{
+  top:20%;
+  border-top:3px solid #efa6c9;
+}
+
+.midLine{
   top:50%;
-  border-top:4px dashed #efacd0;
+  border-top:4px dashed #efa6c9;
 }
 
-.school-bottom{
-  top:81%;
-  border-top:3px solid #efacd0;
+.bottomLine{
+  top:80%;
+  border-top:3px solid #efa6c9;
 }
 
 svg{
@@ -352,13 +306,13 @@ svg{
 
 .guide{
   fill:none;
-  stroke:#dedede;
+  stroke:#ddd;
   stroke-width:22;
   stroke-linecap:round;
   stroke-linejoin:round;
 }
 
-.draw{
+.stroke{
   fill:none;
   stroke:#ef5050;
   stroke-width:17;
@@ -368,74 +322,53 @@ svg{
 
 .dot{
   fill:#ffd328;
-  stroke:#f2a900;
+  stroke:#efa900;
   stroke-width:4;
 }
 
-.step{
-  font-size:30px;
-  font-weight:900;
-  fill:#278bc8;
+.info{
+  min-height:42px;
+  font-size:26px;
+  font-weight:bold;
+  margin:12px;
 }
 
-/* ---------- MOBİL ---------- */
+/* TELEFON */
 
-@media(max-width:800px){
+@media(max-width:750px){
 
-  header{
-    height:78px;
-    padding:8px 15px;
-  }
-
-  .brand img{
-    width:54px;
-    height:54px;
-  }
-
-  .brand-name{
-    font-size:25px;
-  }
-
-  .sound-toggle{
-    font-size:17px;
-    padding:12px;
-  }
-
-  .home-title{
-    font-size:38px;
-  }
+  h1{font-size:34px}
 
   .menu{
     grid-template-columns:1fr;
   }
 
-  .menu-card{
-    min-height:160px;
+  .menu button{
+    min-height:145px;
   }
 
-  .activity-title{
-    font-size:35px;
+  .activity h2{
+    font-size:34px;
   }
 
-  .writing-stage{
-    height:470px;
+  .board{
+    height:440px;
   }
 
-  .neti-box{
-    width:150px;
-    left:10px;
+  .neti{
+    width:135px;
+    left:8px;
   }
 
-  .aa{
-    font-size:110px;
+  .soundLetters{
+    font-size:105px;
   }
 
-  .sound-text{
-    left:170px;
-    font-size:25px;
+  .eyeText{
+    left:150px;
+    font-size:23px;
   }
 }
-
 </style>
 </head>
 
@@ -443,1018 +376,865 @@ svg{
 
 <header>
 
-  <div class="brand">
-    <img
-      src="./72509361-9673-4AB6-8739-B7646C5522E4.png"
-      alt="Neti"
-    >
-    <div class="brand-name">NETİ</div>
-  </div>
+<div class="brand">
 
-  <button
-    class="sound-toggle"
-    id="soundToggle"
-    onclick="toggleSound()"
-  >
-    🔊 Ses Açık
-  </button>
+<img
+src="./72509361-9673-4AB6-8739-B7646C5522E4.png"
+alt="Neti">
+
+<span>NETİ</span>
+
+</div>
+
+<button id="soundToggle" onclick="toggleSound()">
+🔊 Ses Açık
+</button>
 
 </header>
 
 
-<!-- =========================
-ANA SAYFA
-========================= -->
+<!-- ANA SAYFA -->
 
 <section id="home" class="page active">
 
-  <h1 class="home-title">
-    Neti ile A Sesini Öğreniyorum
-  </h1>
+<h1>Neti ile A Sesini Öğreniyorum</h1>
 
-  <div class="home-subtitle">
-    Akıllı Tahta Etkinlikleri
-  </div>
+<div class="subtitle">
+Akıllı Tahta Etkinlikleri
+</div>
 
-  <div class="letters">
+<div class="letters">
 
-    <div class="letter-card">
-      A
-    </div>
+<div class="letter">A</div>
 
-    <div class="letter-card blue">
-      a
-    </div>
+<div class="letter small">a</div>
 
-  </div>
+</div>
 
-  <div class="menu">
+<div class="menu">
 
-    <button
-      class="menu-card"
-      onclick="openPage('soundPage')"
-    >
-      <span class="menu-icon">🔤</span>
+<button onclick="showPage('soundPage')">
 
-      <span class="menu-title">
-        A / a Sesini Tanıyalım
-      </span>
+<span class="icon">🔤</span>
 
-      <span class="menu-desc">
-        Neti'yi dinle • Harfi tanı • Göz egzersizi yap
-      </span>
-    </button>
+<strong>
+A / a Sesini Tanıyalım
+</strong>
+
+<small>
+Neti'yi dinle • Harfi tanı • Göz egzersizi
+</small>
+
+</button>
 
 
-    <button
-      class="menu-card"
-      onclick="openPage('smallPage')"
-    >
-      <span class="menu-icon">✍️</span>
+<button onclick="showPage('smallPage')">
 
-      <span class="menu-title">
-        Küçük a Yazımı
-      </span>
+<span class="icon">✍️</span>
 
-      <span class="menu-desc">
-        Önce c çizgisi, sonra düz çizgi
-      </span>
-    </button>
+<strong>
+Küçük a Yazımı
+</strong>
+
+<small>
+Önce c çizgisi • Sonra düz çizgi
+</small>
+
+</button>
 
 
-    <button
-      class="menu-card"
-      onclick="openPage('bigPage')"
-    >
-      <span class="menu-icon">✏️</span>
+<button onclick="showPage('bigPage')">
 
-      <span class="menu-title">
-        Büyük A Yazımı
-      </span>
+<span class="icon">✏️</span>
 
-      <span class="menu-desc">
-        Sol eğik • Sağ eğik • Orta çizgi
-      </span>
-    </button>
+<strong>
+Büyük A Yazımı
+</strong>
 
-  </div>
+<small>
+Sol eğik • Sağ eğik • Orta çizgi
+</small>
+
+</button>
+
+</div>
 
 </section>
 
 
-<!-- =========================
-A SESİ
-========================= -->
+<!-- SES TANIMA -->
 
-<section
-  id="soundPage"
-  class="page activity"
->
+<section id="soundPage" class="page activity">
 
-  <h2 class="activity-title">
-    A / a Sesini Tanıyalım
-  </h2>
+<h2>A / a Sesini Tanıyalım</h2>
 
-  <div class="sound-stage">
+<div class="soundBox">
 
-    <div class="aa">
-      A a
-    </div>
+<div class="soundLetters">
+A a
+</div>
 
-    <div class="neti-box">
-      <img
-        src="./72509361-9673-4AB6-8739-B7646C5522E4.png"
-        alt="Neti"
-      >
-    </div>
+<div class="neti">
 
-    <div class="eye-path"></div>
+<img
+src="./72509361-9673-4AB6-8739-B7646C5522E4.png"
+alt="Neti">
 
-    <div
-      class="bee"
-      id="bee"
-    >
-      🐝
-    </div>
+</div>
 
-    <div class="sound-text">
-      Gözlerinle arıyı takip et! 👀
-    </div>
+<div class="beePath"></div>
 
-  </div>
+<div id="bee">
+🐝
+</div>
 
-  <button
-    class="green-button"
-    onclick="startSoundActivity()"
-  >
-    🔊 Neti ile Başla
-  </button>
+<div class="eyeText">
+👀 Gözlerinle arıyı takip et!
+</div>
 
-  <button
-    class="home-button"
-    onclick="goHome()"
-  >
-    🏠 Ana Sayfa
-  </button>
+</div>
+
+<button
+class="mainBtn"
+onclick="startSound()">
+🔊 Neti ile Başla
+</button>
+
+<button
+class="homeBtn"
+onclick="goHome()">
+🏠 Ana Sayfa
+</button>
 
 </section>
 
 
-<!-- =========================
-KÜÇÜK a
-========================= -->
+<!-- KÜÇÜK a -->
 
-<section
-  id="smallPage"
-  class="page activity"
->
+<section id="smallPage" class="page activity">
 
-  <h2 class="activity-title">
-    Küçük a Harfini Yazalım
-  </h2>
+<h2>Küçük a Harfini Yazalım</h2>
 
-  <div class="writing-stage">
+<div class="board">
 
-    <div class="school-line school-top"></div>
-    <div class="school-line school-middle"></div>
-    <div class="school-line school-bottom"></div>
+<div class="topLine"></div>
+<div class="midLine"></div>
+<div class="bottomLine"></div>
 
-    <svg viewBox="0 0 900 530">
+<svg viewBox="0 0 900 500">
 
-      <!-- REHBER -->
+<!-- GRİ REHBER -->
 
-      <path
-        class="guide"
-        d="
-        M510 175
-        C420 125 310 165 300 275
-        C290 385 405 420 505 365
-        "
-      />
+<path
+class="guide"
+d="
+M500 170
+C405 125 305 170 300 275
+C295 380 405 415 500 360
+"/>
 
-      <path
-        class="guide"
-        d="
-        M515 155
-        L515 370
-        "
-      />
+<path
+class="guide"
+d="
+M510 150
+L510 365
+"/>
 
-      <!-- ÇİZİM -->
+<!-- KIRMIZI ÇİZİM -->
 
-      <path
-        id="smallC"
-        class="draw"
-        d="
-        M510 175
-        C420 125 310 165 300 275
-        C290 385 405 420 505 365
-        "
-      />
+<path
+id="smallC"
+class="stroke"
+d="
+M500 170
+C405 125 305 170 300 275
+C295 380 405 415 500 360
+"/>
 
-      <path
-        id="smallLine"
-        class="draw"
-        d="
-        M515 155
-        L515 370
-        "
-      />
+<path
+id="smallStraight"
+class="stroke"
+d="
+M510 150
+L510 365
+"/>
 
-      <circle
-        id="smallDot"
-        class="dot"
-        cx="510"
-        cy="175"
-        r="13"
-      />
+<circle
+id="smallDot"
+class="dot"
+cx="500"
+cy="170"
+r="13"/>
 
-      <text
-        x="365"
-        y="135"
-        class="step"
-      >
-        1
-      </text>
+</svg>
 
-      <text
-        x="545"
-        y="150"
-        class="step"
-      >
-        2
-      </text>
+</div>
 
-    </svg>
+<div id="smallInfo" class="info">
+Hazırsan başlayalım!
+</div>
 
-  </div>
+<button
+class="mainBtn"
+onclick="startSmall()">
+🔊 Küçük a'yı Göster
+</button>
 
-  <div
-    class="noti"
-    id="smallText"
-  >
-    Hazırsan başlayalım!
-  </div>
+<button
+class="mainBtn repeatBtn"
+onclick="startSmall()">
+🔁 Tekrar
+</button>
 
-  <button
-    class="green-button"
-    onclick="startSmall()"
-  >
-    🔊 Küçük a'yı Göster
-  </button>
-
-  <button
-    class="green-button orange-button"
-    onclick="startSmall()"
-  >
-    🔁 Tekrar
-  </button>
-
-  <button
-    class="home-button"
-    onclick="goHome()"
-  >
-    🏠 Ana Sayfa
-  </button>
+<button
+class="homeBtn"
+onclick="goHome()">
+🏠 Ana Sayfa
+</button>
 
 </section>
 
 
-<!-- =========================
-BÜYÜK A
-========================= -->
+<!-- BÜYÜK A -->
 
-<section
-  id="bigPage"
-  class="page activity"
->
+<section id="bigPage" class="page activity">
 
-  <h2 class="activity-title">
-    Büyük A Harfini Yazalım
-  </h2>
+<h2>Büyük A Harfini Yazalım</h2>
 
-  <div class="writing-stage">
+<div class="board">
 
-    <div class="school-line school-top"></div>
-    <div class="school-line school-middle"></div>
-    <div class="school-line school-bottom"></div>
+<div class="topLine"></div>
+<div class="midLine"></div>
+<div class="bottomLine"></div>
 
-    <svg viewBox="0 0 900 530">
+<svg viewBox="0 0 900 500">
 
-      <!-- REHBER -->
+<!-- GRİ REHBER -->
 
-      <path
-        class="guide"
-        d="M450 105 L270 425"
-      />
+<path
+class="guide"
+d="M450 100 L270 410"/>
 
-      <path
-        class="guide"
-        d="M450 105 L630 425"
-      />
+<path
+class="guide"
+d="M450 100 L630 410"/>
 
-      <path
-        class="guide"
-        d="M350 300 L550 300"
-      />
+<path
+class="guide"
+d="M350 290 L550 290"/>
 
-      <!-- ÇİZİM -->
+<!-- KIRMIZI -->
 
-      <path
-        id="bigLeft"
-        class="draw"
-        d="M450 105 L270 425"
-      />
+<path
+id="bigLeft"
+class="stroke"
+d="M450 100 L270 410"/>
 
-      <path
-        id="bigRight"
-        class="draw"
-        d="M450 105 L630 425"
-      />
+<path
+id="bigRight"
+class="stroke"
+d="M450 100 L630 410"/>
 
-      <path
-        id="bigMiddle"
-        class="draw"
-        d="M350 300 L550 300"
-      />
+<path
+id="bigBar"
+class="stroke"
+d="M350 290 L550 290"/>
 
-      <circle
-        id="bigDot"
-        class="dot"
-        cx="450"
-        cy="105"
-        r="13"
-      />
+<circle
+id="bigDot"
+class="dot"
+cx="450"
+cy="100"
+r="13"/>
 
-      <text
-        x="390"
-        y="90"
-        class="step"
-      >
-        1
-      </text>
+</svg>
 
-      <text
-        x="500"
-        y="90"
-        class="step"
-      >
-        2
-      </text>
+</div>
 
-      <text
-        x="435"
-        y="285"
-        class="step"
-      >
-        3
-      </text>
+<div id="bigInfo" class="info">
+Hazırsan başlayalım!
+</div>
 
-    </svg>
+<button
+class="mainBtn"
+onclick="startBig()">
+🔊 Büyük A'yı Göster
+</button>
 
-  </div>
+<button
+class="mainBtn repeatBtn"
+onclick="startBig()">
+🔁 Tekrar
+</button>
 
-  <div
-    class="noti"
-    id="bigText"
-  >
-    Hazırsan başlayalım!
-  </div>
-
-  <button
-    class="green-button"
-    onclick="startBig()"
-  >
-    🔊 Büyük A'yı Göster
-  </button>
-
-  <button
-    class="green-button orange-button"
-    onclick="startBig()"
-  >
-    🔁 Tekrar
-  </button>
-
-  <button
-    class="home-button"
-    onclick="goHome()"
-  >
-    🏠 Ana Sayfa
-  </button>
+<button
+class="homeBtn"
+onclick="goHome()">
+🏠 Ana Sayfa
+</button>
 
 </section>
 
 
-<!-- =========================
-SES DOSYALARI
-========================= -->
+<!-- SESLER -->
 
-<audio
-  id="introAudio"
-  preload="auto"
-  src="./neti-a-tam-ses.mp3"
-></audio>
+<audio id="intro"
+src="./neti-a-tam-ses.mp3"
+preload="auto"></audio>
 
-<audio
-  id="s1"
-  preload="auto"
-  src="./1-c-cizgisi.mp3.mp3"
-></audio>
+<audio id="small1"
+src="./1-c-cizgisi.mp3.mp3"
+preload="auto"></audio>
 
-<audio
-  id="s2"
-  preload="auto"
-  src="./2-duz-cizgi.mp3.mp3"
-></audio>
+<audio id="small2"
+src="./2-duz-cizgi.mp3.mp3"
+preload="auto"></audio>
 
-<audio
-  id="s3"
-  preload="auto"
-  src="./3-bir-kez-daha.mp3.mp3"
-></audio>
+<audio id="small3"
+src="./3-bir-kez-daha.mp3.mp3"
+preload="auto"></audio>
 
-<audio
-  id="s4"
-  preload="auto"
-  src="./4-simdi-sen.mp3.mp3"
-></audio>
+<audio id="small4"
+src="./4-simdi-sen.mp3.mp3"
+preload="auto"></audio>
 
-<audio
-  id="b1"
-  preload="auto"
-  src="./5-buyuk-a-sol.mp3"
-></audio>
+<audio id="big1"
+src="./5-buyuk-a-sol.mp3"
+preload="auto"></audio>
 
-<audio
-  id="b2"
-  preload="auto"
-  src="./6-buyuk-a-sag.mp3"
-></audio>
+<audio id="big2"
+src="./6-buyuk-a-sag.mp3"
+preload="auto"></audio>
 
-<audio
-  id="b3"
-  preload="auto"
-  src="./7-buyuk-a-orta.mp3"
-></audio>
+<audio id="big3"
+src="./7-buyuk-a-orta.mp3"
+preload="auto"></audio>
 
-<audio
-  id="b4"
-  preload="auto"
-  src="./8-buyuk-a-bitti.mp3"
-></audio>
+<audio id="big4"
+src="./8-buyuk-a-bitti.mp3"
+preload="auto"></audio>
 
 
 <script>
 
-/* =========================
-GENEL
-========================= */
-
-let soundEnabled = true;
-let running = false;
-
-const sleep = ms =>
-  new Promise(resolve =>
-    setTimeout(resolve,ms)
-  );
+let soundOn=true;
+let busy=false;
 
 
-function stopAudio(){
+/* SAYFA */
 
-  document
-  .querySelectorAll("audio")
-  .forEach(a=>{
+function showPage(id){
 
-    a.pause();
-    a.currentTime=0;
+stopAll();
 
-  });
+document
+.querySelectorAll(".page")
+.forEach(p=>p.classList.remove("active"));
 
-}
-
-
-function toggleSound(){
-
-  soundEnabled=!soundEnabled;
-
-  document.getElementById(
-    "soundToggle"
-  ).textContent=
-    soundEnabled
-    ? "🔊 Ses Açık"
-    : "🔇 Ses Kapalı";
-
-  if(!soundEnabled){
-    stopAudio();
-  }
-
-}
-
-
-function openPage(id){
-
-  stopAudio();
-  running=false;
-
-  document
-  .querySelectorAll(".page")
-  .forEach(page=>
-    page.classList.remove("active")
-  );
-
-  document
-  .getElementById(id)
-  .classList.add("active");
+document
+.getElementById(id)
+.classList.add("active");
 
 }
 
 
 function goHome(){
 
-  stopAudio();
-  running=false;
+stopAll();
 
-  const bee=
-    document.getElementById("bee");
+document
+.querySelectorAll(".page")
+.forEach(p=>p.classList.remove("active"));
 
-  bee.classList.remove("fly");
-
-  document
-  .querySelectorAll(".page")
-  .forEach(page=>
-    page.classList.remove("active")
-  );
-
-  document
-  .getElementById("home")
-  .classList.add("active");
+document
+.getElementById("home")
+.classList.add("active");
 
 }
 
 
-/* =========================
-SES
-========================= */
+/* SES AÇ KAPA */
 
-function playAndWait(id){
+function toggleSound(){
 
-  return new Promise(resolve=>{
+soundOn=!soundOn;
 
-    if(!soundEnabled){
-      resolve();
-      return;
-    }
+document
+.getElementById("soundToggle")
+.textContent=
+soundOn
+? "🔊 Ses Açık"
+: "🔇 Ses Kapalı";
 
-    const audio=
-      document.getElementById(id);
-
-    audio.pause();
-    audio.currentTime=0;
-
-    audio.onended=()=>{
-      resolve();
-    };
-
-    audio.onerror=()=>{
-      resolve();
-    };
-
-    const p=audio.play();
-
-    if(p){
-      p.catch(()=>{
-        resolve();
-      });
-    }
-
-  });
+if(!soundOn){
+stopAllAudio();
+}
 
 }
 
 
-/*
-Safari / iPhone için önemli:
+function stopAllAudio(){
 
-İlk ses doğrudan öğretmenin
-butona dokunmasıyla başlıyor.
-*/
+document
+.querySelectorAll("audio")
+.forEach(a=>{
 
-function startFirstAudio(id){
+a.pause();
+a.currentTime=0;
 
-  const audio=
-    document.getElementById(id);
-
-  if(!soundEnabled){
-    return Promise.resolve();
-  }
-
-  audio.pause();
-  audio.currentTime=0;
-
-  return new Promise(resolve=>{
-
-    audio.onended=resolve;
-    audio.onerror=resolve;
-
-    const p=audio.play();
-
-    if(p){
-      p.catch(resolve);
-    }
-
-  });
+});
 
 }
 
 
-/* =========================
-SES TANIMA
-========================= */
+function stopAll(){
 
-async function startSoundActivity(){
+busy=false;
 
-  if(running)return;
+stopAllAudio();
 
-  running=true;
-  stopAudio();
-
-  const bee=
-    document.getElementById("bee");
-
-  /*
-  Kullanıcı butona bastığı anda
-  ses başlıyor.
-  */
-
-  const firstSound=
-    startFirstAudio("introAudio");
-
-  bee.classList.remove("fly");
-
-  void bee.offsetWidth;
-
-  bee.classList.add("fly");
-
-  await firstSound;
-
-  await sleep(5000);
-
-  bee.classList.remove("fly");
-
-  running=false;
+document
+.getElementById("bee")
+.classList.remove("fly");
 
 }
 
 
-/* =========================
-ÇİZGİ HAZIRLAMA
-========================= */
+/* SES ÇAL */
 
-function preparePath(path){
+function playAudio(id){
 
-  const length=
-    path.getTotalLength();
+return new Promise(resolve=>{
 
-  path.style.strokeDasharray=
-    length;
+if(!soundOn){
 
-  path.style.strokeDashoffset=
-    length;
+resolve();
+return;
+
+}
+
+const audio=
+document.getElementById(id);
+
+audio.pause();
+audio.currentTime=0;
+
+let finished=false;
+
+function done(){
+
+if(finished)return;
+
+finished=true;
+
+audio.onended=null;
+audio.onerror=null;
+
+resolve();
+
+}
+
+audio.onended=done;
+audio.onerror=done;
+
+const result=audio.play();
+
+if(result){
+
+result.catch(err=>{
+
+console.log(
+"Ses başlatılamadı:",
+id,
+err
+);
+
+done();
+
+});
+
+}
+
+});
 
 }
 
 
-function resetSmall(){
+/* PATH */
 
-  preparePath(
-    document.getElementById("smallC")
-  );
+function hidePath(path){
 
-  preparePath(
-    document.getElementById("smallLine")
-  );
+const length=
+path.getTotalLength();
 
-}
+path.style.strokeDasharray=
+length;
 
-
-function resetBig(){
-
-  preparePath(
-    document.getElementById("bigLeft")
-  );
-
-  preparePath(
-    document.getElementById("bigRight")
-  );
-
-  preparePath(
-    document.getElementById("bigMiddle")
-  );
+path.style.strokeDashoffset=
+length;
 
 }
 
 
-/* =========================
-ANİMASYON
-========================= */
+function prepareSmall(){
 
-function drawPath(
-  path,
-  dot,
-  duration
+hidePath(
+document.getElementById("smallC")
+);
+
+hidePath(
+document.getElementById("smallStraight")
+);
+
+}
+
+
+function prepareBig(){
+
+hidePath(
+document.getElementById("bigLeft")
+);
+
+hidePath(
+document.getElementById("bigRight")
+);
+
+hidePath(
+document.getElementById("bigBar")
+);
+
+}
+
+
+/* ÇİZİM */
+
+function animatePath(
+path,
+dot,
+duration
 ){
 
-  return new Promise(resolve=>{
+return new Promise(resolve=>{
 
-    const length=
-      path.getTotalLength();
+const length=
+path.getTotalLength();
 
-    path.style.strokeDasharray=
-      length;
+path.style.strokeDasharray=
+length;
 
-    path.style.strokeDashoffset=
-      length;
+path.style.strokeDashoffset=
+length;
 
-    const start=
-      performance.now();
+const start=
+performance.now();
 
+function frame(now){
 
-    function animate(now){
+const progress=
+Math.min(
+(now-start)/duration,
+1
+);
 
-      const progress=
-        Math.min(
-          (now-start)/duration,
-          1
-        );
+const current=
+length*progress;
 
-      const current=
-        length*progress;
+path.style.strokeDashoffset=
+length-current;
 
-      path.style.strokeDashoffset=
-        length-current;
+const point=
+path.getPointAtLength(current);
 
-      const point=
-        path.getPointAtLength(current);
+dot.setAttribute(
+"cx",
+point.x
+);
 
-      dot.setAttribute(
-        "cx",
-        point.x
-      );
+dot.setAttribute(
+"cy",
+point.y
+);
 
-      dot.setAttribute(
-        "cy",
-        point.y
-      );
+if(progress<1){
 
-      if(progress<1){
+requestAnimationFrame(frame);
 
-        requestAnimationFrame(
-          animate
-        );
+}else{
 
-      }else{
+resolve();
 
-        resolve();
+}
 
-      }
+}
 
-    }
+requestAnimationFrame(frame);
 
-    requestAnimationFrame(
-      animate
-    );
-
-  });
+});
 
 }
 
 
-/* =========================
-KÜÇÜK a
-========================= */
+/* A SESİ */
+
+async function startSound(){
+
+if(busy)return;
+
+busy=true;
+
+stopAllAudio();
+
+const bee=
+document.getElementById("bee");
+
+bee.classList.remove("fly");
+
+void bee.offsetWidth;
+
+bee.classList.add("fly");
+
+/*
+Butona basıldığı anda ses.
+*/
+
+await playAudio("intro");
+
+setTimeout(()=>{
+
+bee.classList.remove("fly");
+
+busy=false;
+
+},5000);
+
+}
+
+
+/* KÜÇÜK a */
 
 async function startSmall(){
 
-  if(running)return;
+if(busy)return;
 
-  running=true;
-  stopAudio();
-  resetSmall();
+busy=true;
 
-  const c=
-    document.getElementById("smallC");
+stopAllAudio();
+prepareSmall();
 
-  const line=
-    document.getElementById("smallLine");
+const c=
+document.getElementById("smallC");
 
-  const dot=
-    document.getElementById("smallDot");
+const straight=
+document.getElementById("smallStraight");
 
-  const text=
-    document.getElementById("smallText");
+const dot=
+document.getElementById("smallDot");
 
-
-  /*
-  1. SES
-  Buton dokunuşunun içinde
-  DOĞRUDAN başlıyor.
-  */
-
-  text.textContent=
-    "1. Önce c çizgisini çiz. Sarı okları takip et.";
-
-  const firstAudio=
-    startFirstAudio("s1");
-
-  await drawPath(
-    c,
-    dot,
-    4200
-  );
-
-  await firstAudio;
+const info=
+document.getElementById("smallInfo");
 
 
-  /*
-  2. SES
-  */
+/*
+1
+Ses + c çizimi
+aynı anda başlar.
+*/
 
-  text.textContent=
-    "2. Şimdi düz çizgiyi yukarıdan aşağı doğru çiz.";
+info.textContent=
+"1️⃣ Önce c çizgisini çiz. Sarı okları takip et.";
 
-  const secondAudio=
-    playAndWait("s2");
+const audio1=
+playAudio("small1");
 
-  await drawPath(
-    line,
-    dot,
-    3000
-  );
+const draw1=
+animatePath(
+c,
+dot,
+4200
+);
 
-  await secondAudio;
-
-
-  /*
-  TEKRAR
-  */
-
-  text.textContent=
-    "Harika! Bir kez daha yazalım.";
-
-  await playAndWait("s3");
-
-  resetSmall();
-
-  await drawPath(
-    c,
-    dot,
-    3500
-  );
-
-  await drawPath(
-    line,
-    dot,
-    2500
-  );
+await Promise.all([
+audio1,
+draw1
+]);
 
 
-  /*
-  BİTİŞ
-  */
+/*
+2
+*/
 
-  text.textContent=
-    "✏️ Şimdi sıra sende!";
+info.textContent=
+"2️⃣ Şimdi düz çizgiyi yukarıdan aşağı doğru çiz.";
 
-  await playAndWait("s4");
+const audio2=
+playAudio("small2");
 
-  running=false;
+const draw2=
+animatePath(
+straight,
+dot,
+3000
+);
+
+await Promise.all([
+audio2,
+draw2
+]);
+
+
+/*
+3
+*/
+
+info.textContent=
+"🌟 Harika! Bir kez daha yazalım.";
+
+await playAudio("small3");
+
+prepareSmall();
+
+await animatePath(
+c,
+dot,
+3300
+);
+
+await animatePath(
+straight,
+dot,
+2300
+);
+
+
+/*
+4
+*/
+
+info.textContent=
+"✏️ Şimdi sıra sende!";
+
+await playAudio("small4");
+
+busy=false;
 
 }
 
 
-/* =========================
-BÜYÜK A
-========================= */
+/* BÜYÜK A */
 
 async function startBig(){
 
-  if(running)return;
+if(busy)return;
 
-  running=true;
-  stopAudio();
-  resetBig();
+busy=true;
 
-  const left=
-    document.getElementById("bigLeft");
+stopAllAudio();
+prepareBig();
 
-  const right=
-    document.getElementById("bigRight");
+const left=
+document.getElementById("bigLeft");
 
-  const middle=
-    document.getElementById("bigMiddle");
+const right=
+document.getElementById("bigRight");
 
-  const dot=
-    document.getElementById("bigDot");
+const bar=
+document.getElementById("bigBar");
 
-  const text=
-    document.getElementById("bigText");
+const dot=
+document.getElementById("bigDot");
 
-
-  /*
-  1. SOL EĞİK
-  */
-
-  text.textContent=
-    "1. Yukarıdan başlayıp sol alta doğru eğik çiz.";
-
-  const firstAudio=
-    startFirstAudio("b1");
-
-  await drawPath(
-    left,
-    dot,
-    4200
-  );
-
-  await firstAudio;
+const info=
+document.getElementById("bigInfo");
 
 
-  /*
-  2. SAĞ EĞİK
-  */
+/*
+1 SOL
+*/
 
-  text.textContent=
-    "2. Tekrar yukarıdan başla. Bu kez sağ alta doğru eğik çiz.";
+info.textContent=
+"1️⃣ Yukarıdan başlayıp sol alta doğru eğik çiz.";
 
-  const secondAudio=
-    playAndWait("b2");
+await Promise.all([
 
-  await drawPath(
-    right,
-    dot,
-    4200
-  );
+playAudio("big1"),
 
-  await secondAudio;
+animatePath(
+left,
+dot,
+4200
+)
 
-
-  /*
-  3. ORTA
-  */
-
-  text.textContent=
-    "3. Şimdi ortadaki çizgiyi soldan sağa doğru çiz.";
-
-  const thirdAudio=
-    playAndWait("b3");
-
-  await drawPath(
-    middle,
-    dot,
-    3200
-  );
-
-  await thirdAudio;
+]);
 
 
-  /*
-  BİTİŞ
-  */
+/*
+2 SAĞ
+*/
 
-  text.textContent=
-    "🌟 Harika! Büyük A harfini tamamladın.";
+info.textContent=
+"2️⃣ Tekrar yukarıdan başla. Bu kez sağ alta doğru eğik çiz.";
 
-  await playAndWait("b4");
+await Promise.all([
 
-  running=false;
+playAudio("big2"),
+
+animatePath(
+right,
+dot,
+4200
+)
+
+]);
+
+
+/*
+3 ORTA
+*/
+
+info.textContent=
+"3️⃣ Şimdi ortadaki çizgiyi soldan sağa doğru çiz.";
+
+await Promise.all([
+
+playAudio("big3"),
+
+animatePath(
+bar,
+dot,
+3200
+)
+
+]);
+
+
+/*
+4 BİTİŞ
+*/
+
+info.textContent=
+"🌟 Harika! Büyük A harfini tamamladın.";
+
+await playAudio("big4");
+
+busy=false;
 
 }
 
 
-/* =========================
-SAYFA AÇILIŞI
-========================= */
+/* AÇILIŞ */
 
 window.addEventListener(
-  "load",
-  ()=>{
+"load",
+()=>{
 
-    resetSmall();
-    resetBig();
+prepareSmall();
+prepareBig();
 
-    /*
-    Ses dosyalarını tarayıcıya
-    önceden hazırlatıyoruz.
-    */
+document
+.querySelectorAll("audio")
+.forEach(a=>a.load());
 
-    document
-    .querySelectorAll("audio")
-    .forEach(audio=>{
-      audio.load();
-    });
-
-  }
-);
+});
 
 </script>
 
