@@ -7,10 +7,7 @@
 <title>Neti | A Sesi</title>
 
 <style>
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
+*{box-sizing:border-box}
 
 html,body{
   margin:0;
@@ -18,7 +15,7 @@ html,body{
 }
 
 body{
-  font-family:Arial,Helvetica,sans-serif;
+  font-family:Arial,sans-serif;
   background:linear-gradient(135deg,#effcff,#fff9ea);
   color:#292929;
 }
@@ -28,118 +25,103 @@ button{
   cursor:pointer;
 }
 
-/* ================= HEADER ================= */
-
 header{
-  height:82px;
+  height:78px;
   background:#fff;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:8px 24px;
+  padding:7px 20px;
   box-shadow:0 3px 12px rgba(0,0,0,.10);
 }
 
 .brand{
   display:flex;
   align-items:center;
-  gap:10px;
-  font-size:28px;
+  gap:9px;
+  font-size:27px;
   font-weight:900;
   color:#ef7d43;
 }
 
 .brand img{
-  width:62px;
-  height:62px;
+  width:58px;
+  height:58px;
   object-fit:contain;
 }
 
 #soundToggle{
   border:0;
-  border-radius:18px;
+  border-radius:16px;
   background:#e7f6ff;
   color:#328bc8;
-  font-size:20px;
+  font-size:18px;
   font-weight:900;
-  padding:13px 18px;
+  padding:12px 16px;
 }
 
-/* ================= SAYFALAR ================= */
-
-.page{
-  display:none;
-}
-
-.page.active{
-  display:block;
-}
+.page{display:none}
+.page.active{display:block}
 
 .activity{
   text-align:center;
-  padding:20px 14px 45px;
+  padding:18px 12px 40px;
 }
 
 .activityTitle{
   color:#3888c7;
-  font-size:40px;
-  margin:5px 0 18px;
+  font-size:38px;
+  margin:5px 0 16px;
 }
 
 .controls{
   display:flex;
   justify-content:center;
   flex-wrap:wrap;
-  gap:14px;
-  margin-top:18px;
+  gap:12px;
+  margin-top:17px;
 }
 
 .mainBtn{
   border:0;
   border-radius:20px;
-  padding:17px 28px;
-  min-width:250px;
+  padding:16px 26px;
+  min-width:240px;
   background:#61c77a;
   color:#fff;
-  font-size:22px;
+  font-size:21px;
   font-weight:900;
-  box-shadow:0 5px 12px rgba(0,0,0,.10);
 }
 
-.repeatBtn{
-  background:#ff9e43;
-}
-
-.homeBtn{
-  background:#4f9fd3;
-}
+.repeatBtn{background:#ff9e43}
+.homeBtn{background:#4f9fd3}
 
 .info{
-  min-height:50px;
-  margin:18px auto 8px;
-  font-size:24px;
-  line-height:1.25;
+  min-height:48px;
+  margin:16px auto 5px;
+  font-size:23px;
   font-weight:900;
 }
 
-/* ================= ANA SAYFA ================= */
+/* =====================================================
+ANA SAYFA
+===================================================== */
 
 #home{
   text-align:center;
-  padding:35px 20px;
+  padding:32px 20px;
 }
 
 #home h1{
   color:#3888c7;
-  font-size:44px;
-  margin:10px 0 12px;
+  font-size:42px;
 }
 
 .homeLetters{
-  font-size:100px;
+  font-size:96px;
   font-weight:900;
   color:#ef7038;
-  margin:20px;
+  margin:18px;
 }
 
 .menu{
@@ -154,33 +136,27 @@ header{
   border:0;
   border-radius:28px;
   padding:28px 20px;
-  font-size:25px;
+  font-size:24px;
   font-weight:900;
   box-shadow:0 7px 18px rgba(0,0,0,.10);
 }
 
-.menuCard:first-child{
-  background:#fff0a5;
-}
-
-.menuCard:last-child{
-  background:#dff6ff;
-}
+.menuCard:first-child{background:#fff0a5}
+.menuCard:last-child{background:#dff6ff}
 
 /* =====================================================
-ARI EKRANI
+ARI
 ===================================================== */
 
 .soundStage{
   width:min(1050px,94vw);
-  height:540px;
+  height:530px;
   margin:auto;
   position:relative;
   overflow:hidden;
   background:#fff;
   border:5px solid #f1d66c;
   border-radius:32px;
-  box-shadow:0 8px 20px rgba(0,0,0,.08);
 }
 
 .soundLetters{
@@ -188,7 +164,7 @@ ARI EKRANI
   top:20px;
   left:0;
   right:0;
-  font-size:120px;
+  font-size:115px;
   line-height:1;
   font-weight:900;
   color:#ef7038;
@@ -210,29 +186,25 @@ ARI EKRANI
 
 .eyeText{
   position:absolute;
-  right:25px;
-  bottom:25px;
-  font-size:27px;
+  right:24px;
+  bottom:24px;
+  font-size:26px;
   font-weight:900;
-  z-index:4;
 }
 
-/* ================= ARI ================= */
+/* BÜYÜK ARI */
 
 #bee{
   position:absolute;
-
-  left:150px;
-  bottom:135px;
-
-  width:155px;
-  height:155px;
-
-  z-index:7;
+  width:165px;
+  height:165px;
+  left:145px;
+  bottom:115px;
 
   opacity:0;
   visibility:hidden;
 
+  z-index:8;
   pointer-events:none;
   will-change:transform;
 }
@@ -249,21 +221,15 @@ KÜÇÜK a
 
 .writingStage{
   width:min(1000px,94vw);
-  height:400px;
-  margin:8px auto;
-
-  position:relative;
-  overflow:hidden;
-
+  height:390px;
+  margin:auto;
   background:#fff;
-
   border:6px solid #58b6da;
   border-radius:32px;
-
-  box-shadow:0 8px 20px rgba(0,0,0,.08);
+  overflow:hidden;
 }
 
-.letterSvg{
+#smallSvg{
   display:block;
   width:100%;
   height:100%;
@@ -282,7 +248,7 @@ KÜÇÜK a
 
 .guideOuter{
   fill:none;
-  stroke:#bfc1c5;
+  stroke:rgba(120,125,130,.58);
   stroke-width:30;
   stroke-linecap:round;
   stroke-linejoin:round;
@@ -290,7 +256,7 @@ KÜÇÜK a
 
 .guideInner{
   fill:none;
-  stroke:#e5e6e8;
+  stroke:#e1e3e6;
   stroke-width:21;
   stroke-linecap:round;
   stroke-linejoin:round;
@@ -302,55 +268,54 @@ KÜÇÜK a
   stroke-width:4;
   stroke-dasharray:10 8;
   stroke-linecap:round;
-  stroke-linejoin:round;
 }
 
 .drawStroke{
   fill:none;
-  stroke:#ff3f3f;
+  stroke:#ff3030;
   stroke-width:19;
   stroke-linecap:round;
   stroke-linejoin:round;
 }
 
 .yellowDot{
-  fill:#ffe52b;
-  stroke:#efa900;
+  fill:#fff000;
+  stroke:#e6a800;
   stroke-width:4;
 }
 
 .stepCircle{
-  fill:#2599d0;
+  fill:#1976ff;
+  stroke:#fff;
+  stroke-width:3;
 }
 
 .stepNumber{
   fill:#fff;
-  font-size:22px;
+  font-size:21px;
   font-weight:900;
   text-anchor:middle;
   dominant-baseline:middle;
 }
 
-.arrowLine{
-  fill:none;
-  stroke:#ef5050;
-  stroke-width:7;
-  stroke-linecap:round;
-  stroke-linejoin:round;
+.arrow{
+  fill:#ffd600;
+  stroke:#fff;
+  stroke-width:3;
 }
 
-/* ================= MOBİL ================= */
+/* =====================================================
+MOBİL
+===================================================== */
 
 @media(max-width:760px){
 
   header{
-    height:72px;
-    padding:6px 12px;
+    height:70px;
+    padding:5px 10px;
   }
 
-  .brand{
-    font-size:22px;
-  }
+  .brand{font-size:21px}
 
   .brand img{
     width:48px;
@@ -358,25 +323,20 @@ KÜÇÜK a
   }
 
   #soundToggle{
-    font-size:16px;
-    padding:10px 12px;
-  }
-
-  .activity{
-    padding:15px 9px 40px;
+    font-size:15px;
+    padding:9px 11px;
   }
 
   .activityTitle{
-    font-size:31px;
-    line-height:1.08;
+    font-size:30px;
   }
 
   #home h1{
-    font-size:32px;
+    font-size:31px;
   }
 
   .homeLetters{
-    font-size:80px;
+    font-size:76px;
   }
 
   .menu{
@@ -389,35 +349,32 @@ KÜÇÜK a
   }
 
   .soundLetters{
-    font-size:100px;
+    font-size:98px;
   }
 
   .netiWrap{
     width:140px;
     left:8px;
-    bottom:10px;
+    bottom:8px;
   }
 
+  /* TELEFONDA DA BÜYÜK */
   #bee{
-    width:135px;
-    height:135px;
-    left:100px;
-    bottom:110px;
+    width:145px;
+    height:145px;
+    left:105px;
+    bottom:105px;
   }
 
   .eyeText{
     right:10px;
-    bottom:22px;
-    font-size:19px;
+    bottom:20px;
+    font-size:18px;
   }
 
   .writingStage{
     width:96vw;
-    height:350px;
-  }
-
-  .info{
-    font-size:21px;
+    height:340px;
   }
 
   .controls{
@@ -428,31 +385,28 @@ KÜÇÜK a
   .mainBtn{
     width:min(88vw,430px);
     min-width:0;
+    font-size:19px;
+  }
+
+  .info{
     font-size:20px;
   }
 }
-
 </style>
 </head>
 
 <body>
 
 <header>
-
   <div class="brand">
-    <img
-      src="./72509361-9673-4AB6-8739-B7646C5522E4.png"
-      alt="Neti"
-    >
+    <img src="./72509361-9673-4AB6-8739-B7646C5522E4.png">
     <span>NETİ</span>
   </div>
 
   <button id="soundToggle" onclick="toggleSound()">
     🔊 Ses Açık
   </button>
-
 </header>
-
 
 <!-- =====================================================
 ANA SAYFA
@@ -462,35 +416,29 @@ ANA SAYFA
 
   <h1>Neti ile A Sesini Öğreniyorum</h1>
 
-  <div class="homeLetters">
-    A a
-  </div>
+  <div class="homeLetters">A a</div>
 
   <div class="menu">
 
     <button
       class="menuCard"
-      onclick="showPage('soundPage')"
-    >
+      onclick="showPage('soundPage')">
       🐝<br><br>
       A / a Sesini Tanıyalım
     </button>
 
     <button
       class="menuCard"
-      onclick="showPage('smallPage')"
-    >
+      onclick="showPage('smallPage')">
       ✍️<br><br>
       Küçük a Harfini Yazalım
     </button>
 
   </div>
-
 </section>
 
-
 <!-- =====================================================
-ARI
+ARI SAYFASI
 ===================================================== -->
 
 <section id="soundPage" class="page activity">
@@ -499,24 +447,18 @@ ARI
     A / a Sesini Tanıyalım
   </h2>
 
-  <div class="soundStage" id="soundStage">
+  <div id="soundStage" class="soundStage">
 
     <div class="soundLetters">
       A a
     </div>
 
     <div class="netiWrap">
-      <img
-        src="./72509361-9673-4AB6-8739-B7646C5522E4.png"
-        alt="Neti"
-      >
+      <img src="./72509361-9673-4AB6-8739-B7646C5522E4.png">
     </div>
 
     <div id="bee">
-      <img
-        src="./831FD224-0476-409E-B2D5-24D2A8AD424E.png"
-        alt="Arı"
-      >
+      <img src="./831FD224-0476-409E-B2D5-24D2A8AD424E.png">
     </div>
 
     <div class="eyeText">
@@ -529,25 +471,21 @@ ARI
 
     <button
       class="mainBtn"
-      onclick="startSoundActivity()"
-    >
+      onclick="startSoundActivity()">
       🔊 Neti ile Başla
     </button>
 
     <button
       class="mainBtn homeBtn"
-      onclick="goHome()"
-    >
+      onclick="goHome()">
       🏠 Ana Sayfa
     </button>
 
   </div>
-
 </section>
 
-
 <!-- =====================================================
-KÜÇÜK a
+KÜÇÜK a SAYFASI
 ===================================================== -->
 
 <section id="smallPage" class="page activity">
@@ -559,362 +497,131 @@ KÜÇÜK a
   <div class="writingStage">
 
     <svg
-      class="letterSvg"
+      id="smallSvg"
       viewBox="0 0 900 500"
-      preserveAspectRatio="none"
-    >
+      preserveAspectRatio="none">
 
       <!--
-      SATIR ÖLÇÜLERİ
+        SENİN SABİT ÖLÇÜLERİN
 
-      ÜST PEMBE = 90
-      KESİK     = 250
-      ALT PEMBE = 430
+        Kesik çizgi = 250
+        Alt çizgi   = 430
 
-      KÜÇÜK a:
-      ÜST = 240
-      ALT = 420
+        HARF:
+        üst = 240
+        alt = 420
       -->
-
-
-      <!-- ÜST PEMBE -->
 
       <line
         class="rowSolid"
-        x1="55"
-        y1="90"
-        x2="845"
-        y2="90"
-      />
-
-
-      <!-- KESİK PEMBE -->
+        x1="55" y1="90"
+        x2="845" y2="90"/>
 
       <line
         class="rowDash"
-        x1="55"
-        y1="250"
-        x2="845"
-        y2="250"
-      />
-
-
-      <!-- ALT PEMBE -->
+        x1="55" y1="250"
+        x2="845" y2="250"/>
 
       <line
         class="rowSolid"
-        x1="55"
-        y1="430"
-        x2="845"
-        y2="430"
-      />
+        x1="55" y1="430"
+        x2="845" y2="430"/>
 
+      <!--
+        Harf JS ile üretilecek.
 
-      <!-- =================================================
-      KÜÇÜK a
+        ÖNEMLİ:
+        çalışan yazma.html'deki
+        CX/CY/R/-40/40 matematiği.
+      -->
 
-      Genişlik yaklaşık 300
-      Yükseklik 180
+      <g id="smallGuide"></g>
 
-      üst = 240
-      alt = 420
-      ================================================= -->
+      <g id="smallAnimated"></g>
 
-
-      <!-- C DIŞ -->
-
-      <path
-        class="guideOuter"
-        d="
-        M 590 265
-
-        C 545 240,
-          475 238,
-          410 250
-
-        C 330 265,
-          290 310,
-          290 335
-
-        C 290 385,
-          340 420,
-          415 420
-
-        C 500 420,
-          560 390,
-          590 350
-
-        C 600 330,
-          600 295,
-          590 265
-        "
-      />
-
-
-      <!-- DÜZ ÇİZGİ DIŞ -->
-
-      <path
-        class="guideOuter"
-        d="
-        M 590 240
-        L 590 420
-        "
-      />
-
-
-      <!-- C İÇ -->
-
-      <path
-        class="guideInner"
-        d="
-        M 590 265
-
-        C 545 240,
-          475 238,
-          410 250
-
-        C 330 265,
-          290 310,
-          290 335
-
-        C 290 385,
-          340 420,
-          415 420
-
-        C 500 420,
-          560 390,
-          590 350
-
-        C 600 330,
-          600 295,
-          590 265
-        "
-      />
-
-
-      <!-- DÜZ ÇİZGİ İÇ -->
-
-      <path
-        class="guideInner"
-        d="
-        M 590 240
-        L 590 420
-        "
-      />
-
-
-      <!-- C BEYAZ KESİK -->
-
-      <path
-        class="guideDash"
-        d="
-        M 590 265
-
-        C 545 240,
-          475 238,
-          410 250
-
-        C 330 265,
-          290 310,
-          290 335
-
-        C 290 385,
-          340 420,
-          415 420
-
-        C 500 420,
-          560 390,
-          590 350
-
-        C 600 330,
-          600 295,
-          590 265
-        "
-      />
-
-
-      <!-- DÜZ ÇİZGİ BEYAZ KESİK -->
-
-      <path
-        class="guideDash"
-        d="
-        M 590 240
-        L 590 420
-        "
-      />
-
-
-      <!-- =================================================
-      KIRMIZI ANİMASYON
-      ================================================= -->
-
-
-      <path
-        id="smallC"
-        class="drawStroke"
-        d="
-        M 590 265
-
-        C 545 240,
-          475 238,
-          410 250
-
-        C 330 265,
-          290 310,
-          290 335
-
-        C 290 385,
-          340 420,
-          415 420
-
-        C 500 420,
-          560 390,
-          590 350
-
-        C 600 330,
-          600 295,
-          590 265
-        "
-      />
-
-
-      <path
-        id="smallStraight"
-        class="drawStroke"
-        d="
-        M 590 240
-        L 590 420
-        "
-      />
-
-
-      <!-- 1 -->
+      <!-- NUMARALAR -->
 
       <circle
         class="stepCircle"
-        cx="515"
-        cy="210"
-        r="19"
-      />
+        cx="575"
+        cy="215"
+        r="18"/>
 
       <text
         class="stepNumber"
-        x="515"
-        y="210"
-      >
-        1
-      </text>
-
-
-      <!-- 2 -->
+        x="575"
+        y="215">1</text>
 
       <circle
         class="stepCircle"
-        cx="645"
-        cy="230"
-        r="19"
-      />
+        cx="650"
+        cy="245"
+        r="18"/>
 
       <text
         class="stepNumber"
-        x="645"
-        y="230"
-      >
-        2
-      </text>
+        x="650"
+        y="245">2</text>
 
+      <!-- SARI YÖN OKLARI -->
 
-      <!-- C YÖN OKU -->
+      <polygon
+        class="arrow"
+        points="
+          545,245
+          510,225
+          515,241
+          475,247
+          515,255
+          510,271
+        "/>
 
-      <path
-        class="arrowLine"
-        d="
-        M 565 245
-        C 505 215,
-          420 218,
-          355 260
-        "
-      />
-
-      <path
-        class="arrowLine"
-        d="
-        M 355 260
-        L 365 230
-
-        M 355 260
-        L 386 252
-        "
-      />
-
-
-      <!-- DÜZ YÖN OKU -->
-
-      <path
-        class="arrowLine"
-        d="
-        M 655 270
-        L 655 370
-        "
-      />
-
-      <path
-        class="arrowLine"
-        d="
-        M 642 348
-        L 655 370
-        L 668 348
-        "
-      />
-
-
-      <!-- SARI NOKTA -->
+      <polygon
+        class="arrow"
+        points="
+          650,285
+          638,315
+          650,308
+          662,315
+        "/>
 
       <circle
         id="smallDot"
         class="yellowDot"
-        cx="590"
-        cy="265"
-        r="12"
-      />
+        cx="0"
+        cy="0"
+        r="11"/>
 
     </svg>
 
   </div>
 
-
   <div id="smallInfo" class="info">
     Hazırsan başlayalım!
   </div>
-
 
   <div class="controls">
 
     <button
       class="mainBtn"
-      onclick="startSmall()"
-    >
+      onclick="startSmall()">
       🔊 Küçük a'yı Göster
     </button>
 
     <button
       class="mainBtn repeatBtn"
-      onclick="startSmall()"
-    >
+      onclick="startSmall()">
       🔁 Tekrar
     </button>
 
     <button
       class="mainBtn homeBtn"
-      onclick="goHome()"
-    >
+      onclick="goHome()">
       🏠 Ana Sayfa
     </button>
 
   </div>
-
 </section>
-
 
 <!-- =====================================================
 SESLER
@@ -955,47 +662,49 @@ SESLER
   playsinline>
 </audio>
 
-
 <script>
 
-let soundEnabled = true;
-let running = false;
+/* =====================================================
+GENEL
+===================================================== */
 
-let beeAnimation = null;
-let beeStartTimer = null;
-let beeStopTimer = null;
+let soundEnabled=true;
+let running=false;
+
+let beeFrame=null;
+let beeStartTimer=null;
+let beeStopTimer=null;
 
 
 /* =====================================================
-SAYFA
+SAYFALAR
 ===================================================== */
 
 function showPage(id){
 
   stopEverything();
 
-  document.querySelectorAll(".page")
-    .forEach(page=>{
-      page.classList.remove("active");
-    });
+  document
+    .querySelectorAll(".page")
+    .forEach(p=>p.classList.remove("active"));
 
-  document.getElementById(id)
+  document
+    .getElementById(id)
     .classList.add("active");
 
   window.scrollTo(0,0);
 }
 
-
 function goHome(){
 
   stopEverything();
 
-  document.querySelectorAll(".page")
-    .forEach(page=>{
-      page.classList.remove("active");
-    });
+  document
+    .querySelectorAll(".page")
+    .forEach(p=>p.classList.remove("active"));
 
-  document.getElementById("home")
+  document
+    .getElementById("home")
     .classList.add("active");
 
   window.scrollTo(0,0);
@@ -1008,10 +717,11 @@ SES
 
 function toggleSound(){
 
-  soundEnabled = !soundEnabled;
+  soundEnabled=!soundEnabled;
 
-  document.getElementById("soundToggle")
-    .textContent =
+  document
+    .getElementById("soundToggle")
+    .textContent=
       soundEnabled
       ? "🔊 Ses Açık"
       : "🔇 Ses Kapalı";
@@ -1021,20 +731,19 @@ function toggleSound(){
   }
 }
 
-
 function stopAllAudio(){
 
-  document.querySelectorAll("audio")
-    .forEach(audio=>{
+  document
+    .querySelectorAll("audio")
+    .forEach(a=>{
 
       try{
-        audio.pause();
-        audio.currentTime = 0;
+        a.pause();
+        a.currentTime=0;
       }catch(e){}
 
     });
 }
-
 
 function playAudio(id){
 
@@ -1045,33 +754,33 @@ function playAudio(id){
       return;
     }
 
-    const audio =
+    const a=
       document.getElementById(id);
 
-    audio.pause();
-    audio.currentTime = 0;
+    a.pause();
+    a.currentTime=0;
 
-    let finished = false;
+    let done=false;
 
-    function done(){
+    function finish(){
 
-      if(finished) return;
+      if(done)return;
 
-      finished = true;
+      done=true;
 
-      audio.onended = null;
-      audio.onerror = null;
+      a.onended=null;
+      a.onerror=null;
 
       resolve();
     }
 
-    audio.onended = done;
-    audio.onerror = done;
+    a.onended=finish;
+    a.onerror=finish;
 
-    const p = audio.play();
+    const p=a.play();
 
     if(p){
-      p.catch(done);
+      p.catch(finish);
     }
 
   });
@@ -1080,6 +789,14 @@ function playAudio(id){
 
 /* =====================================================
 ARI
+
+Burada keyframe noktaları yok.
+
+Tek sürekli matematiksel hareket var.
+Bu yüzden:
+- noktalarda durmuyor
+- birden hızlanmıyor
+- yumuşak dönüyor
 ===================================================== */
 
 function hideBee(){
@@ -1087,299 +804,215 @@ function hideBee(){
   clearTimeout(beeStartTimer);
   clearTimeout(beeStopTimer);
 
-  if(beeAnimation){
-    beeAnimation.cancel();
-    beeAnimation = null;
+  if(beeFrame){
+    cancelAnimationFrame(beeFrame);
+    beeFrame=null;
   }
 
-  const bee =
+  const bee=
     document.getElementById("bee");
 
-  bee.style.opacity = "0";
-  bee.style.visibility = "hidden";
-  bee.style.transform = "translate3d(0,0,0)";
+  bee.style.opacity="0";
+  bee.style.visibility="hidden";
+  bee.style.transform="translate3d(0,0,0)";
 }
 
 
-/* =====================================================
-ARI HAREKETİ
-
-Önemli:
-Web Animations keyframe kullanmıyoruz.
-
-requestAnimationFrame + matematiksel
-sürekli eğri kullanıyoruz.
-
-Böylece noktalarda hızlanma/duraklama yok.
-===================================================== */
-
 function startBee(){
 
-  const bee =
+  const bee=
     document.getElementById("bee");
 
-  const stage =
+  const stage=
     document.getElementById("soundStage");
 
+  bee.style.opacity="1";
+  bee.style.visibility="visible";
 
-  const mobile =
-    window.innerWidth <= 760;
+  const stageW=stage.clientWidth;
+  const stageH=stage.clientHeight;
 
-
-  const startX =
-    mobile ? 100 : 150;
-
-  const startBottom =
-    mobile ? 110 : 135;
-
-
-  bee.style.left =
-    startX + "px";
-
-  bee.style.bottom =
-    startBottom + "px";
-
-  bee.style.visibility = "visible";
-  bee.style.opacity = "1";
-
-
-  const beeW =
-    bee.offsetWidth;
-
-  const beeH =
-    bee.offsetHeight;
-
-  const stageW =
-    stage.clientWidth;
-
-  const stageH =
-    stage.clientHeight;
-
-
-  const startTop =
-    stageH -
-    startBottom -
-    beeH;
-
+  const beeW=bee.offsetWidth;
+  const beeH=bee.offsetHeight;
 
   /*
-  Hareket alanı
+  Arının kullanacağı güvenli alan
   */
 
-  const areaW =
-    stageW -
-    startX -
-    beeW -
-    30;
+  const centerX=stageW*0.48;
+  const centerY=stageH*0.48;
 
-  const centerY =
-    stageH * 0.43;
+  const radiusX=
+    Math.max(
+      100,
+      stageW*0.30
+    );
 
+  const radiusY=
+    Math.max(
+      80,
+      stageH*0.24
+    );
 
   /*
-  ÇOK YAVAŞ HAREKET
+  ÇOK DAHA YAVAŞ.
 
-  Tam hareket döngüsü 18 saniye.
-  Biz arıyı daha önce durduracağımız için
-  sadece bunun bir bölümünü göreceğiz.
+  1 tam karma hareket:
+  24 saniye.
   */
 
-  const duration = 18000;
+  const duration=24000;
 
-  const startTime =
+  const start=
     performance.now();
 
 
-  let animationFrame;
+  function frame(now){
 
-
-  function move(now){
-
-    if(
-      bee.style.visibility === "hidden"
-    ){
-      cancelAnimationFrame(animationFrame);
-      return;
-    }
-
-
-    const t =
-      ((now - startTime) % duration)
-      / duration;
-
+    const t=
+      (now-start)/duration;
 
     /*
-    x:
-    yavaş sağ-sol
+    İki farklı sinüs frekansı.
 
-    sinüs kullandığımız için
-    keskin dönüş yok.
+    Sonuç:
+    yuvarlak +
+    sağ-sol +
+    yukarı-aşağı +
+    çapraz geçiş.
     */
 
-    const x =
-      areaW *
-      (
-        0.48 +
-        0.43 *
-        Math.sin(
-          t * Math.PI * 2
-        )
-      );
+    const angle=
+      t*Math.PI*2;
 
+    const x=
+      centerX
+      + radiusX*Math.sin(angle)
+      + radiusX*0.22*Math.sin(angle*3);
 
-    /*
-    y:
-    farklı frekansta yukarı-aşağı.
-
-    x ve y farklı çalıştığı için
-    arı:
-    - yuvarlak
-    - çapraz
-    - sağ-sol
-    - yukarı-aşağı
-
-    karışık bir rota oluşturuyor.
-    */
-
-    const yWave1 =
-      Math.sin(
-        t * Math.PI * 4
-      );
-
-    const yWave2 =
-      Math.sin(
-        t * Math.PI * 2 + 1.2
-      );
-
-
-    const y =
+    const y=
       centerY
-      + yWave1 * 80
-      + yWave2 * 45
-      - startTop;
+      + radiusY*Math.cos(angle*2)
+      + radiusY*0.24*Math.sin(angle*3);
 
 
-    bee.style.transform =
-      `translate3d(
-        ${x}px,
-        ${y}px,
-        0
-      )`;
+    /*
+    bee'nin CSS başlangıç noktasına göre
+    transform hesaplanıyor.
+    */
+
+    const baseLeft=
+      bee.offsetLeft;
+
+    const baseTop=
+      bee.offsetTop;
+
+    let tx=
+      x-baseLeft-beeW/2;
+
+    let ty=
+      y-baseTop-beeH/2;
 
 
-    animationFrame =
-      requestAnimationFrame(move);
+    /*
+    Kutudan çıkmasını engelle.
+    */
+
+    const actualX=
+      baseLeft+tx;
+
+    const actualY=
+      baseTop+ty;
+
+    if(actualX<10)
+      tx+=10-actualX;
+
+    if(actualX+beeW>stageW-10)
+      tx-=actualX+beeW-(stageW-10);
+
+    if(actualY<105)
+      ty+=105-actualY;
+
+    if(actualY+beeH>stageH-60)
+      ty-=actualY+beeH-(stageH-60);
+
+
+    bee.style.transform=
+      `translate3d(${tx}px,${ty}px,0)`;
+
+
+    beeFrame=
+      requestAnimationFrame(frame);
   }
 
-
-  animationFrame =
-    requestAnimationFrame(move);
-
-
-  beeAnimation = {
-
-    cancel(){
-
-      cancelAnimationFrame(
-        animationFrame
-      );
-
-    }
-
-  };
+  beeFrame=
+    requestAnimationFrame(frame);
 }
 
 
 function stopBee(){
 
-  if(beeAnimation){
-
-    beeAnimation.cancel();
-    beeAnimation = null;
-
+  if(beeFrame){
+    cancelAnimationFrame(beeFrame);
+    beeFrame=null;
   }
 
-  const bee =
+  const bee=
     document.getElementById("bee");
 
-  bee.style.opacity = "0";
-  bee.style.visibility = "hidden";
+  bee.style.opacity="0";
+  bee.style.visibility="hidden";
 }
 
 
 /* =====================================================
-TÜMÜNÜ DURDUR
-===================================================== */
+NETİ + ARI
 
-function stopEverything(){
+Neti önce konuşuyor.
+Arı ilk konuşmadan SONRA çıkıyor.
 
-  running = false;
+Şimdilik zamanlama:
+3.4 sn -> arı gelir
+6.4 sn -> arı gider
 
-  stopAllAudio();
-
-  clearTimeout(beeStartTimer);
-  clearTimeout(beeStopTimer);
-
-  hideBee();
-}
-
-
-/* =====================================================
-NETİ + ARI ZAMANLAMASI
+Hareket çok daha yavaş.
 ===================================================== */
 
 function startSoundActivity(){
 
-  if(running) return;
+  if(running)return;
 
-  running = true;
+  running=true;
 
   stopAllAudio();
   hideBee();
 
-
-  const audio =
-    document.getElementById(
-      "introAudio"
-    );
-
+  const audio=
+    document.getElementById("introAudio");
 
   /*
-  ÖNEMLİ:
-
-  Ses başlarken arı GİZLİ.
+  TIKLAMA İÇİNDE DOĞRUDAN PLAY:
+  iPHONE SAFARI SES İZNİ KORUNUYOR.
   */
-
-  hideBee();
-
 
   if(soundEnabled){
 
     audio.pause();
-    audio.currentTime = 0;
-    audio.volume = 1;
+    audio.currentTime=0;
+    audio.volume=1;
 
     audio.play().catch(()=>{
-      running = false;
+      running=false;
     });
-
   }
 
 
   /*
-  ==================================================
-  ARI BAŞLANGICI
-
-  Neti'nin ilk konuşmasının bitmesini
-  bekliyoruz.
-
-  Önceki 1.7 saniyeyi kaldırdım.
-
-  Arı 3.4 saniyede çıkıyor.
-  ==================================================
+  Neti'nin ilk cümlesi sırasında
+  ARI YOK.
   */
 
-  beeStartTimer =
+  beeStartTimer=
     setTimeout(()=>{
 
       if(running){
@@ -1390,15 +1023,11 @@ function startSoundActivity(){
 
 
   /*
-  ==================================================
-  ARI BİTİŞİ
-
-  "Şimdi sıra sende" başlamadan
-  hemen önce kayboluyor.
-  ==================================================
+  "Şimdi sıra sende" kısmına
+  geçerken ARI KAYBOLUR.
   */
 
-  beeStopTimer =
+  beeStopTimer=
     setTimeout(()=>{
 
       stopBee();
@@ -1406,97 +1035,474 @@ function startSoundActivity(){
     },6400);
 
 
-  audio.onended = ()=>{
+  audio.onended=()=>{
 
     stopBee();
-    running = false;
+    running=false;
 
   };
 
-
-  /*
-  Ses kapalıysa test
-  */
 
   if(!soundEnabled){
 
     clearTimeout(beeStartTimer);
     clearTimeout(beeStopTimer);
 
-    beeStartTimer =
-      setTimeout(()=>{
+    beeStartTimer=
+      setTimeout(startBee,500);
 
-        startBee();
-
-      },500);
-
-
-    beeStopTimer =
+    beeStopTimer=
       setTimeout(()=>{
 
         stopBee();
-        running = false;
+        running=false;
 
       },5000);
-
   }
-
 }
 
 
 /* =====================================================
 KÜÇÜK a
+
+BURASI ÇALIŞAN yazma.html'DEKİ
+GERÇEK GEOMETRİ.
+
+Orijinal:
+CX = 520
+CY = 600
+R  = 250
+START = -40
+END = 40
+
+ÖNCE ORİJİNAL NOKTALARI ÜRETİYORUZ.
+SONRA TAM OLARAK 240-420 ARASINA
+ÖLÇEKLİYORUZ.
+===================================================== */
+
+const ORIGINAL_CX=520;
+const ORIGINAL_CY=600;
+const ORIGINAL_R=250;
+
+const START_DEG=-40;
+const END_DEG=40;
+
+
+function makeOriginalC(){
+
+  const points=[];
+
+  const travel=
+    360-(END_DEG-START_DEG);
+
+  const count=400;
+
+  for(let i=0;i<=count;i++){
+
+    const t=i/count;
+
+    const degree=
+      START_DEG-(travel*t);
+
+    const angle=
+      degree*Math.PI/180;
+
+    points.push({
+
+      x:
+        ORIGINAL_CX+
+        ORIGINAL_R*Math.cos(angle),
+
+      y:
+        ORIGINAL_CY+
+        ORIGINAL_R*Math.sin(angle)
+
+    });
+  }
+
+  return points;
+}
+
+
+const originalC=
+  makeOriginalC();
+
+
+/*
+Orijinal harfin bütün sınırlarını
+hesaplıyoruz.
+
+Stem de hesaba dahil.
+*/
+
+const originalJoin=
+  originalC[0];
+
+const originalStemX=
+  originalJoin.x;
+
+const originalStemTop=
+  originalJoin.y-95;
+
+const originalStemBottom=
+  ORIGINAL_CY+ORIGINAL_R;
+
+
+/*
+İSTEDİĞİN KESİN SINIRLAR
+*/
+
+const TARGET_TOP=240;
+const TARGET_BOTTOM=420;
+
+
+/*
+Orijinal harfin en üst / alt noktası
+*/
+
+let sourceTop=
+  Math.min(
+    originalStemTop,
+    ...originalC.map(p=>p.y)
+  );
+
+let sourceBottom=
+  Math.max(
+    originalStemBottom,
+    ...originalC.map(p=>p.y)
+  );
+
+
+/*
+Y ölçeği:
+tam 240 -> 420
+*/
+
+const scaleY=
+  (TARGET_BOTTOM-TARGET_TOP)/
+  (sourceBottom-sourceTop);
+
+
+/*
+X'i Y ile aynı oranda küçültürsek
+çalışan AR'daki dairesel yapı
+KORUNUR.
+
+Yani artık yumurta şeklinde
+elle çizilmiş bir Bézier yok.
+*/
+
+const scaleX=
+  scaleY;
+
+
+/*
+Tahta üzerinde merkez.
+*/
+
+const TARGET_CENTER_X=450;
+
+
+/*
+Orijinal harfin x sınırları
+*/
+
+const allOriginalX=[
+  ...originalC.map(p=>p.x),
+  originalStemX
+];
+
+const sourceLeft=
+  Math.min(...allOriginalX);
+
+const sourceRight=
+  Math.max(...allOriginalX);
+
+const sourceCenterX=
+  (sourceLeft+sourceRight)/2;
+
+
+/*
+Dönüşüm
+*/
+
+function transformPoint(p){
+
+  return{
+
+    x:
+      TARGET_CENTER_X+
+      (p.x-sourceCenterX)*scaleX,
+
+    y:
+      TARGET_TOP+
+      (p.y-sourceTop)*scaleY
+
+  };
+}
+
+
+const cPoints=
+  originalC.map(transformPoint);
+
+
+const stemTopPoint=
+  transformPoint({
+    x:originalStemX,
+    y:originalStemTop
+  });
+
+
+const stemBottomPoint=
+  transformPoint({
+    x:originalStemX,
+    y:originalStemBottom
+  });
+
+
+const stemPoints=[];
+
+for(let i=0;i<=200;i++){
+
+  const t=i/200;
+
+  stemPoints.push({
+
+    x:stemTopPoint.x,
+
+    y:
+      stemTopPoint.y+
+      (
+        stemBottomPoint.y-
+        stemTopPoint.y
+      )*t
+
+  });
+}
+
+
+/* =====================================================
+SVG PATH ÜRET
+===================================================== */
+
+function pointsToPath(points){
+
+  if(!points.length)return "";
+
+  let d=
+    `M ${points[0].x} ${points[0].y}`;
+
+  for(let i=1;i<points.length;i++){
+
+    d+=
+      ` L ${points[i].x} ${points[i].y}`;
+  }
+
+  return d;
+}
+
+
+const cD=
+  pointsToPath(cPoints);
+
+const stemD=
+  pointsToPath(stemPoints);
+
+
+/* =====================================================
+KILAVUZU ÇİZ
+===================================================== */
+
+function addPath(parent,className,d,id=null){
+
+  const NS=
+    "http://www.w3.org/2000/svg";
+
+  const path=
+    document.createElementNS(
+      NS,
+      "path"
+    );
+
+  path.setAttribute(
+    "class",
+    className
+  );
+
+  path.setAttribute(
+    "d",
+    d
+  );
+
+  if(id){
+    path.setAttribute("id",id);
+  }
+
+  parent.appendChild(path);
+
+  return path;
+}
+
+
+function buildSmallA(){
+
+  const guide=
+    document.getElementById(
+      "smallGuide"
+    );
+
+  const animated=
+    document.getElementById(
+      "smallAnimated"
+    );
+
+  guide.innerHTML="";
+  animated.innerHTML="";
+
+
+  /*
+  DIŞ GRİ
+  */
+
+  addPath(
+    guide,
+    "guideOuter",
+    cD
+  );
+
+  addPath(
+    guide,
+    "guideOuter",
+    stemD
+  );
+
+
+  /*
+  İÇ GRİ
+  */
+
+  addPath(
+    guide,
+    "guideInner",
+    cD
+  );
+
+  addPath(
+    guide,
+    "guideInner",
+    stemD
+  );
+
+
+  /*
+  BEYAZ KESİKLİ
+  */
+
+  addPath(
+    guide,
+    "guideDash",
+    cD
+  );
+
+  addPath(
+    guide,
+    "guideDash",
+    stemD
+  );
+
+
+  /*
+  KIRMIZI ANİMASYON
+  */
+
+  const c=
+    addPath(
+      animated,
+      "drawStroke",
+      cD,
+      "smallC"
+    );
+
+  const stem=
+    addPath(
+      animated,
+      "drawStroke",
+      stemD,
+      "smallStraight"
+    );
+
+
+  hidePath(c);
+  hidePath(stem);
+
+
+  const dot=
+    document.getElementById(
+      "smallDot"
+    );
+
+  dot.setAttribute(
+    "cx",
+    cPoints[0].x
+  );
+
+  dot.setAttribute(
+    "cy",
+    cPoints[0].y
+  );
+}
+
+
+/* =====================================================
+HARF ANİMASYONU
 ===================================================== */
 
 function hidePath(path){
 
-  const length =
+  if(!path)return;
+
+  const length=
     path.getTotalLength();
 
-  path.style.strokeDasharray =
+  path.style.strokeDasharray=
     length;
 
-  path.style.strokeDashoffset =
+  path.style.strokeDashoffset=
     length;
 }
 
 
 function resetSmall(){
 
-  hidePath(
+  const c=
     document.getElementById(
       "smallC"
-    )
-  );
+    );
 
-  hidePath(
+  const stem=
     document.getElementById(
       "smallStraight"
-    )
-  );
+    );
 
+  hidePath(c);
+  hidePath(stem);
 
-  const dot =
+  const dot=
     document.getElementById(
       "smallDot"
     );
 
-
   dot.setAttribute(
     "cx",
-    "590"
+    cPoints[0].x
   );
 
   dot.setAttribute(
     "cy",
-    "265"
+    cPoints[0].y
   );
 }
 
-
-/* =====================================================
-ÇİZİM
-===================================================== */
 
 function animatePath(
   path,
@@ -1506,122 +1512,102 @@ function animatePath(
 
   return new Promise(resolve=>{
 
-    const length =
+    const length=
       path.getTotalLength();
 
-
-    path.style.strokeDasharray =
+    path.style.strokeDasharray=
       length;
 
-    path.style.strokeDashoffset =
+    path.style.strokeDashoffset=
       length;
 
-
-    const start =
+    const start=
       performance.now();
 
 
     function frame(now){
 
-      const progress =
+      const progress=
         Math.min(
           (now-start)/duration,
           1
         );
 
+      const current=
+        length*progress;
 
-      const current =
-        length * progress;
-
-
-      path.style.strokeDashoffset =
+      path.style.strokeDashoffset=
         length-current;
 
-
-      const point =
-        path.getPointAtLength(
-          current
-        );
-
+      const point=
+        path.getPointAtLength(current);
 
       dot.setAttribute(
         "cx",
         point.x
       );
 
-
       dot.setAttribute(
         "cy",
         point.y
       );
 
+      if(progress<1){
 
-      if(progress < 1){
-
-        requestAnimationFrame(
-          frame
-        );
+        requestAnimationFrame(frame);
 
       }else{
 
         resolve();
-
       }
-
     }
 
-
-    requestAnimationFrame(
-      frame
-    );
-
+    requestAnimationFrame(frame);
   });
 }
 
 
 /* =====================================================
-KÜÇÜK a ETKİNLİĞİ
+KÜÇÜK a AKIŞI
 ===================================================== */
 
 async function startSmall(){
 
-  if(running) return;
+  if(running)return;
 
-  running = true;
+  running=true;
 
   stopAllAudio();
   resetSmall();
 
 
-  const c =
+  const c=
     document.getElementById(
       "smallC"
     );
 
-
-  const straight =
+  const stem=
     document.getElementById(
       "smallStraight"
     );
 
-
-  const dot =
+  const dot=
     document.getElementById(
       "smallDot"
     );
 
-
-  const info =
+  const info=
     document.getElementById(
       "smallInfo"
     );
 
 
-  /* 1 */
+  /*
+  1. C
+  */
 
-  info.textContent =
+  info.textContent=
     "1️⃣ Önce c çizgisini çiz. Sarı okları takip et.";
-
 
   await Promise.all([
 
@@ -1630,93 +1616,97 @@ async function startSmall(){
     animatePath(
       c,
       dot,
-      5200
+      6500
     )
-
   ]);
 
 
-  /* 2 */
+  /*
+  2. DÜZ
+  */
 
-  info.textContent =
+  info.textContent=
     "2️⃣ Şimdi düz çizgiyi yukarıdan aşağı doğru çiz.";
-
 
   dot.setAttribute(
     "cx",
-    "590"
+    stemTopPoint.x
   );
 
   dot.setAttribute(
     "cy",
-    "240"
+    stemTopPoint.y
   );
-
 
   await Promise.all([
 
     playAudio("small2"),
 
     animatePath(
-      straight,
+      stem,
       dot,
-      3200
+      4000
     )
-
   ]);
 
 
-  /* TEKRAR */
+  /*
+  TEKRAR
+  */
 
-  info.textContent =
+  info.textContent=
     "🌟 Harika! Bir kez daha yazalım.";
 
-
-  await playAudio(
-    "small3"
-  );
-
+  await playAudio("small3");
 
   resetSmall();
-
 
   await animatePath(
     c,
     dot,
-    5200
+    6500
   );
-
 
   dot.setAttribute(
     "cx",
-    "590"
+    stemTopPoint.x
   );
 
   dot.setAttribute(
     "cy",
-    "240"
+    stemTopPoint.y
   );
-
 
   await animatePath(
-    straight,
+    stem,
     dot,
-    3200
+    4000
   );
 
 
-  /* BİTİŞ */
+  /*
+  BİTİŞ
+  */
 
-  info.textContent =
+  info.textContent=
     "✏️ Şimdi sıra sende!";
 
+  await playAudio("small4");
 
-  await playAudio(
-    "small4"
-  );
+  running=false;
+}
 
 
-  running = false;
+/* =====================================================
+DURDUR
+===================================================== */
+
+function stopEverything(){
+
+  running=false;
+
+  stopAllAudio();
+  hideBee();
 }
 
 
@@ -1728,15 +1718,17 @@ window.addEventListener(
   "load",
   ()=>{
 
-    resetSmall();
+    /*
+    ÖNCE GERÇEK a'YI ÜRET
+    */
+
+    buildSmallA();
+
     hideBee();
 
     document
       .querySelectorAll("audio")
-      .forEach(audio=>{
-        audio.load();
-      });
-
+      .forEach(a=>a.load());
   }
 );
 
