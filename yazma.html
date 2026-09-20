@@ -52,8 +52,8 @@ html,body{
   top:15%;
   left:50%;
   transform:translateX(-50%);
-  width:82vw;
-  max-width:470px;
+  width:84vw;
+  max-width:480px;
   box-sizing:border-box;
   background:rgba(255,255,255,.97);
   border:4px solid #ff981f;
@@ -69,6 +69,7 @@ html,body{
   color:#143b73;
   font-size:21px;
   font-weight:800;
+  line-height:1.15;
 }
 
 #instructionText{
@@ -76,6 +77,7 @@ html,body{
   color:#555;
   font-size:14px;
   font-weight:700;
+  line-height:1.2;
 }
 
 #drawCanvas{
@@ -87,63 +89,35 @@ html,body{
 <body>
 
 <div id="startScreen">
-
   <button id="startButton">
-    🔊 Küçük a yazımını başlat
+    🔊 A - a yazımını başlat
   </button>
 
   <div id="startText">
     Dokun ve yazma sayfasını kameraya göster.
   </div>
-
 </div>
-
 
 <div id="instruction">
-
   <div id="instructionTitle"></div>
-
   <div id="instructionText"></div>
-
 </div>
 
 
-<!-- SES DOSYALARI -->
+<!-- KÜÇÜK a SESLERİ -->
+<audio id="sound1" src="./1-c-cizgisi.mp3.mp3" preload="auto" playsinline></audio>
+<audio id="sound2" src="./2-duz-cizgi.mp3.mp3" preload="auto" playsinline></audio>
+<audio id="sound3" src="./3-bir-kez-daha.mp3.mp3" preload="auto" playsinline></audio>
+<audio id="sound4" src="./4-simdi-sen.mp3.mp3" preload="auto" playsinline></audio>
 
-<audio
-id="sound1"
-src="./1-c-cizgisi.mp3.mp3"
-preload="auto"
-playsinline>
-</audio>
-
-<audio
-id="sound2"
-src="./2-duz-cizgi.mp3.mp3"
-preload="auto"
-playsinline>
-</audio>
-
-<audio
-id="sound3"
-src="./3-bir-kez-daha.mp3.mp3"
-preload="auto"
-playsinline>
-</audio>
-
-<audio
-id="sound4"
-src="./4-simdi-sen.mp3.mp3"
-preload="auto"
-playsinline>
-</audio>
+<!-- BÜYÜK A SESLERİ -->
+<audio id="sound5" src="./5-buyuk-a-sol.mp3" preload="auto" playsinline></audio>
+<audio id="sound6" src="./6-buyuk-a-sag.mp3" preload="auto" playsinline></audio>
+<audio id="sound7" src="./7-buyuk-a-orta.mp3" preload="auto" playsinline></audio>
+<audio id="sound8" src="./8-buyuk-a-bitti.mp3" preload="auto" playsinline></audio>
 
 
-<canvas
-id="drawCanvas"
-width="1200"
-height="1200">
-</canvas>
+<canvas id="drawCanvas" width="1200" height="1200"></canvas>
 
 
 <script>
@@ -153,34 +127,24 @@ height="1200">
 ===================================================== */
 
 let userStarted = false;
-
-let firstSoundStarted = false;
-
-let firstSoundFinished = false;
-
 let targetVisible = false;
 
+const sounds = [];
 
-const sound1 =
-document.getElementById("sound1");
+for(let i=1;i<=8;i++){
+  sounds.push(
+    document.getElementById("sound"+i)
+  );
+}
 
-const sound2 =
-document.getElementById("sound2");
-
-const sound3 =
-document.getElementById("sound3");
-
-const sound4 =
-document.getElementById("sound4");
-
-
-const sounds =
-[
-  sound1,
-  sound2,
-  sound3,
-  sound4
-];
+const sound1 = sounds[0];
+const sound2 = sounds[1];
+const sound3 = sounds[2];
+const sound4 = sounds[3];
+const sound5 = sounds[4];
+const sound6 = sounds[5];
+const sound7 = sounds[6];
+const sound8 = sounds[7];
 
 
 /* =====================================================
@@ -188,9 +152,6 @@ const sounds =
 ===================================================== */
 
 function showMessage(title,text){
-
-  const box =
-  document.getElementById("instruction");
 
   document.getElementById(
     "instructionTitle"
@@ -200,13 +161,14 @@ function showMessage(title,text){
     "instructionText"
   ).textContent = text;
 
-  box.style.display = "block";
-
+  document.getElementById(
+    "instruction"
+  ).style.display = "block";
 }
 
 
 /* =====================================================
-   SES OYNAT
+   SES
 ===================================================== */
 
 function stopAllSounds(){
@@ -214,15 +176,11 @@ function stopAllSounds(){
   sounds.forEach(audio=>{
 
     try{
-
       audio.pause();
-
-      audio.currentTime = 0;
-
+      audio.currentTime=0;
     }catch(e){}
 
   });
-
 }
 
 
@@ -234,117 +192,63 @@ async function playSound(audio){
 
   try{
 
-    audio.muted = false;
-
-    audio.volume = 1;
-
-    audio.currentTime = 0;
+    audio.muted=false;
+    audio.volume=1;
+    audio.currentTime=0;
 
     await audio.play();
 
-  }
+  }catch(e){
 
-  catch(error){
-
-    console.log(
-      "SES HATASI:",
-      error
-    );
+    console.log("Ses hatası:",e);
 
   }
-
 }
 
 
 /* =====================================================
-   BAŞLAT BUTONU
+   BAŞLATMA BUTONU
 
-   ÖNEMLİ:
-   1. SES DOĞRUDAN KULLANICI
-   DOKUNUŞUNDA ÇALIYOR.
+   iPHONE SAFARI:
+   İLK SES DOĞRUDAN KULLANICI
+   DOKUNUŞUYLA BAŞLIYOR.
 ===================================================== */
 
 document
 .getElementById("startButton")
 .addEventListener("click",function(){
 
-  userStarted = true;
-
-
-  /*
-    ÖNCE EKRANI KAPAT
-  */
+  userStarted=true;
 
   document
   .getElementById("startScreen")
-  .style.display = "none";
-
-
-  /*
-    YÖNERGEYİ HEMEN GÖSTER
-  */
+  .style.display="none";
 
   showMessage(
     "1. Önce c çizgisini çiz.",
     "Sarı okları takip et."
   );
 
-
   /*
-    SAFARI İÇİN:
-
-    SESİ DOĞRUDAN
-    BU DOKUNUŞLA BAŞLATIYORUZ.
+    İLK SESİ DOĞRUDAN
+    DOKUNUŞLA BAŞLAT
   */
 
-  sound1.muted = false;
+  sound1.muted=false;
+  sound1.volume=1;
+  sound1.currentTime=0;
 
-  sound1.volume = 1;
+  sound1.play().catch(
+    e=>console.log("İlk ses:",e)
+  );
 
-  sound1.currentTime = 0;
+  /*
+    DİĞER DOSYALARI HAZIRLA
+  */
 
-
-  const promise =
-  sound1.play();
-
-
-  firstSoundStarted = true;
-
-
-  if(promise){
-
-    promise
-    .then(()=>{
-
-      console.log(
-        "1. ses başladı."
-      );
-
-    })
-
-    .catch(error=>{
-
-      console.log(
-        "1. ses açılamadı:",
-        error
-      );
-
-    });
-
+  for(let i=1;i<sounds.length;i++){
+    sounds[i].load();
   }
-
-
-  /*
-    DİĞER SESLERİ DE
-    SAFARI'YE TANITIYORUZ.
-  */
-
-  sound2.load();
-
-  sound3.load();
-
-  sound4.load();
-
 
   window.dispatchEvent(
     new Event("user-started")
@@ -354,24 +258,7 @@ document
 
 
 /* =====================================================
-   1. SES BİTTİĞİNDE
-===================================================== */
-
-sound1.addEventListener(
-"ended",
-function(){
-
-  firstSoundFinished = true;
-
-  window.dispatchEvent(
-    new Event("first-sound-finished")
-  );
-
-});
-
-
-/* =====================================================
-   AR BİLEŞENİ
+   AR
 ===================================================== */
 
 AFRAME.registerComponent(
@@ -380,27 +267,26 @@ AFRAME.registerComponent(
 
 init:function(){
 
-const target = this.el;
+const target=this.el;
 
-const canvas =
-document.getElementById(
-  "drawCanvas"
-);
+const canvas=
+document.getElementById("drawCanvas");
 
-const ctx =
+const ctx=
 canvas.getContext("2d");
 
-const plane =
-document.getElementById(
-  "drawPlane"
-);
+const plane=
+document.getElementById("drawPlane");
 
+let animationStarted=false;
 
-let animationStarted = false;
+let smallRound=1;
 
-let round = 1;
+let completedSmallC=false;
 
-let completedC = false;
+let bigLeftDone=false;
+let bigRightDone=false;
+let bigMiddleDone=false;
 
 
 /* =====================================================
@@ -409,7 +295,7 @@ let completedC = false;
 
 function updateTexture(){
 
-  const mesh =
+  const mesh=
   plane.getObject3D("mesh");
 
   if(
@@ -417,196 +303,23 @@ function updateTexture(){
     mesh.material &&
     mesh.material.map
   ){
-
-    mesh.material.map.needsUpdate =
-    true;
-
+    mesh.material.map.needsUpdate=true;
   }
-
 }
 
 
 function clearCanvas(){
 
   ctx.clearRect(
-    0,
-    0,
-    1200,
-    1200
+    0,0,
+    canvas.width,
+    canvas.height
   );
-
 }
 
 
 /* =====================================================
-   HARF GEOMETRİSİ
-===================================================== */
-
-/*
-
-KÜÇÜK a:
-
-1.
-SAĞ ÜSTTEN BAŞLAR.
-
-C ŞEKLİNDE SOLA DOĞRU
-DÖNER.
-
-2.
-AYNI BİRLEŞME NOKTASINDAN
-DÜZ ÇİZGİ AŞAĞI İNER.
-
-*/
-
-
-const CX = 520;
-
-const CY = 600;
-
-const R = 250;
-
-
-/*
-C AÇIKLIĞI
-SAĞ TARAFTA.
-*/
-
-const START_DEG = -40;
-
-const END_DEG = 40;
-
-
-function makeC(){
-
-  const points = [];
-
-  const travel =
-  360 -
-  (
-    END_DEG -
-    START_DEG
-  );
-
-  const count = 400;
-
-
-  for(
-    let i=0;
-    i<=count;
-    i++
-  ){
-
-    const t =
-    i/count;
-
-    const degree =
-    START_DEG -
-    travel*t;
-
-    const angle =
-    degree *
-    Math.PI/180;
-
-
-    points.push({
-
-      x:
-      CX +
-      R *
-      Math.cos(angle),
-
-      y:
-      CY +
-      R *
-      Math.sin(angle)
-
-    });
-
-  }
-
-
-  return points;
-
-}
-
-
-const cPoints =
-makeC();
-
-
-const joinPoint =
-cPoints[0];
-
-
-/*
-DÜZ ÇİZGİ
-
-C'NİN BAŞLADIĞI NOKTAYA
-TAM BAĞLANIR.
-*/
-
-const STEM_X =
-joinPoint.x;
-
-
-/*
-BİRAZ YUKARIDAN
-BAŞLIYOR.
-*/
-
-const STEM_TOP =
-joinPoint.y - 95;
-
-
-const STEM_BOTTOM =
-CY + R;
-
-
-function makeStem(){
-
-  const points = [];
-
-  const count = 200;
-
-
-  for(
-    let i=0;
-    i<=count;
-    i++
-  ){
-
-    const t =
-    i/count;
-
-
-    points.push({
-
-      x:
-      STEM_X,
-
-      y:
-      STEM_TOP +
-      (
-        STEM_BOTTOM -
-        STEM_TOP
-      ) * t
-
-    });
-
-  }
-
-
-  return points;
-
-}
-
-
-const stemPoints =
-makeStem();
-
-
-/* =====================================================
-   PATH ÇİZ
+   ORTAK PATH
 ===================================================== */
 
 function drawPath(
@@ -616,30 +329,16 @@ width,
 dash=[]
 ){
 
-  if(
-    !points ||
-    points.length<2
-  ) return;
-
+  if(!points || points.length<2)
+    return;
 
   ctx.save();
 
-  ctx.strokeStyle =
-  color;
-
-  ctx.lineWidth =
-  width;
-
-  ctx.lineCap =
-  "round";
-
-  ctx.lineJoin =
-  "round";
-
-  ctx.setLineDash(
-    dash
-  );
-
+  ctx.strokeStyle=color;
+  ctx.lineWidth=width;
+  ctx.lineCap="round";
+  ctx.lineJoin="round";
+  ctx.setLineDash(dash);
 
   ctx.beginPath();
 
@@ -648,74 +347,17 @@ dash=[]
     points[0].y
   );
 
-
-  for(
-    let i=1;
-    i<points.length;
-    i++
-  ){
+  for(let i=1;i<points.length;i++){
 
     ctx.lineTo(
       points[i].x,
       points[i].y
     );
-
   }
-
 
   ctx.stroke();
 
   ctx.restore();
-
-}
-
-
-/* =====================================================
-   GRİ HARF
-===================================================== */
-
-function drawGuide(){
-
-  drawPath(
-    cPoints,
-    "rgba(120,125,130,.55)",
-    112
-  );
-
-  drawPath(
-    stemPoints,
-    "rgba(120,125,130,.55)",
-    112
-  );
-
-
-  drawPath(
-    cPoints,
-    "rgba(225,227,230,.98)",
-    78
-  );
-
-  drawPath(
-    stemPoints,
-    "rgba(225,227,230,.98)",
-    78
-  );
-
-
-  drawPath(
-    cPoints,
-    "white",
-    8,
-    [24,20]
-  );
-
-  drawPath(
-    stemPoints,
-    "white",
-    8,
-    [24,20]
-  );
-
 }
 
 
@@ -724,53 +366,31 @@ function drawGuide(){
 ===================================================== */
 
 function numberCircle(
-x,
-y,
-number,
-color
+x,y,number,color
 ){
 
   ctx.save();
 
-
   ctx.beginPath();
 
   ctx.arc(
-    x,
-    y,
-    45,
+    x,y,
+    43,
     0,
     Math.PI*2
   );
 
-
-  ctx.fillStyle =
-  color;
-
+  ctx.fillStyle=color;
   ctx.fill();
 
-
-  ctx.strokeStyle =
-  "white";
-
-  ctx.lineWidth =
-  8;
-
+  ctx.strokeStyle="white";
+  ctx.lineWidth=7;
   ctx.stroke();
 
-
-  ctx.fillStyle =
-  "white";
-
-  ctx.font =
-  "bold 52px Arial";
-
-  ctx.textAlign =
-  "center";
-
-  ctx.textBaseline =
-  "middle";
-
+  ctx.fillStyle="white";
+  ctx.font="bold 49px Arial";
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
 
   ctx.fillText(
     number,
@@ -778,147 +398,250 @@ color
     y+2
   );
 
-
   ctx.restore();
-
 }
 
 
 /* =====================================================
-   SARI OK
+   OK
 ===================================================== */
 
 function arrow(
-x,
-y,
-rotation
+x,y,rotation
 ){
 
   ctx.save();
 
-  ctx.translate(
-    x,
-    y
-  );
-
-  ctx.rotate(
-    rotation
-  );
-
+  ctx.translate(x,y);
+  ctx.rotate(rotation);
 
   ctx.beginPath();
 
-  ctx.moveTo(
-    -36,-17
-  );
-
-  ctx.lineTo(
-    5,-17
-  );
-
-  ctx.lineTo(
-    5,-31
-  );
-
-  ctx.lineTo(
-    44,0
-  );
-
-  ctx.lineTo(
-    5,31
-  );
-
-  ctx.lineTo(
-    5,17
-  );
-
-  ctx.lineTo(
-    -36,17
-  );
+  ctx.moveTo(-34,-16);
+  ctx.lineTo(5,-16);
+  ctx.lineTo(5,-29);
+  ctx.lineTo(42,0);
+  ctx.lineTo(5,29);
+  ctx.lineTo(5,16);
+  ctx.lineTo(-34,16);
 
   ctx.closePath();
 
-
-  ctx.fillStyle =
-  "#ffd600";
-
-  ctx.strokeStyle =
-  "white";
-
-  ctx.lineWidth =
-  7;
+  ctx.fillStyle="#ffd600";
+  ctx.strokeStyle="white";
+  ctx.lineWidth=7;
 
   ctx.stroke();
-
   ctx.fill();
 
   ctx.restore();
-
 }
 
 
 /* =====================================================
-   YÖNLER
+   SARI HAREKET NOKTASI
 ===================================================== */
 
-function drawDirections(){
+function drawPoint(points){
 
-  /*
-    1 NUMARA
-  */
+  if(!points || !points.length)
+    return;
 
-  numberCircle(
-    STEM_X + 5,
-    STEM_TOP - 58,
-    "1",
-    "#ff2d2d"
+  const p=
+  points[points.length-1];
+
+  ctx.save();
+
+  ctx.shadowColor="#ffe600";
+  ctx.shadowBlur=25;
+
+  ctx.beginPath();
+
+  ctx.arc(
+    p.x,p.y,
+    18,
+    0,
+    Math.PI*2
   );
 
+  ctx.fillStyle="#fff000";
+  ctx.fill();
 
-  /*
-    C OKLARI
-  */
+  ctx.strokeStyle="white";
+  ctx.lineWidth=5;
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+
+/* =====================================================
+   ÇİZGİ NOKTALARI OLUŞTUR
+===================================================== */
+
+function linePoints(
+x1,y1,x2,y2,count=200
+){
+
+  const points=[];
+
+  for(let i=0;i<=count;i++){
+
+    const t=i/count;
+
+    points.push({
+      x:x1+(x2-x1)*t,
+      y:y1+(y2-y1)*t
+    });
+  }
+
+  return points;
+}
+
+
+/* =====================================================
+   KÜÇÜK a
+===================================================== */
+
+const CX=520;
+const CY=600;
+const R=250;
+
+const START_DEG=-40;
+const END_DEG=40;
+
+
+function makeC(){
+
+  const points=[];
+
+  const travel=
+  360-(END_DEG-START_DEG);
+
+  const count=400;
+
+  for(let i=0;i<=count;i++){
+
+    const t=i/count;
+
+    const degree=
+    START_DEG-(travel*t);
+
+    const angle=
+    degree*Math.PI/180;
+
+    points.push({
+      x:CX+R*Math.cos(angle),
+      y:CY+R*Math.sin(angle)
+    });
+  }
+
+  return points;
+}
+
+
+const cPoints=makeC();
+
+const joinPoint=cPoints[0];
+
+const STEM_X=joinPoint.x;
+
+const STEM_TOP=
+joinPoint.y-95;
+
+const STEM_BOTTOM=
+CY+R;
+
+const stemPoints=
+linePoints(
+  STEM_X,
+  STEM_TOP,
+  STEM_X,
+  STEM_BOTTOM
+);
+
+
+/* =====================================================
+   KÜÇÜK a KILAVUZ
+===================================================== */
+
+function drawSmallGuide(){
+
+  drawPath(
+    cPoints,
+    "rgba(120,125,130,.55)",
+    112
+  );
+
+  drawPath(
+    stemPoints,
+    "rgba(120,125,130,.55)",
+    112
+  );
+
+  drawPath(
+    cPoints,
+    "rgba(225,227,230,.98)",
+    78
+  );
+
+  drawPath(
+    stemPoints,
+    "rgba(225,227,230,.98)",
+    78
+  );
+
+  drawPath(
+    cPoints,
+    "white",
+    8,
+    [24,20]
+  );
+
+  drawPath(
+    stemPoints,
+    "white",
+    8,
+    [24,20]
+  );
+}
+
+
+function drawSmallDirections(){
+
+  numberCircle(
+    STEM_X+5,
+    STEM_TOP-58,
+    "1",
+    "#1976ff"
+  );
 
   arrow(
-    510,
-    340,
+    510,340,
     Math.PI
   );
 
   arrow(
-    280,
-    520,
+    280,520,
     Math.PI/2
   );
 
   arrow(
-    330,
-    790,
+    330,790,
     .65
   );
 
   arrow(
-    570,
-    845,
+    570,845,
     -.30
   );
 
-
-  /*
-    2 NUMARA
-  */
-
   numberCircle(
-    STEM_X + 88,
+    STEM_X+88,
     STEM_BOTTOM,
     "2",
     "#ff2d2d"
   );
-
-
-  /*
-    DÜZ ÇİZGİ OKLARI
-  */
 
   arrow(
     STEM_X,
@@ -931,81 +654,18 @@ function drawDirections(){
     710,
     Math.PI/2
   );
-
 }
 
 
-/* =====================================================
-   SARI TAKİP NOKTASI
-===================================================== */
-
-function drawPoint(points){
-
-  if(
-    !points ||
-    !points.length
-  ) return;
-
-
-  const p =
-  points[
-    points.length-1
-  ];
-
-
-  ctx.save();
-
-  ctx.shadowColor =
-  "#ffe600";
-
-  ctx.shadowBlur =
-  25;
-
-
-  ctx.beginPath();
-
-  ctx.arc(
-    p.x,
-    p.y,
-    18,
-    0,
-    Math.PI*2
-  );
-
-
-  ctx.fillStyle =
-  "#fff000";
-
-  ctx.fill();
-
-
-  ctx.strokeStyle =
-  "white";
-
-  ctx.lineWidth =
-  5;
-
-  ctx.stroke();
-
-  ctx.restore();
-
-}
-
-
-/* =====================================================
-   SAHNE
-===================================================== */
-
-function drawScene(
+function drawSmallScene(
 active=null
 ){
 
   clearCanvas();
 
-  drawGuide();
+  drawSmallGuide();
 
-
-  if(completedC){
+  if(completedSmallC){
 
     drawPath(
       cPoints,
@@ -1019,9 +679,7 @@ active=null
       8,
       [24,20]
     );
-
   }
-
 
   if(active){
 
@@ -1038,328 +696,719 @@ active=null
       [24,20]
     );
 
-    drawPoint(
-      active
-    );
-
+    drawPoint(active);
   }
 
-
-  drawDirections();
+  drawSmallDirections();
 
   updateTexture();
-
 }
 
 
 /* =====================================================
-   ANİMASYON
+   ANİMASYON MOTORU
 ===================================================== */
 
 function animate(
 points,
 duration,
+drawFunction,
 callback
 ){
 
   let start=null;
 
-
   function frame(time){
 
-    if(start===null){
-
+    if(start===null)
       start=time;
 
-    }
-
-
-    const progress =
+    const progress=
     Math.min(
-      (time-start)
-      /duration,
+      (time-start)/duration,
       1
     );
 
-
-    const index =
+    const index=
     Math.max(
       1,
       Math.floor(
-        progress *
+        progress*
         (points.length-1)
       )
     );
 
-
-    const partial =
+    const partial=
     points.slice(
       0,
       index+1
     );
 
-
-    drawScene(
-      partial
-    );
-
+    drawFunction(partial);
 
     if(progress<1){
 
-      requestAnimationFrame(
-        frame
-      );
+      requestAnimationFrame(frame);
 
-    }
-
-    else{
+    }else{
 
       if(callback)
-      callback();
-
+        callback();
     }
-
   }
 
-
-  requestAnimationFrame(
-    frame
-  );
-
+  requestAnimationFrame(frame);
 }
 
 
 /* =====================================================
-   C ÇİZ
+   KÜÇÜK a AKIŞI
 ===================================================== */
 
-function startC(){
+function startSmallC(){
 
-  completedC=false;
+  completedSmallC=false;
 
-  drawScene();
-
+  drawSmallScene();
 
   showMessage(
     "1. Önce c çizgisini çiz.",
     "Sarı okları takip et."
   );
 
-
   /*
-    İLK TURDA SES
-    ZATEN BUTONA BASINCA ÇALDI.
-
-    İKİNCİ TURDA
-    1. SESİ TEKRAR ÇALIYORUZ.
+    2. TURDA SESİ
+    TEKRAR ÇAL
   */
 
-  if(round===2){
-
-    playSound(
-      sound1
-    );
-
+  if(smallRound===2){
+    playSound(sound1);
   }
 
+  setTimeout(()=>{
 
-  setTimeout(
-    ()=>{
+    animate(
+      cPoints,
+      6500,
+      drawSmallScene,
+      startSmallStem
+    );
 
-      animate(
-        cPoints,
-        6500,
-        startStem
-      );
-
-    },
-    700
-  );
-
+  },700);
 }
 
 
-/* =====================================================
-   DÜZ ÇİZGİ
-===================================================== */
+function startSmallStem(){
 
-function startStem(){
+  completedSmallC=true;
 
-  completedC=true;
-
-  drawScene();
-
+  drawSmallScene();
 
   showMessage(
     "2. Şimdi düz çizgiyi çiz.",
     "Yukarıdan aşağı doğru ilerle."
   );
 
+  playSound(sound2);
 
-  playSound(
-    sound2
-  );
+  setTimeout(()=>{
 
+    animate(
+      stemPoints,
+      4000,
+      drawSmallScene,
+      smallRoundFinished
+    );
 
-  setTimeout(
-    ()=>{
-
-      animate(
-        stemPoints,
-        4000,
-        roundFinished
-      );
-
-    },
-    700
-  );
-
+  },700);
 }
 
 
-/* =====================================================
-   TUR BİTTİ
-===================================================== */
+function smallRoundFinished(){
 
-function roundFinished(){
+  completedSmallC=true;
 
-  completedC=true;
-
-  drawScene(
+  drawSmallScene(
     stemPoints
   );
 
-
-  if(round===1){
+  if(smallRound===1){
 
     showMessage(
       "Harika! Bir kez daha yazalım.",
       "Aynı hareketleri tekrar izle."
     );
 
+    playSound(sound3);
 
-    playSound(
-      sound3
-    );
+    smallRound=2;
 
+    let moved=false;
 
-    round=2;
+    function next(){
 
+      if(moved) return;
 
-    /*
-      3. SES BİTİNCE
-      İKİNCİ TUR.
-    */
-
-    sound3.onended =
-    function(){
+      moved=true;
 
       setTimeout(
-        startC,
+        startSmallC,
         500
       );
+    }
 
-    };
-
-
-    /*
-      YEDEK:
-      SES BİTME OLAYI
-      GELMEZSE ÇOK UZUN
-      BEKLEMESİN.
-    */
+    sound3.onended=next;
 
     setTimeout(
-      ()=>{
-
-        if(
-          round===2 &&
-          sound3.paused
-        ){
-
-          startC();
-
-        }
-
-      },
-      5500
+      next,
+      6000
     );
 
+  }else{
+
+    finishSmallA();
   }
-
-  else{
-
-    finish();
-
-  }
-
 }
 
 
 /* =====================================================
-   SON
+   KÜÇÜK a BİTTİ
 ===================================================== */
 
-function finish(){
+function finishSmallA(){
 
-  completedC=true;
+  completedSmallC=true;
 
-  drawScene(
+  drawSmallScene(
     stemPoints
   );
 
-
   showMessage(
-    "Harika! Şimdi sıra sende.",
-    "Kitabındaki küçük a harflerini yaz."
+    "Harika! Küçük a tamamlandı.",
+    "Şimdi büyük A harfine geçiyoruz."
   );
 
+  /*
+    4. SES:
+    ŞİMDİ SIRA SENDE
+  */
 
-  playSound(
-    sound4
+  playSound(sound4);
+
+  let moved=false;
+
+  function goBig(){
+
+    if(moved) return;
+
+    moved=true;
+
+    setTimeout(
+      startBigA,
+      700
+    );
+  }
+
+  sound4.onended=goBig;
+
+  setTimeout(
+    goBig,
+    6500
   );
-
 }
 
 
 /* =====================================================
-   AR BAŞLANGICI
+   BÜYÜK A GEOMETRİSİ
+
+              TEPE
+               /\
+              /  \
+             /----\
+            /      \
+
+   1 = tepeden sol alta
+   2 = tepeden sağ alta
+   3 = soldan sağa orta
+===================================================== */
+
+const A_TOP_X=600;
+const A_TOP_Y=255;
+
+const A_LEFT_X=345;
+const A_LEFT_Y=875;
+
+const A_RIGHT_X=855;
+const A_RIGHT_Y=875;
+
+
+/*
+   ORTA ÇİZGİYİ
+   İKİ EĞİK ÇİZGİYE
+   TAM BAĞLIYORUZ.
+*/
+
+const BAR_Y=635;
+
+
+/*
+   SOL EĞİK ÜZERİNDE
+   BAR_Y NOKTASI
+*/
+
+const leftRatio=
+(BAR_Y-A_TOP_Y)/
+(A_LEFT_Y-A_TOP_Y);
+
+const BAR_LEFT_X=
+A_TOP_X+
+(A_LEFT_X-A_TOP_X)*
+leftRatio;
+
+
+/*
+   SAĞ EĞİK ÜZERİNDE
+*/
+
+const rightRatio=
+(BAR_Y-A_TOP_Y)/
+(A_RIGHT_Y-A_TOP_Y);
+
+const BAR_RIGHT_X=
+A_TOP_X+
+(A_RIGHT_X-A_TOP_X)*
+rightRatio;
+
+
+const bigLeft=
+linePoints(
+  A_TOP_X,
+  A_TOP_Y,
+  A_LEFT_X,
+  A_LEFT_Y,
+  240
+);
+
+const bigRight=
+linePoints(
+  A_TOP_X,
+  A_TOP_Y,
+  A_RIGHT_X,
+  A_RIGHT_Y,
+  240
+);
+
+const bigMiddle=
+linePoints(
+  BAR_LEFT_X,
+  BAR_Y,
+  BAR_RIGHT_X,
+  BAR_Y,
+  180
+);
+
+
+/* =====================================================
+   BÜYÜK A KILAVUZ
+===================================================== */
+
+function drawBigGuide(){
+
+  /*
+    DIŞ GRİ
+  */
+
+  drawPath(
+    bigLeft,
+    "rgba(120,125,130,.55)",
+    108
+  );
+
+  drawPath(
+    bigRight,
+    "rgba(120,125,130,.55)",
+    108
+  );
+
+  drawPath(
+    bigMiddle,
+    "rgba(120,125,130,.55)",
+    108
+  );
+
+
+  /*
+    İÇ AÇIK GRİ
+  */
+
+  drawPath(
+    bigLeft,
+    "rgba(225,227,230,.98)",
+    75
+  );
+
+  drawPath(
+    bigRight,
+    "rgba(225,227,230,.98)",
+    75
+  );
+
+  drawPath(
+    bigMiddle,
+    "rgba(225,227,230,.98)",
+    75
+  );
+
+
+  /*
+    BEYAZ KESİKLİ ORTA
+  */
+
+  drawPath(
+    bigLeft,
+    "white",
+    8,
+    [24,20]
+  );
+
+  drawPath(
+    bigRight,
+    "white",
+    8,
+    [24,20]
+  );
+
+  drawPath(
+    bigMiddle,
+    "white",
+    8,
+    [24,20]
+  );
+}
+
+
+/* =====================================================
+   BÜYÜK A YÖNLERİ
+===================================================== */
+
+function drawBigDirections(){
+
+  /*
+    1
+  */
+
+  numberCircle(
+    A_TOP_X-85,
+    A_TOP_Y-45,
+    "1",
+    "#1976ff"
+  );
+
+  /*
+    SOL ALTA OKLAR
+  */
+
+  arrow(
+    505,
+    455,
+    1.96
+  );
+
+  arrow(
+    415,
+    700,
+    1.96
+  );
+
+
+  /*
+    2
+  */
+
+  numberCircle(
+    A_TOP_X+85,
+    A_TOP_Y-45,
+    "2",
+    "#ff2d2d"
+  );
+
+  /*
+    SAĞ ALTA OKLAR
+  */
+
+  arrow(
+    695,
+    455,
+    1.18
+  );
+
+  arrow(
+    790,
+    700,
+    1.18
+  );
+
+
+  /*
+    3
+  */
+
+  numberCircle(
+    BAR_LEFT_X-75,
+    BAR_Y,
+    "3",
+    "#7b4dff"
+  );
+
+  /*
+    SOLDAN SAĞA
+  */
+
+  arrow(
+    600,
+    BAR_Y,
+    0
+  );
+}
+
+
+/* =====================================================
+   BÜYÜK A SAHNESİ
+===================================================== */
+
+function drawBigScene(
+active=null
+){
+
+  clearCanvas();
+
+  drawBigGuide();
+
+
+  /*
+    TAMAMLANMIŞ ÇİZGİLER
+  */
+
+  if(bigLeftDone){
+
+    drawPath(
+      bigLeft,
+      "#ff3030",
+      72
+    );
+
+    drawPath(
+      bigLeft,
+      "white",
+      8,
+      [24,20]
+    );
+  }
+
+
+  if(bigRightDone){
+
+    drawPath(
+      bigRight,
+      "#ff3030",
+      72
+    );
+
+    drawPath(
+      bigRight,
+      "white",
+      8,
+      [24,20]
+    );
+  }
+
+
+  if(bigMiddleDone){
+
+    drawPath(
+      bigMiddle,
+      "#ff3030",
+      72
+    );
+
+    drawPath(
+      bigMiddle,
+      "white",
+      8,
+      [24,20]
+    );
+  }
+
+
+  /*
+    ŞU ANDA ÇİZİLEN
+  */
+
+  if(active){
+
+    drawPath(
+      active,
+      "#ff3030",
+      72
+    );
+
+    drawPath(
+      active,
+      "white",
+      8,
+      [24,20]
+    );
+
+    drawPoint(active);
+  }
+
+
+  drawBigDirections();
+
+  updateTexture();
+}
+
+
+/* =====================================================
+   BÜYÜK A BAŞLA
+===================================================== */
+
+function startBigA(){
+
+  bigLeftDone=false;
+  bigRightDone=false;
+  bigMiddleDone=false;
+
+  drawBigScene();
+
+  showMessage(
+    "Şimdi büyük A harfini yazalım.",
+    "1. Yukarıdan başlayıp sol alta doğru eğik çiz."
+  );
+
+  playSound(sound5);
+
+  setTimeout(()=>{
+
+    animate(
+      bigLeft,
+      4200,
+      drawBigScene,
+      startBigRight
+    );
+
+  },900);
+}
+
+
+/* =====================================================
+   BÜYÜK A - 2
+===================================================== */
+
+function startBigRight(){
+
+  bigLeftDone=true;
+
+  drawBigScene();
+
+  showMessage(
+    "2. Tekrar yukarıdan başla.",
+    "Bu kez sağ alta doğru eğik çiz."
+  );
+
+  playSound(sound6);
+
+  setTimeout(()=>{
+
+    animate(
+      bigRight,
+      4200,
+      drawBigScene,
+      startBigMiddle
+    );
+
+  },900);
+}
+
+
+/* =====================================================
+   BÜYÜK A - 3
+===================================================== */
+
+function startBigMiddle(){
+
+  bigLeftDone=true;
+  bigRightDone=true;
+
+  drawBigScene();
+
+  showMessage(
+    "3. Şimdi ortadaki çizgiyi çiz.",
+    "Soldan sağa doğru ilerle."
+  );
+
+  playSound(sound7);
+
+  setTimeout(()=>{
+
+    animate(
+      bigMiddle,
+      3200,
+      drawBigScene,
+      finishBigA
+    );
+
+  },900);
+}
+
+
+/* =====================================================
+   BÜYÜK A BİTTİ
+===================================================== */
+
+function finishBigA(){
+
+  bigLeftDone=true;
+  bigRightDone=true;
+  bigMiddleDone=true;
+
+  drawBigScene();
+
+  showMessage(
+    "Harika! Büyük A harfini de tamamladın.",
+    "Şimdi sıra sende!"
+  );
+
+  playSound(sound8);
+}
+
+
+/* =====================================================
+   AR BAŞLAT
 ===================================================== */
 
 function tryStart(){
 
   if(animationStarted)
-  return;
+    return;
 
   if(!userStarted)
-  return;
+    return;
 
   if(!targetVisible)
-  return;
-
+    return;
 
   animationStarted=true;
-
 
   plane.setAttribute(
     "visible",
     "true"
   );
 
-
-  /*
-    1. SES BUTONDA
-    BAŞLAMIŞTI.
-
-    SAYFA BULUNUNCA
-    ÇİZİM BAŞLIYOR.
-  */
-
   setTimeout(
-    startC,
+    startSmallC,
     400
   );
-
 }
 
 
@@ -1374,7 +1423,6 @@ function(){
   targetVisible=true;
 
   tryStart();
-
 });
 
 
@@ -1383,7 +1431,6 @@ target.addEventListener(
 function(){
 
   targetVisible=false;
-
 });
 
 
@@ -1395,8 +1442,6 @@ tryStart
 }
 
 });
-
-
 </script>
 
 
@@ -1404,8 +1449,8 @@ tryStart
 
 mindar-image="
 imageTargetSrc: ./targets%202.mind;
-filterMinCF: 0.0001;
-filterBeta: 0.01;
+filterMinCF:0.0001;
+filterBeta:0.01;
 "
 
 renderer="
@@ -1434,12 +1479,9 @@ school-a-writing>
 
 <a-plane
 id="drawPlane"
-
 position="0 0.01 0.08"
-
 width="1.12"
 height="1.12"
-
 visible="false"
 
 material="
