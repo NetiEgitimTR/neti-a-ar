@@ -7,6 +7,7 @@
 <title>Neti | A Sesi</title>
 
 <style>
+
 *{
   box-sizing:border-box;
   -webkit-tap-highlight-color:transparent;
@@ -32,7 +33,7 @@ button{
 
 header{
   height:82px;
-  background:white;
+  background:#fff;
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -100,9 +101,10 @@ header{
   padding:17px 28px;
   min-width:250px;
   background:#61c77a;
-  color:white;
+  color:#fff;
   font-size:22px;
   font-weight:900;
+  box-shadow:0 5px 12px rgba(0,0,0,.10);
 }
 
 .repeatBtn{
@@ -121,9 +123,7 @@ header{
   font-weight:900;
 }
 
-/* =====================================================
-ANA SAYFA
-===================================================== */
+/* ================= ANA SAYFA ================= */
 
 #home{
   text-align:center;
@@ -176,14 +176,11 @@ ARI EKRANI
   width:min(1050px,94vw);
   height:540px;
   margin:auto;
-
   position:relative;
   overflow:hidden;
-
   background:#fff;
   border:5px solid #f1d66c;
   border-radius:32px;
-
   box-shadow:0 8px 20px rgba(0,0,0,.08);
 }
 
@@ -192,12 +189,10 @@ ARI EKRANI
   top:20px;
   left:0;
   right:0;
-
   font-size:120px;
   line-height:1;
   font-weight:900;
   color:#ef7038;
-
   z-index:3;
 }
 
@@ -206,7 +201,7 @@ ARI EKRANI
   left:18px;
   bottom:12px;
   width:190px;
-  z-index:3;
+  z-index:4;
 }
 
 .netiWrap img{
@@ -220,61 +215,49 @@ ARI EKRANI
   bottom:25px;
   font-size:27px;
   font-weight:900;
-  z-index:3;
+  z-index:4;
 }
 
-/*
-=====================================================
-ARI SVG
+/* ================= ARI ================= */
 
-ÖNEMLİ:
-ROTANIN ÇİZGİSİ YOK.
-SADECE ARI GÖRÜNÜYOR.
-=====================================================
-*/
-
-#beeArea{
+#bee{
   position:absolute;
 
-  left:5%;
-  top:25%;
+  /* Neti'nin yanından başlıyor */
+  left:150px;
+  bottom:155px;
 
-  width:90%;
-  height:53%;
+  /* ÖNCEKİNDEN DAHA BÜYÜK */
+  width:105px;
+  height:105px;
 
-  overflow:visible;
+  z-index:7;
 
-  z-index:5;
+  opacity:0;
+  visibility:hidden;
 
-  pointer-events:none;
+  will-change:transform;
 }
 
-#beePath{
-  fill:none;
-
-  /* ÇİZGİ TAMAMEN GİZLİ */
-  stroke:none;
-}
-
-#movingBee{
-  width:72px;
-  height:72px;
+#bee img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
 }
 
 /* =====================================================
-KÜÇÜK a YAZI ALANI
+KÜÇÜK a ALANI
 ===================================================== */
 
 .writingStage{
   width:min(1000px,94vw);
   height:400px;
-
   margin:8px auto;
 
   position:relative;
   overflow:hidden;
 
-  background:white;
+  background:#fff;
 
   border:6px solid #58b6da;
   border-radius:32px;
@@ -283,84 +266,73 @@ KÜÇÜK a YAZI ALANI
 }
 
 /*
-SATIR:
+ÇOK ÖNEMLİ:
 
-ÜST PEMBE     = %14
-KESİK PEMBE   = %43
-ALT PEMBE     = %82
+ARTIK PEMBE ÇİZGİLER CSS DEĞİL.
 
-KÜÇÜK a SADECE
-%43 - %82 ARASINDA.
+PEMBE ÇİZGİLER + a
+AYNI SVG'NİN İÇİNDE.
+
+BÖYLECE TELEFONDA DA
+AKILLI TAHTADA DA
+AYNI ORANDA ÖLÇEKLENİYOR.
 */
 
-.schoolLine{
-  position:absolute;
-  left:6%;
-  width:88%;
-  z-index:1;
-}
-
-.schoolTop{
-  top:14%;
-  border-top:3px solid #efa6c9;
-}
-
-.schoolMiddle{
-  top:43%;
-  border-top:4px dashed #efa6c9;
-}
-
-.schoolBottom{
-  top:82%;
-  border-top:3px solid #efa6c9;
-}
-
-/* =====================================================
-SVG
-===================================================== */
-
 .letterSvg{
-  position:absolute;
-  inset:0;
+  display:block;
   width:100%;
   height:100%;
-  z-index:2;
 }
+
+/* PEMBE SATIRLAR */
+
+.rowSolid{
+  stroke:#eca1c7;
+  stroke-width:4;
+}
+
+.rowDash{
+  stroke:#eca1c7;
+  stroke-width:5;
+  stroke-dasharray:22 18;
+}
+
+/* HARF */
 
 .guideOuter{
   fill:none;
-  stroke:#bfc1c5;
-  stroke-width:27;
+  stroke:rgba(120,125,130,.55);
+  stroke-width:34;
   stroke-linecap:round;
   stroke-linejoin:round;
 }
 
 .guideInner{
   fill:none;
-  stroke:#e5e6e8;
-  stroke-width:19;
+  stroke:rgba(225,227,230,.98);
+  stroke-width:24;
   stroke-linecap:round;
   stroke-linejoin:round;
 }
 
 .guideDash{
   fill:none;
-  stroke:white;
-  stroke-width:3;
-  stroke-dasharray:8 7;
+  stroke:#fff;
+  stroke-width:4;
+  stroke-dasharray:10 8;
   stroke-linecap:round;
 }
 
 .drawStroke{
   fill:none;
-  stroke:#ff3d3d;
-  stroke-width:16;
+  stroke:#ff3030;
+  stroke-width:22;
   stroke-linecap:round;
   stroke-linejoin:round;
 }
 
 .yellowDot{
-  fill:#ffd928;
+  fill:#fff000;
   stroke:#efa900;
   stroke-width:4;
 }
@@ -370,7 +342,7 @@ SVG
 }
 
 .stepNumber{
-  fill:white;
+  fill:#fff;
   font-size:22px;
   font-weight:900;
   text-anchor:middle;
@@ -446,15 +418,18 @@ MOBİL
     bottom:10px;
   }
 
+  #bee{
+    width:88px;
+    height:88px;
+    left:105px;
+    bottom:135px;
+  }
+
   .eyeText{
     right:10px;
     bottom:22px;
     font-size:19px;
   }
-
-  /*
-  TELEFONDA SATIR DAHA KISA
-  */
 
   .writingStage{
     width:96vw;
@@ -504,14 +479,12 @@ MOBİL
 
 </header>
 
+
 <!-- =====================================================
 ANA SAYFA
 ===================================================== -->
 
-<section
-  id="home"
-  class="page active"
->
+<section id="home" class="page active">
 
   <h1>
     Neti ile A Sesini Öğreniyorum
@@ -543,169 +516,42 @@ ANA SAYFA
 
 </section>
 
+
 <!-- =====================================================
 ARI
 ===================================================== -->
 
-<section
-  id="soundPage"
-  class="page activity"
->
+<section id="soundPage" class="page activity">
 
   <h2 class="activityTitle">
     A / a Sesini Tanıyalım
   </h2>
 
-  <div class="soundStage">
+  <div
+    class="soundStage"
+    id="soundStage"
+  >
 
     <div class="soundLetters">
       A a
     </div>
-
-    <!-- ===============================================
-    ARI
-
-    PATH GÖRÜNMEZ.
-    =============================================== -->
-
-    <svg
-      id="beeArea"
-      viewBox="0 0 1000 400"
-      preserveAspectRatio="xMidYMid meet"
-    >
-
-      <!--
-      TEK SÜREKLİ ROTA:
-
-      başlangıç sol orta
-
-      → sağ-sol
-      → büyük yuvarlak
-      → merkez
-      → yukarı-aşağı
-      → çapraz
-      → küçük yuvarlak
-      → ters çapraz
-      → başlangıç
-
-      Çizgi görünmüyor.
-      -->
-
-      <path
-        id="beePath"
-        d="
-        M 80 200
-
-        C 180 80,
-          350 80,
-          470 200
-
-        C 590 320,
-          760 320,
-          900 200
-
-        C 760 80,
-          600 80,
-          500 200
-
-        C 400 320,
-          220 320,
-          80 200
-
-        C 220 190,
-          360 190,
-          500 200
-
-        C 640 210,
-          780 210,
-          900 200
-
-        C 770 180,
-          650 100,
-          500 55
-
-        C 350 100,
-          230 180,
-          100 340
-
-        C 250 300,
-          380 260,
-          500 200
-
-        C 620 140,
-          740 100,
-          900 60
-
-        C 820 180,
-          740 300,
-          610 340
-
-        C 480 380,
-          360 320,
-          320 230
-
-        C 280 140,
-          340 75,
-          430 90
-
-        C 520 105,
-          560 180,
-          525 240
-
-        C 490 300,
-          410 300,
-          375 240
-
-        C 340 180,
-          385 115,
-          465 115
-
-        C 590 120,
-          690 250,
-          820 330
-
-        C 670 300,
-          520 250,
-          400 200
-
-        C 280 150,
-          180 130,
-          80 200
-        "
-      />
-
-      <image
-        id="movingBee"
-        href="./831FD224-0476-409E-B2D5-24D2A8AD424E.png"
-
-        x="-36"
-        y="-36"
-        width="72"
-        height="72"
-      >
-
-        <animateMotion
-          id="beeMotion"
-          dur="20s"
-          repeatCount="indefinite"
-          rotate="auto"
-          calcMode="paced"
-          begin="indefinite"
-        >
-
-          <mpath href="#beePath"/>
-
-        </animateMotion>
-
-      </image>
-
-    </svg>
 
     <div class="netiWrap">
 
       <img
         src="./72509361-9673-4AB6-8739-B7646C5522E4.png"
         alt="Neti"
+      >
+
+    </div>
+
+    <!-- ARI -->
+
+    <div id="bee">
+
+      <img
+        src="./831FD224-0476-409E-B2D5-24D2A8AD424E.png"
+        alt="Arı"
       >
 
     </div>
@@ -736,14 +582,12 @@ ARI
 
 </section>
 
+
 <!-- =====================================================
 KÜÇÜK a
 ===================================================== -->
 
-<section
-  id="smallPage"
-  class="page activity"
->
+<section id="smallPage" class="page activity">
 
   <h2 class="activityTitle">
     Küçük a Harfini Yazalım
@@ -751,9 +595,17 @@ KÜÇÜK a
 
   <div class="writingStage">
 
-    <div class="schoolLine schoolTop"></div>
-    <div class="schoolLine schoolMiddle"></div>
-    <div class="schoolLine schoolBottom"></div>
+    <!--
+    TEK KOORDİNAT SİSTEMİ
+
+    ÜST PEMBE = 80
+
+    KESİK ÇİZGİ = 220
+    ALT ÇİZGİ   = 430
+
+    KÜÇÜK a TAM OLARAK
+    220 - 430 ARASINDA.
+    -->
 
     <svg
       class="letterSvg"
@@ -761,239 +613,333 @@ KÜÇÜK a
       preserveAspectRatio="none"
     >
 
-      <!--
-      =================================================
+      <!-- =========================
+      SATIR ÇİZGİLERİ
+      ========================= -->
+
+      <line
+        class="rowSolid"
+        x1="55"
+        y1="80"
+        x2="845"
+        y2="80"
+      />
+
+      <line
+        class="rowDash"
+        x1="55"
+        y1="220"
+        x2="845"
+        y2="220"
+      />
+
+      <line
+        class="rowSolid"
+        x1="55"
+        y1="430"
+        x2="845"
+        y2="430"
+      />
+
+
+      <!-- =================================================
       KÜÇÜK a
 
-      SVG SATIR KOORDİNATLARI:
+      HARFİN GÖRSEL SINIRLARI:
 
-      KESİK ÇİZGİ = yaklaşık Y 215
-      ALT ÇİZGİ   = yaklaşık Y 410
+      ÜST = 220
+      ALT = 430
 
-      HARF:
-      EN ÜST      = 216
-      EN ALT      = 409
+      DİK ÇİZGİ:
+      220 -> 430
 
-      YANİ İKİ ÇİZGİYE DE DEĞİYOR.
-      =================================================
-      -->
+      C:
+      ÜST = yaklaşık 220
+      ALT = yaklaşık 430
 
-      <!-- ================= C KILAVUZ ================= -->
+      İKİSİ DE AYNI SATIRA OTURUYOR.
+      ================================================= -->
 
-      <path
-        class="guideOuter"
-        d="
-        M 540 230
 
-        C 510 215,
-          455 215,
-          415 235
-
-        C 360 263,
-          345 325,
-          370 370
-
-        C 395 414,
-          465 420,
-          515 385
-
-        C 535 370,
-          542 345,
-          542 320
-        "
-      />
-
-      <path
-        class="guideInner"
-        d="
-        M 540 230
-
-        C 510 215,
-          455 215,
-          415 235
-
-        C 360 263,
-          345 325,
-          370 370
-
-        C 395 414,
-          465 420,
-          515 385
-
-        C 535 370,
-          542 345,
-          542 320
-        "
-      />
-
-      <path
-        class="guideDash"
-        d="
-        M 540 230
-
-        C 510 215,
-          455 215,
-          415 235
-
-        C 360 263,
-          345 325,
-          370 370
-
-        C 395 414,
-          465 420,
-          515 385
-
-        C 535 370,
-          542 345,
-          542 320
-        "
-      />
-
-      <!-- ================= DİK KILAVUZ ================= -->
+      <!-- =========================
+      C - DIŞ GRİ
+      ========================= -->
 
       <path
         class="guideOuter"
         d="
-        M 542 216
-        L 542 409
+        M 548 248
+
+        C 520 220,
+          466 213,
+          418 230
+
+        C 360 250,
+          330 300,
+          338 350
+
+        C 346 402,
+          392 430,
+          448 430
+
+        C 500 430,
+          538 405,
+          548 370
+
+        C 554 350,
+          554 325,
+          552 305
         "
       />
+
+
+      <!-- =========================
+      DİK - DIŞ GRİ
+      ========================= -->
+
+      <path
+        class="guideOuter"
+        d="
+        M 552 220
+        L 552 430
+        "
+      />
+
+
+      <!-- =========================
+      C - İÇ GRİ
+      ========================= -->
 
       <path
         class="guideInner"
         d="
-        M 542 216
-        L 542 409
+        M 548 248
+
+        C 520 220,
+          466 213,
+          418 230
+
+        C 360 250,
+          330 300,
+          338 350
+
+        C 346 402,
+          392 430,
+          448 430
+
+        C 500 430,
+          538 405,
+          548 370
+
+        C 554 350,
+          554 325,
+          552 305
         "
       />
+
+
+      <!-- =========================
+      DİK - İÇ GRİ
+      ========================= -->
+
+      <path
+        class="guideInner"
+        d="
+        M 552 220
+        L 552 430
+        "
+      />
+
+
+      <!-- =========================
+      C - BEYAZ KESİK
+      ========================= -->
 
       <path
         class="guideDash"
         d="
-        M 542 216
-        L 542 409
+        M 548 248
+
+        C 520 220,
+          466 213,
+          418 230
+
+        C 360 250,
+          330 300,
+          338 350
+
+        C 346 402,
+          392 430,
+          448 430
+
+        C 500 430,
+          538 405,
+          548 370
+
+        C 554 350,
+          554 325,
+          552 305
         "
       />
 
-      <!-- ================= KIRMIZI ÇİZİM ================= -->
+
+      <!-- =========================
+      DİK - BEYAZ KESİK
+      ========================= -->
+
+      <path
+        class="guideDash"
+        d="
+        M 552 220
+        L 552 430
+        "
+      />
+
+
+      <!-- =========================
+      KIRMIZI ANİMASYON - C
+      ========================= -->
 
       <path
         id="smallC"
         class="drawStroke"
         d="
-        M 540 230
+        M 548 248
 
-        C 510 215,
-          455 215,
-          415 235
+        C 520 220,
+          466 213,
+          418 230
 
-        C 360 263,
-          345 325,
-          370 370
+        C 360 250,
+          330 300,
+          338 350
 
-        C 395 414,
-          465 420,
-          515 385
+        C 346 402,
+          392 430,
+          448 430
 
-        C 535 370,
-          542 345,
-          542 320
+        C 500 430,
+          538 405,
+          548 370
+
+        C 554 350,
+          554 325,
+          552 305
         "
       />
+
+
+      <!-- =========================
+      KIRMIZI ANİMASYON - DİK
+      ========================= -->
 
       <path
         id="smallStraight"
         class="drawStroke"
         d="
-        M 542 216
-        L 542 409
+        M 552 220
+        L 552 430
         "
       />
 
-      <!-- ================= NUMARA 1 ================= -->
+
+      <!-- =========================
+      NUMARA 1
+      ========================= -->
 
       <circle
         class="stepCircle"
         cx="495"
-        cy="195"
-        r="18"
+        cy="190"
+        r="19"
       />
 
       <text
         class="stepNumber"
         x="495"
-        y="195"
+        y="190"
       >
         1
       </text>
 
-      <!-- ================= NUMARA 2 ================= -->
+
+      <!-- =========================
+      NUMARA 2
+      ========================= -->
 
       <circle
         class="stepCircle"
-        cx="585"
+        cx="600"
         cy="210"
-        r="18"
+        r="19"
       />
 
       <text
         class="stepNumber"
-        x="585"
+        x="600"
         y="210"
       >
         2
       </text>
 
-      <!-- ================= C OKU ================= -->
+
+      <!-- =========================
+      C YÖN OKU
+      ========================= -->
 
       <path
         class="arrowLine"
         d="
-        M 525 218
-
-        C 480 195,
+        M 530 225
+        C 480 200,
           420 205,
-          390 245
+          385 245
         "
       />
 
       <path
         class="arrowLine"
         d="
-        M 390 245
-        L 394 219
+        M 385 245
+        L 391 218
 
-        M 390 245
-        L 416 238
+        M 385 245
+        L 412 238
         "
       />
 
-      <!-- ================= DİK OK ================= -->
+
+      <!-- =========================
+      DİK YÖN OKU
+      ========================= -->
 
       <path
         class="arrowLine"
         d="
-        M 590 240
-        L 590 355
+        M 605 255
+        L 605 380
         "
       />
 
       <path
         class="arrowLine"
         d="
-        M 577 335
-        L 590 355
-        L 603 335
+        M 592 359
+        L 605 380
+        L 618 359
         "
       />
 
-      <!-- ================= SARI NOKTA ================= -->
+
+      <!-- =========================
+      SARI NOKTA
+      ========================= -->
 
       <circle
         id="smallDot"
         class="yellowDot"
-        cx="540"
-        cy="230"
+        cx="548"
+        cy="248"
         r="12"
       />
 
@@ -1035,6 +981,7 @@ KÜÇÜK a
 
 </section>
 
+
 <!-- =====================================================
 SESLER
 ===================================================== -->
@@ -1074,10 +1021,16 @@ SESLER
   playsinline>
 </audio>
 
+
 <script>
 
 let soundEnabled=true;
 let running=false;
+
+let beeAnimation=null;
+let beeStartTimer=null;
+let beeStopTimer=null;
+
 
 /* =====================================================
 SAYFA
@@ -1100,6 +1053,7 @@ function showPage(id){
   window.scrollTo(0,0);
 }
 
+
 function goHome(){
 
   stopEverything();
@@ -1116,6 +1070,7 @@ function goHome(){
 
   window.scrollTo(0,0);
 }
+
 
 /* =====================================================
 SES
@@ -1137,6 +1092,7 @@ function toggleSound(){
   }
 }
 
+
 function stopAllAudio(){
 
   document
@@ -1150,6 +1106,7 @@ function stopAllAudio(){
 
     });
 }
+
 
 function playAudio(id){
 
@@ -1192,50 +1149,308 @@ function playAudio(id){
   });
 }
 
+
 /* =====================================================
 ARI
+
+ZAMANLAMA:
+
+0.0 sn
+Neti konuşmaya başlıyor.
+
+1.7 sn
+İlk cümle bitiyor.
+ARI NETİ'NİN YANINDA BELİRİYOR.
+
+1.7 - 6.4 sn
+ARI YAVAŞ VE AKICI HAREKET EDİYOR.
+
+6.4 sn
+"Şimdi sıra sende" kısmına geçerken
+ARI DURUYOR VE KAYBOLUYOR.
 ===================================================== */
 
-function resetBee(){
 
-  const svg=
-    document.getElementById("beeArea");
+function hideBee(){
 
-  try{
+  const bee=
+    document.getElementById("bee");
 
-    svg.pauseAnimations();
-    svg.setCurrentTime(0);
+  if(beeAnimation){
 
-  }catch(e){}
+    beeAnimation.cancel();
+    beeAnimation=null;
+
+  }
+
+  bee.style.opacity="0";
+  bee.style.visibility="hidden";
+  bee.style.transform="translate3d(0,0,0)";
 }
+
 
 function startBee(){
 
-  const svg=
-    document.getElementById("beeArea");
+  const bee=
+    document.getElementById("bee");
 
-  const motion=
-    document.getElementById("beeMotion");
+  const stage=
+    document.getElementById("soundStage");
 
-  try{
 
-    svg.setCurrentTime(0);
-    svg.unpauseAnimations();
+  /*
+  NETİ'NİN YANINDA BAŞLANGIÇ
+  */
 
-    motion.beginElement();
+  const startX=
+    window.innerWidth<=760
+    ? 105
+    : 150;
 
-  }catch(e){}
+  const startBottom=
+    window.innerWidth<=760
+    ? 135
+    : 155;
+
+  bee.style.left=startX+"px";
+  bee.style.bottom=startBottom+"px";
+
+
+  bee.style.visibility="visible";
+  bee.style.opacity="1";
+
+
+  /*
+  HAREKET ALANI
+
+  Arı kutudan çıkmayacak.
+  */
+
+  const beeW=
+    bee.offsetWidth;
+
+  const beeH=
+    bee.offsetHeight;
+
+  const stageW=
+    stage.clientWidth;
+
+  const stageH=
+    stage.clientHeight;
+
+
+  /*
+  BAŞLANGIÇ KONUMUNA GÖRE
+  TRANSFORM SINIRLARI
+  */
+
+  const maxRight=
+    stageW
+    -startX
+    -beeW
+    -25;
+
+  const currentTop=
+    stageH
+    -startBottom
+    -beeH;
+
+  const maxUp=
+    -currentTop
+    +125;
+
+  const maxDown=
+    stageH
+    -currentTop
+    -beeH
+    -100;
+
+
+  /*
+  4.7 SANİYEDE TEK TUR.
+
+  Arı:
+  - sağa
+  - yukarı
+  - yuvarlak
+  - merkeze
+  - aşağı
+  - sola
+  - çapraz
+
+  gidiyor.
+
+  EASING = LINEAR
+
+  Yani hiçbir noktada
+  yavaşlayıp hızlanmıyor.
+  */
+
+  beeAnimation=
+    bee.animate(
+
+      [
+
+        {
+          transform:
+            "translate3d(0px,0px,0px)",
+          offset:0
+        },
+
+
+        /*
+        SOL → ORTA ÜST
+        */
+
+        {
+          transform:
+            `translate3d(
+              ${maxRight*0.34}px,
+              ${maxUp*0.70}px,
+              0
+            )`,
+          offset:.16
+        },
+
+
+        /*
+        ORTA ÜST → SAĞ ÜST
+        */
+
+        {
+          transform:
+            `translate3d(
+              ${maxRight*0.72}px,
+              ${maxUp*0.82}px,
+              0
+            )`,
+          offset:.29
+        },
+
+
+        /*
+        SAĞA DOĞRU YUVARLAK DÖNÜŞ
+        */
+
+        {
+          transform:
+            `translate3d(
+              ${maxRight*0.94}px,
+              ${maxUp*0.30}px,
+              0
+            )`,
+          offset:.40
+        },
+
+
+        /*
+        SAĞ ORTA
+        */
+
+        {
+          transform:
+            `translate3d(
+              ${maxRight*0.86}px,
+              ${maxDown*0.45}px,
+              0
+            )`,
+          offset:.51
+        },
+
+
+        /*
+        ORTA ALT
+        */
+
+        {
+          transform:
+            `translate3d(
+              ${maxRight*0.55}px,
+              ${maxDown*0.90}px,
+              0
+            )`,
+          offset:.64
+        },
+
+
+        /*
+        SOL ALT
+        */
+
+        {
+          transform:
+            `translate3d(
+              ${maxRight*0.17}px,
+              ${maxDown*0.67}px,
+              0
+            )`,
+          offset:.77
+        },
+
+
+        /*
+        MERKEZDEN ÇAPRAZ
+        */
+
+        {
+          transform:
+            `translate3d(
+              ${maxRight*0.53}px,
+              ${maxUp*0.10}px,
+              0
+            )`,
+          offset:.88
+        },
+
+
+        /*
+        SAĞ ORTA
+        */
+
+        {
+          transform:
+            `translate3d(
+              ${maxRight*0.78}px,
+              ${maxDown*0.15}px,
+              0
+            )`,
+          offset:1
+        }
+
+      ],
+
+      {
+        duration:4700,
+
+        /*
+        SABİT HIZ
+        */
+
+        easing:"linear",
+
+        fill:"forwards"
+      }
+
+    );
 }
+
 
 function stopBee(){
 
-  const svg=
-    document.getElementById("beeArea");
+  if(beeAnimation){
 
-  try{
-    svg.pauseAnimations();
-  }catch(e){}
+    beeAnimation.cancel();
+    beeAnimation=null;
+
+  }
+
+  const bee=
+    document.getElementById("bee");
+
+  bee.style.opacity="0";
+  bee.style.visibility="hidden";
 }
+
 
 /* =====================================================
 DURDUR
@@ -1246,11 +1461,123 @@ function stopEverything(){
   running=false;
 
   stopAllAudio();
-  resetBee();
+
+  clearTimeout(beeStartTimer);
+  clearTimeout(beeStopTimer);
+
+  hideBee();
 }
 
+
 /* =====================================================
-PATH HAZIRLIK
+ARI + NETİ SESİ
+===================================================== */
+
+function startSoundActivity(){
+
+  if(running) return;
+
+  running=true;
+
+  stopAllAudio();
+
+  clearTimeout(beeStartTimer);
+  clearTimeout(beeStopTimer);
+
+  hideBee();
+
+
+  const audio=
+    document.getElementById("introAudio");
+
+
+  /*
+  SESİ TIKLAMANIN İÇİNDEN
+  DOĞRUDAN BAŞLATIYORUZ.
+  */
+
+  if(soundEnabled){
+
+    audio.pause();
+    audio.currentTime=0;
+    audio.volume=1;
+
+    audio.play().catch(()=>{});
+
+  }
+
+
+  /*
+  1.7 SANİYE:
+  "Neti ile A harfini öğrenmeye
+  hazır mısın?" bittikten sonra
+  arı geliyor.
+  */
+
+  beeStartTimer=
+    setTimeout(()=>{
+
+      startBee();
+
+    },1700);
+
+
+  /*
+  6.4 SANİYE:
+
+  "Şimdi sıra sende" başlarken
+  arı duruyor.
+  */
+
+  beeStopTimer=
+    setTimeout(()=>{
+
+      stopBee();
+
+    },6400);
+
+
+  /*
+  SES DOSYASI BİTİNCE
+  BUTON TEKRAR KULLANILABİLİR.
+  */
+
+  audio.onended=()=>{
+
+    stopBee();
+
+    running=false;
+
+  };
+
+
+  /*
+  Ses kapalıysa da etkinlik
+  kilitlenmesin.
+  */
+
+  if(!soundEnabled){
+
+    beeStartTimer=
+      setTimeout(
+        startBee,
+        300
+      );
+
+    beeStopTimer=
+      setTimeout(()=>{
+
+        stopBee();
+        running=false;
+
+      },5000);
+
+  }
+}
+
+
+/* =====================================================
+KÜÇÜK a
 ===================================================== */
 
 function hidePath(path){
@@ -1264,6 +1591,7 @@ function hidePath(path){
   path.style.strokeDashoffset=
     length;
 }
+
 
 function resetSmall(){
 
@@ -1280,18 +1608,15 @@ function resetSmall(){
 
   dot.setAttribute(
     "cx",
-    "540"
+    "548"
   );
 
   dot.setAttribute(
     "cy",
-    "230"
+    "248"
   );
 }
 
-/* =====================================================
-ÇİZİM ANİMASYONU
-===================================================== */
 
 function animatePath(
   path,
@@ -1349,6 +1674,7 @@ function animatePath(
         resolve();
 
       }
+
     }
 
     requestAnimationFrame(frame);
@@ -1356,46 +1682,6 @@ function animatePath(
   });
 }
 
-/* =====================================================
-ARI ETKİNLİĞİ
-===================================================== */
-
-async function startSoundActivity(){
-
-  if(running) return;
-
-  running=true;
-
-  stopAllAudio();
-
-  startBee();
-
-  /*
-  SESİ BUTON TIKLAMASINDAN
-  DOĞRUDAN BAŞLATIYORUZ.
-  */
-
-  await playAudio(
-    "introAudio"
-  );
-
-  /*
-  SES BİTSE DE ARI
-  BİRAZ DEVAM ETSİN.
-  */
-
-  await new Promise(resolve=>{
-    setTimeout(resolve,4500);
-  });
-
-  stopBee();
-
-  running=false;
-}
-
-/* =====================================================
-KÜÇÜK a
-===================================================== */
 
 async function startSmall(){
 
@@ -1406,10 +1692,9 @@ async function startSmall(){
   stopAllAudio();
   resetSmall();
 
+
   const c=
-    document.getElementById(
-      "smallC"
-    );
+    document.getElementById("smallC");
 
   const straight=
     document.getElementById(
@@ -1426,10 +1711,12 @@ async function startSmall(){
       "smallInfo"
     );
 
+
   /* ================= 1 ================= */
 
   info.textContent=
     "1️⃣ Önce c çizgisini çiz. Sarı okları takip et.";
+
 
   await Promise.all([
 
@@ -1438,25 +1725,28 @@ async function startSmall(){
     animatePath(
       c,
       dot,
-      4200
+      6500
     )
 
   ]);
+
 
   /* ================= 2 ================= */
 
   info.textContent=
     "2️⃣ Şimdi düz çizgiyi yukarıdan aşağı doğru çiz.";
 
+
   dot.setAttribute(
     "cx",
-    "542"
+    "552"
   );
 
   dot.setAttribute(
     "cy",
-    "216"
+    "220"
   );
+
 
   await Promise.all([
 
@@ -1465,55 +1755,65 @@ async function startSmall(){
     animatePath(
       straight,
       dot,
-      3000
+      4000
     )
 
   ]);
+
 
   /* ================= TEKRAR ================= */
 
   info.textContent=
     "🌟 Harika! Bir kez daha yazalım.";
 
+
   await playAudio(
     "small3"
   );
 
+
   resetSmall();
+
 
   await animatePath(
     c,
     dot,
-    3500
+    6500
   );
+
 
   dot.setAttribute(
     "cx",
-    "542"
+    "552"
   );
 
   dot.setAttribute(
     "cy",
-    "216"
+    "220"
   );
+
 
   await animatePath(
     straight,
     dot,
-    2500
+    4000
   );
+
 
   /* ================= BİTİŞ ================= */
 
   info.textContent=
     "✏️ Şimdi sıra sende!";
 
+
   await playAudio(
     "small4"
   );
 
+
   running=false;
 }
+
 
 /* =====================================================
 AÇILIŞ
@@ -1524,7 +1824,7 @@ window.addEventListener(
   ()=>{
 
     resetSmall();
-    resetBee();
+    hideBee();
 
     document
       .querySelectorAll("audio")
