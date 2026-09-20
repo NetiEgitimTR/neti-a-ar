@@ -1,1 +1,2809 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+<style>
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  font-family:Arial,sans-serif;
+}
+
+#harfCanvas,
+#tekHarfCanvas,
+#drawCanvas{
+  display:none;
+}
+
+#startScreen{
+  position:fixed;
+  inset:0;
+  z-index:10000;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,248,225,.97);
+}
+
+#startButton{
+  border:0;
+  border-radius:28px;
+  padding:18px 28px;
+  background:#ff8a3d;
+  color:white;
+  font-size:22px;
+  font-weight:800;
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+}
+
+#startText{
+  margin-top:14px;
+  padding:0 28px;
+  color:#555;
+  font-size:16px;
+  text-align:center;
+}
+
+#instruction{
+  position:fixed;
+  z-index:9000;
+  top:15%;
+  left:50%;
+  transform:translateX(-50%);
+  width:84vw;
+  max-width:480px;
+  box-sizing:border-box;
+  background:rgba(255,255,255,.97);
+  border:4px solid #ff981f;
+  border-radius:23px;
+  padding:11px 15px;
+  text-align:center;
+  box-shadow:0 5px 18px rgba(0,0,0,.18);
+  display:none;
+  pointer-events:none;
+}
+
+#instructionTitle{
+  color:#143b73;
+  font-size:21px;
+  font-weight:800;
+  line-height:1.15;
+}
+
+#instructionText{
+  margin-top:5px;
+  color:#555;
+  font-size:14px;
+  font-weight:700;
+  line-height:1.2;
+}
+</style>
+</head>
+
+<body>
+
+<div id="startScreen">
+
+  <button id="startButton">
+    🔊 Neti ile Başla
+  </button>
+
+  <div id="startText">
+    Dokun ve A etkinlik sayfalarından birini kameraya göster.
+  </div>
+
+</div>
+
+
+<div id="instruction">
+  <div id="instructionTitle"></div>
+  <div id="instructionText"></div>
+</div>
+
+
+<!-- TANIMA SESİ -->
+
+<audio
+id="tamSes"
+src="./neti-a-tam-ses.mp3"
+preload="auto"
+playsinline>
+</audio>
+
+
+<!-- KÜÇÜK a SESLERİ -->
+
+<audio id="sound1" src="./1-c-cizgisi.mp3.mp3" preload="auto" playsinline></audio>
+<audio id="sound2" src="./2-duz-cizgi.mp3.mp3" preload="auto" playsinline></audio>
+<audio id="sound3" src="./3-bir-kez-daha.mp3.mp3" preload="auto" playsinline></audio>
+<audio id="sound4" src="./4-simdi-sen.mp3.mp3" preload="auto" playsinline></audio>
+
+
+<!-- BÜYÜK A SESLERİ -->
+
+<audio id="sound5" src="./5-buyuk-a-sol.mp3" preload="auto" playsinline></audio>
+<audio id="sound6" src="./6-buyuk-a-sag.mp3" preload="auto" playsinline></audio>
+<audio id="sound7" src="./7-buyuk-a-orta.mp3" preload="auto" playsinline></audio>
+<audio id="sound8" src="./8-buyuk-a-bitti.mp3" preload="auto" playsinline></audio>
+
+
+<canvas id="harfCanvas" width="1200" height="600"></canvas>
+<canvas id="tekHarfCanvas" width="500" height="500"></canvas>
+<canvas id="drawCanvas" width="1200" height="1200"></canvas>
+
+
+<script>
+
+/* =====================================================
+   ORTAK DEĞİŞKENLER
+===================================================== */
+
+let userStarted=false;
+
+let audioContext=null;
+
+let fonTimer=null;
+let fonAktif=false;
+
+let aktifTarget=-1;
+
+
+/* =====================================================
+   SESLER
+===================================================== */
+
+const tamSes=
+document.getElementById("tamSes");
+
+const sounds=[];
+
+for(let i=1;i<=8;i++){
+  sounds.push(
+    document.getElementById("sound"+i)
+  );
+}
+
+const sound1=sounds[0];
+const sound2=sounds[1];
+const sound3=sounds[2];
+const sound4=sounds[3];
+
+const sound5=sounds[4];
+const sound6=sounds[5];
+const sound7=sounds[6];
+const sound8=sounds[7];
+
+
+function sesSisteminiAc(){
+
+  if(!audioContext){
+
+    const AC=
+    window.AudioContext ||
+    window.webkitAudioContext;
+
+    audioContext=
+    new AC();
+  }
+
+  if(
+    audioContext.state==="suspended"
+  ){
+    audioContext.resume();
+  }
+}
+
+
+function stopMP3(){
+
+  try{
+    tamSes.pause();
+    tamSes.currentTime=0;
+  }catch(e){}
+
+  sounds.forEach(audio=>{
+
+    try{
+      audio.pause();
+      audio.currentTime=0;
+    }catch(e){}
+
+  });
+}
+
+
+async function playSound(audio){
+
+  if(!audio) return;
+
+  stopMP3();
+
+  try{
+
+    audio.muted=false;
+    audio.volume=1;
+    audio.currentTime=0;
+
+    await audio.play();
+
+  }catch(e){
+
+    console.log(
+      "Ses hatası:",
+      e
+    );
+  }
+}
+
+
+/* =====================================================
+   WEB AUDIO
+===================================================== */
+
+function popSesiCal(){
+
+  if(!audioContext) return;
+
+  const now=
+  audioContext.currentTime;
+
+  const oscillator=
+  audioContext.createOscillator();
+
+  const gain=
+  audioContext.createGain();
+
+  oscillator.type="sine";
+
+  oscillator.frequency.setValueAtTime(
+    720,
+    now
+  );
+
+  oscillator.frequency.exponentialRampToValueAtTime(
+    980,
+    now+.07
+  );
+
+  gain.gain.setValueAtTime(
+    .0001,
+    now
+  );
+
+  gain.gain.exponentialRampToValueAtTime(
+    .13,
+    now+.015
+  );
+
+  gain.gain.exponentialRampToValueAtTime(
+    .0001,
+    now+.16
+  );
+
+  oscillator.connect(gain);
+  gain.connect(
+    audioContext.destination
+  );
+
+  oscillator.start(now);
+  oscillator.stop(now+.18);
+}
+
+
+function fonNotasiCal(
+frequency,
+duration=.55
+){
+
+  if(!audioContext) return;
+
+  const now=
+  audioContext.currentTime;
+
+  const oscillator=
+  audioContext.createOscillator();
+
+  const gain=
+  audioContext.createGain();
+
+  oscillator.type="sine";
+
+  oscillator.frequency.setValueAtTime(
+    frequency,
+    now
+  );
+
+  gain.gain.setValueAtTime(
+    .0001,
+    now
+  );
+
+  gain.gain.exponentialRampToValueAtTime(
+    .018,
+    now+.08
+  );
+
+  gain.gain.exponentialRampToValueAtTime(
+    .0001,
+    now+duration
+  );
+
+  oscillator.connect(gain);
+
+  gain.connect(
+    audioContext.destination
+  );
+
+  oscillator.start(now);
+
+  oscillator.stop(
+    now+duration+.05
+  );
+}
+
+
+function fonBaslat(){
+
+  fonDurdur();
+
+  if(!audioContext) return;
+
+  fonAktif=true;
+
+  const notalar=[
+    261.63,
+    329.63,
+    392,
+    329.63,
+    293.66,
+    349.23,
+    392,
+    329.63
+  ];
+
+  let index=0;
+
+  function cal(){
+
+    if(!fonAktif) return;
+
+    fonNotasiCal(
+      notalar[index],
+      .55
+    );
+
+    index=
+    (index+1)%
+    notalar.length;
+
+    fonTimer=
+    setTimeout(
+      cal,
+      750
+    );
+  }
+
+  cal();
+}
+
+
+function fonDurdur(){
+
+  fonAktif=false;
+
+  if(fonTimer){
+
+    clearTimeout(
+      fonTimer
+    );
+
+    fonTimer=null;
+  }
+}
+
+
+/* =====================================================
+   YÖNERGE
+===================================================== */
+
+function showMessage(
+title,
+text
+){
+
+  document.getElementById(
+    "instructionTitle"
+  ).textContent=title;
+
+  document.getElementById(
+    "instructionText"
+  ).textContent=text;
+
+  document.getElementById(
+    "instruction"
+  ).style.display="block";
+}
+
+
+function hideMessage(){
+
+  document.getElementById(
+    "instruction"
+  ).style.display="none";
+}
+
+
+/* =====================================================
+   BAŞLANGIÇ
+
+   Burada Safari için tüm MP3'leri
+   kullanıcı dokunuşu sırasında
+   hazırlıyoruz.
+===================================================== */
+
+document
+.getElementById("startButton")
+.addEventListener(
+"click",
+async function(){
+
+  sesSisteminiAc();
+
+  userStarted=true;
+
+  document.getElementById(
+    "startScreen"
+  ).style.display="none";
+
+
+  /*
+    TANIMA SESİNİ SAFARI'YE
+    TANIT
+  */
+
+  try{
+
+    tamSes.muted=true;
+    tamSes.currentTime=0;
+
+    await tamSes.play();
+
+    tamSes.pause();
+    tamSes.currentTime=0;
+    tamSes.muted=false;
+
+  }catch(e){
+
+    tamSes.muted=false;
+  }
+
+
+  /*
+    YAZMA SESLERİNİ YÜKLE
+  */
+
+  sounds.forEach(
+    audio=>audio.load()
+  );
+
+
+  window.dispatchEvent(
+    new Event(
+      "neti-user-start"
+    )
+  );
+
+});
+
+
+/* =====================================================
+   A / a CANVASI
+===================================================== */
+
+window.addEventListener(
+"DOMContentLoaded",
+()=>{
+
+  const canvas=
+  document.getElementById(
+    "harfCanvas"
+  );
+
+  const ctx=
+  canvas.getContext("2d");
+
+  ctx.clearRect(
+    0,0,
+    1200,600
+  );
+
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+  ctx.lineJoin="round";
+  ctx.lineCap="round";
+
+
+  ctx.font=
+  "bold 390px Arial";
+
+  ctx.lineWidth=22;
+
+  ctx.strokeStyle=
+  "#FFFFFF";
+
+  ctx.strokeText(
+    "A",
+    420,
+    300
+  );
+
+  ctx.fillStyle=
+  "#FF6B35";
+
+  ctx.fillText(
+    "A",
+    420,
+    300
+  );
+
+
+  ctx.strokeStyle=
+  "#FFFFFF";
+
+  ctx.strokeText(
+    "ɑ",
+    790,
+    300
+  );
+
+  ctx.fillStyle=
+  "#FF6B35";
+
+  ctx.fillText(
+    "ɑ",
+    790,
+    300
+  );
+
+});
+
+
+/* =====================================================
+   ARI
+===================================================== */
+
+AFRAME.registerComponent(
+"smooth-bee-flight",
+{
+
+init:function(){
+
+  this.active=false;
+
+  this.startTime=0;
+
+  this.duration=3700;
+
+  this.points=[
+
+    {x:-.48,y:-.30},
+    {x:-.40,y:-.18},
+    {x:-.32,y:-.03},
+    {x:-.25,y:.08},
+    {x:-.17,y:.03},
+    {x:-.08,y:-.13},
+    {x:.02,y:-.23},
+    {x:.14,y:-.22},
+    {x:.25,y:-.12},
+    {x:.35,y:.02},
+    {x:.43,y:.18},
+    {x:.45,y:.35},
+    {x:.40,y:.50},
+    {x:.30,y:.62},
+    {x:.17,y:.70},
+    {x:.02,y:.75},
+    {x:-.15,y:.78},
+    {x:-.27,y:.79}
+
+  ];
+},
+
+
+startFlight:function(){
+
+  this.startTime=
+  performance.now();
+
+  this.active=true;
+
+  this.el.setAttribute(
+    "visible",
+    true
+  );
+
+  this.el.object3D.scale.set(
+    1,1,1
+  );
+},
+
+
+stopFlight:function(){
+
+  this.active=false;
+
+  this.el.setAttribute(
+    "visible",
+    false
+  );
+},
+
+
+catmull:function(
+p0,p1,p2,p3,t
+){
+
+  const t2=t*t;
+  const t3=t2*t;
+
+  return{
+
+    x:.5*(
+
+      2*p1.x+
+
+      (-p0.x+p2.x)*t+
+
+      (
+        2*p0.x-
+        5*p1.x+
+        4*p2.x-
+        p3.x
+      )*t2+
+
+      (
+        -p0.x+
+        3*p1.x-
+        3*p2.x+
+        p3.x
+      )*t3
+    ),
+
+    y:.5*(
+
+      2*p1.y+
+
+      (-p0.y+p2.y)*t+
+
+      (
+        2*p0.y-
+        5*p1.y+
+        4*p2.y-
+        p3.y
+      )*t2+
+
+      (
+        -p0.y+
+        3*p1.y-
+        3*p2.y+
+        p3.y
+      )*t3
+    )
+  };
+},
+
+
+tick:function(){
+
+  if(!this.active) return;
+
+  const elapsed=
+  performance.now()-
+  this.startTime;
+
+  let progress=
+  elapsed/
+  this.duration;
+
+  if(progress>=1)
+    progress=1;
+
+  const segmentCount=
+  this.points.length-1;
+
+  let position=
+  progress*
+  segmentCount;
+
+  let index=
+  Math.floor(position);
+
+  let localT=
+  position-index;
+
+  if(index>=segmentCount){
+
+    index=
+    segmentCount-1;
+
+    localT=1;
+  }
+
+  const p0=
+  this.points[
+    Math.max(
+      0,
+      index-1
+    )
+  ];
+
+  const p1=
+  this.points[index];
+
+  const p2=
+  this.points[
+    Math.min(
+      this.points.length-1,
+      index+1
+    )
+  ];
+
+  const p3=
+  this.points[
+    Math.min(
+      this.points.length-1,
+      index+2
+    )
+  ];
+
+  const pos=
+  this.catmull(
+    p0,p1,p2,p3,
+    localT
+  );
+
+  this.el.object3D.position.set(
+    pos.x,
+    pos.y,
+    .09
+  );
+
+  if(progress>=1){
+
+    this.active=false;
+
+    this.el.object3D.position.set(
+      -.27,
+      .79,
+      .09
+    );
+  }
+}
+
+});
+
+
+/* =====================================================
+   GÖZ EGZERSİZİ
+===================================================== */
+
+AFRAME.registerComponent(
+"eye-pop-exercise",
+{
+
+init:function(){
+
+  this.running=false;
+
+  this.timers=[];
+
+  this.steps=[
+
+    {x:-.40,y:.72,letter:"A",show:950,gap:250},
+    {x:.40,y:.22,letter:"a",show:950,gap:250},
+    {x:.40,y:.72,letter:"A",show:950,gap:250},
+    {x:-.40,y:.22,letter:"a",show:950,gap:250},
+
+    {x:0,y:.48,letter:"A",show:900,gap:230},
+    {x:-.46,y:.48,letter:"a",show:900,gap:230},
+    {x:.46,y:.48,letter:"A",show:900,gap:230},
+
+    {x:0,y:.80,letter:"a",show:850,gap:220},
+    {x:0,y:.16,letter:"A",show:850,gap:220},
+
+    {x:-.42,y:.48,letter:"a",show:800,gap:200},
+
+    {x:.39,y:.70,letter:"A",show:750,gap:180},
+    {x:-.39,y:.20,letter:"a",show:750,gap:180},
+
+    {x:.39,y:.20,letter:"A",show:700,gap:170},
+
+    {x:0,y:.48,letter:"a",show:900,gap:0}
+
+  ];
+},
+
+
+clearTimers:function(){
+
+  this.timers.forEach(
+    clearTimeout
+  );
+
+  this.timers=[];
+},
+
+
+stopExercise:function(){
+
+  this.running=false;
+
+  this.clearTimers();
+
+  fonDurdur();
+
+  this.el.setAttribute(
+    "visible",
+    false
+  );
+},
+
+
+drawLetter:function(letter){
+
+  const canvas=
+  document.getElementById(
+    "tekHarfCanvas"
+  );
+
+  const ctx=
+  canvas.getContext("2d");
+
+  ctx.clearRect(
+    0,0,
+    500,500
+  );
+
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+
+  ctx.font=
+  "bold 360px Arial";
+
+  ctx.lineWidth=20;
+
+  ctx.strokeStyle=
+  "#FFFFFF";
+
+  ctx.fillStyle=
+  "#FF6B35";
+
+  const value=
+  letter==="a"
+  ?
+  "ɑ"
+  :
+  "A";
+
+  ctx.strokeText(
+    value,
+    250,
+    255
+  );
+
+  ctx.fillText(
+    value,
+    250,
+    255
+  );
+
+  const mesh=
+  this.el.getObject3D(
+    "mesh"
+  );
+
+  if(
+    mesh &&
+    mesh.material &&
+    mesh.material.map
+  ){
+
+    mesh.material.map.needsUpdate=true;
+  }
+},
+
+
+startExercise:function(){
+
+  this.stopExercise();
+
+  this.running=true;
+
+  fonBaslat();
+
+  let currentTime=0;
+
+  this.steps.forEach(
+  step=>{
+
+    const showTimer=
+    setTimeout(()=>{
+
+      if(!this.running)
+        return;
+
+      this.drawLetter(
+        step.letter
+      );
+
+      this.el.object3D.position.set(
+        step.x,
+        step.y,
+        .12
+      );
+
+      this.el.setAttribute(
+        "visible",
+        true
+      );
+
+      popSesiCal();
+
+    },currentTime);
+
+    this.timers.push(
+      showTimer
+    );
+
+
+    const hideTimer=
+    setTimeout(()=>{
+
+      if(!this.running)
+        return;
+
+      this.el.setAttribute(
+        "visible",
+        false
+      );
+
+    },
+    currentTime+
+    step.show);
+
+    this.timers.push(
+      hideTimer
+    );
+
+
+    currentTime+=
+    step.show+
+    step.gap;
+
+  });
+
+
+  const finishTimer=
+  setTimeout(()=>{
+
+    this.running=false;
+
+    this.el.setAttribute(
+      "visible",
+      false
+    );
+
+    fonDurdur();
+
+    window.dispatchEvent(
+      new Event(
+        "neti-gorev-animasyon"
+      )
+    );
+
+  },
+  currentTime+100);
+
+  this.timers.push(
+    finishTimer
+  );
+}
+
+});
+
+
+/* =====================================================
+   TARGET 0
+   TANIMA + GÖZ EGZERSİZİ
+===================================================== */
+
+AFRAME.registerComponent(
+"neti-recognition",
+{
+
+init:function(){
+
+const target=this.el;
+
+const neti=
+document.getElementById(
+  "netiKarakter"
+);
+
+const harfler=
+document.getElementById(
+  "harfler"
+);
+
+const tekHarf=
+document.getElementById(
+  "tekHarf"
+);
+
+const ari=
+document.getElementById(
+  "ariKarakter"
+);
+
+let basladi=false;
+
+let timers=[];
+
+let kayipTimer=null;
+
+
+function timer(fn,ms){
+
+  const t=
+  setTimeout(fn,ms);
+
+  timers.push(t);
+
+  return t;
+}
+
+
+function temizle(){
+
+  timers.forEach(
+    clearTimeout
+  );
+
+  timers=[];
+
+  fonDurdur();
+
+  try{
+
+    tamSes.pause();
+    tamSes.currentTime=0;
+
+  }catch(e){}
+
+  if(
+    ari.components[
+      "smooth-bee-flight"
+    ]
+  ){
+    ari.components[
+      "smooth-bee-flight"
+    ].stopFlight();
+  }
+
+  if(
+    tekHarf.components[
+      "eye-pop-exercise"
+    ]
+  ){
+    tekHarf.components[
+      "eye-pop-exercise"
+    ].stopExercise();
+  }
+
+  ari.setAttribute(
+    "visible",
+    false
+  );
+
+  harfler.setAttribute(
+    "visible",
+    false
+  );
+
+  tekHarf.setAttribute(
+    "visible",
+    false
+  );
+}
+
+
+window.addEventListener(
+"neti-gorev-animasyon",
+()=>{
+
+  if(aktifTarget!==0)
+    return;
+
+  neti.removeAttribute(
+    "animation__gorev"
+  );
+
+  neti.setAttribute(
+    "animation__gorev",
+    "property:scale;"+
+    "from:1 1 1;"+
+    "to:1.12 1.12 1.12;"+
+    "dir:alternate;"+
+    "loop:2;"+
+    "dur:350;"
+  );
+
+});
+
+
+function baslat(){
+
+  if(basladi)
+    return;
+
+  if(!userStarted)
+    return;
+
+  if(aktifTarget!==0)
+    return;
+
+  basladi=true;
+
+  temizle();
+
+
+  neti.removeAttribute(
+    "animation__buyume"
+  );
+
+  neti.removeAttribute(
+    "animation__yuksel"
+  );
+
+  neti.setAttribute(
+    "scale",
+    ".05 .05 .05"
+  );
+
+  neti.setAttribute(
+    "position",
+    "0 -.25 .03"
+  );
+
+
+  timer(()=>{
+
+    neti.setAttribute(
+      "animation__buyume",
+      "property:scale;"+
+      "from:.05 .05 .05;"+
+      "to:1 1 1;"+
+      "dur:1100;"+
+      "easing:easeOutBack"
+    );
+
+    neti.setAttribute(
+      "animation__yuksel",
+      "property:position;"+
+      "from:0 -.25 .03;"+
+      "to:0 .08 .03;"+
+      "dur:1100;"+
+      "easing:easeOutQuad"
+    );
+
+
+    try{
+
+      tamSes.muted=false;
+      tamSes.volume=1;
+      tamSes.currentTime=0;
+
+      tamSes.play();
+
+    }catch(e){}
+
+  },100);
+
+
+  harfler.setAttribute(
+    "visible",
+    false
+  );
+
+  harfler.setAttribute(
+    "position",
+    "0 .55 .04"
+  );
+
+  harfler.setAttribute(
+    "scale",
+    ".01 .01 .01"
+  );
+
+
+  timer(()=>{
+
+    harfler.setAttribute(
+      "visible",
+      true
+    );
+
+    harfler.setAttribute(
+      "animation__harf",
+      "property:scale;"+
+      "from:.01 .01 .01;"+
+      "to:1 1 1;"+
+      "dur:550;"+
+      "easing:easeOutBack"
+    );
+
+  },1500);
+
+
+  ari.object3D.position.set(
+    -.48,
+    -.30,
+    .09
+  );
+
+
+  timer(()=>{
+
+    const flight=
+    ari.components[
+      "smooth-bee-flight"
+    ];
+
+    if(flight)
+      flight.startFlight();
+
+  },1700);
+
+
+  timer(()=>{
+
+    ari.setAttribute(
+      "visible",
+      false
+    );
+
+    harfler.setAttribute(
+      "visible",
+      false
+    );
+
+  },6400);
+
+
+  timer(()=>{
+
+    const exercise=
+    tekHarf.components[
+      "eye-pop-exercise"
+    ];
+
+    if(exercise)
+      exercise.startExercise();
+
+  },6700);
+
+}
+
+
+target.addEventListener(
+"targetFound",
+()=>{
+
+  aktifTarget=0;
+
+  hideMessage();
+
+  if(kayipTimer){
+
+    clearTimeout(
+      kayipTimer
+    );
+
+    kayipTimer=null;
+  }
+
+  baslat();
+});
+
+
+target.addEventListener(
+"targetLost",
+()=>{
+
+  kayipTimer=
+  setTimeout(()=>{
+
+    if(aktifTarget===0)
+      aktifTarget=-1;
+
+    basladi=false;
+
+    temizle();
+
+  },1200);
+
+});
+
+
+window.addEventListener(
+"neti-user-start",
+()=>{
+
+  if(aktifTarget===0)
+    baslat();
+
+});
+
+}
+
+});
+
+
+/* =====================================================
+   YAZMA ORTAK ÇİZİM FONKSİYONLARI
+===================================================== */
+
+function linePoints(
+x1,y1,x2,y2,count=200
+){
+
+  const points=[];
+
+  for(let i=0;i<=count;i++){
+
+    const t=i/count;
+
+    points.push({
+
+      x:
+      x1+
+      (x2-x1)*t,
+
+      y:
+      y1+
+      (y2-y1)*t
+
+    });
+  }
+
+  return points;
+}
+
+
+/* =====================================================
+   TARGET 1
+   YAZMA
+===================================================== */
+
+AFRAME.registerComponent(
+"school-a-writing",
+{
+
+init:function(){
+
+const target=this.el;
+
+const canvas=
+document.getElementById(
+  "drawCanvas"
+);
+
+const ctx=
+canvas.getContext("2d");
+
+const plane=
+document.getElementById(
+  "drawPlane"
+);
+
+let animationStarted=false;
+
+let smallRound=1;
+
+let completedSmallC=false;
+
+let bigLeftDone=false;
+let bigRightDone=false;
+let bigMiddleDone=false;
+
+let writingTimers=[];
+
+let animationToken=0;
+
+
+/* =====================================================
+   TIMER
+===================================================== */
+
+function wTimer(fn,ms){
+
+  const t=
+  setTimeout(fn,ms);
+
+  writingTimers.push(t);
+
+  return t;
+}
+
+
+function clearWritingTimers(){
+
+  writingTimers.forEach(
+    clearTimeout
+  );
+
+  writingTimers=[];
+}
+
+
+/* =====================================================
+   TEXTURE
+===================================================== */
+
+function updateTexture(){
+
+  const mesh=
+  plane.getObject3D("mesh");
+
+  if(
+    mesh &&
+    mesh.material &&
+    mesh.material.map
+  ){
+    mesh.material.map.needsUpdate=true;
+  }
+}
+
+
+function clearCanvas(){
+
+  ctx.clearRect(
+    0,0,
+    canvas.width,
+    canvas.height
+  );
+}
+
+
+/* =====================================================
+   PATH
+===================================================== */
+
+function drawPath(
+points,
+color,
+width,
+dash=[]
+){
+
+  if(!points || points.length<2)
+    return;
+
+  ctx.save();
+
+  ctx.strokeStyle=color;
+  ctx.lineWidth=width;
+  ctx.lineCap="round";
+  ctx.lineJoin="round";
+
+  ctx.setLineDash(
+    dash
+  );
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    points[0].x,
+    points[0].y
+  );
+
+  for(let i=1;i<points.length;i++){
+
+    ctx.lineTo(
+      points[i].x,
+      points[i].y
+    );
+  }
+
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+
+/* =====================================================
+   NUMARA
+===================================================== */
+
+function numberCircle(
+x,y,number,color
+){
+
+  ctx.save();
+
+  ctx.beginPath();
+
+  ctx.arc(
+    x,y,
+    43,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fillStyle=color;
+  ctx.fill();
+
+  ctx.strokeStyle="white";
+  ctx.lineWidth=7;
+  ctx.stroke();
+
+  ctx.fillStyle="white";
+  ctx.font=
+  "bold 49px Arial";
+
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+
+  ctx.fillText(
+    number,
+    x,
+    y+2
+  );
+
+  ctx.restore();
+}
+
+
+/* =====================================================
+   OK
+===================================================== */
+
+function arrow(
+x,y,rotation
+){
+
+  ctx.save();
+
+  ctx.translate(x,y);
+  ctx.rotate(rotation);
+
+  ctx.beginPath();
+
+  ctx.moveTo(-34,-16);
+  ctx.lineTo(5,-16);
+  ctx.lineTo(5,-29);
+  ctx.lineTo(42,0);
+  ctx.lineTo(5,29);
+  ctx.lineTo(5,16);
+  ctx.lineTo(-34,16);
+
+  ctx.closePath();
+
+  ctx.fillStyle="#ffd600";
+  ctx.strokeStyle="white";
+  ctx.lineWidth=7;
+
+  ctx.stroke();
+  ctx.fill();
+
+  ctx.restore();
+}
+
+
+/* =====================================================
+   NOKTA
+===================================================== */
+
+function drawPoint(points){
+
+  if(!points || !points.length)
+    return;
+
+  const p=
+  points[
+    points.length-1
+  ];
+
+  ctx.save();
+
+  ctx.shadowColor="#ffe600";
+  ctx.shadowBlur=25;
+
+  ctx.beginPath();
+
+  ctx.arc(
+    p.x,p.y,
+    18,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fillStyle="#fff000";
+  ctx.fill();
+
+  ctx.strokeStyle="white";
+  ctx.lineWidth=5;
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+
+/* =====================================================
+   KÜÇÜK a
+===================================================== */
+
+const CX=520;
+const CY=600;
+const R=250;
+
+const START_DEG=-40;
+const END_DEG=40;
+
+
+function makeC(){
+
+  const points=[];
+
+  const travel=
+  360-
+  (
+    END_DEG-
+    START_DEG
+  );
+
+  const count=400;
+
+  for(let i=0;i<=count;i++){
+
+    const t=i/count;
+
+    const degree=
+    START_DEG-
+    travel*t;
+
+    const angle=
+    degree*
+    Math.PI/180;
+
+    points.push({
+
+      x:
+      CX+
+      R*Math.cos(angle),
+
+      y:
+      CY+
+      R*Math.sin(angle)
+
+    });
+  }
+
+  return points;
+}
+
+
+const cPoints=
+makeC();
+
+const joinPoint=
+cPoints[0];
+
+const STEM_X=
+joinPoint.x;
+
+const STEM_TOP=
+joinPoint.y-95;
+
+const STEM_BOTTOM=
+CY+R;
+
+const stemPoints=
+linePoints(
+  STEM_X,
+  STEM_TOP,
+  STEM_X,
+  STEM_BOTTOM
+);
+
+
+/* =====================================================
+   KÜÇÜK a KILAVUZ
+===================================================== */
+
+function drawSmallGuide(){
+
+  drawPath(
+    cPoints,
+    "rgba(120,125,130,.55)",
+    112
+  );
+
+  drawPath(
+    stemPoints,
+    "rgba(120,125,130,.55)",
+    112
+  );
+
+  drawPath(
+    cPoints,
+    "rgba(225,227,230,.98)",
+    78
+  );
+
+  drawPath(
+    stemPoints,
+    "rgba(225,227,230,.98)",
+    78
+  );
+
+  drawPath(
+    cPoints,
+    "white",
+    8,
+    [24,20]
+  );
+
+  drawPath(
+    stemPoints,
+    "white",
+    8,
+    [24,20]
+  );
+}
+
+
+function drawSmallDirections(){
+
+  numberCircle(
+    STEM_X+5,
+    STEM_TOP-58,
+    "1",
+    "#1976ff"
+  );
+
+  arrow(
+    510,
+    340,
+    Math.PI
+  );
+
+  arrow(
+    280,
+    520,
+    Math.PI/2
+  );
+
+  arrow(
+    330,
+    790,
+    .65
+  );
+
+  arrow(
+    570,
+    845,
+    -.30
+  );
+
+  numberCircle(
+    STEM_X+88,
+    STEM_BOTTOM,
+    "2",
+    "#ff2d2d"
+  );
+
+  arrow(
+    STEM_X,
+    530,
+    Math.PI/2
+  );
+
+  arrow(
+    STEM_X,
+    710,
+    Math.PI/2
+  );
+}
+
+
+function drawSmallScene(
+active=null
+){
+
+  clearCanvas();
+
+  drawSmallGuide();
+
+  if(completedSmallC){
+
+    drawPath(
+      cPoints,
+      "#ff3030",
+      74
+    );
+
+    drawPath(
+      cPoints,
+      "white",
+      8,
+      [24,20]
+    );
+  }
+
+  if(active){
+
+    drawPath(
+      active,
+      "#ff3030",
+      74
+    );
+
+    drawPath(
+      active,
+      "white",
+      8,
+      [24,20]
+    );
+
+    drawPoint(active);
+  }
+
+  drawSmallDirections();
+
+  updateTexture();
+}
+
+
+/* =====================================================
+   ANİMASYON
+===================================================== */
+
+function animate(
+points,
+duration,
+drawFunction,
+callback
+){
+
+  const myToken=
+  animationToken;
+
+  let start=null;
+
+  function frame(time){
+
+    /*
+      SAYFA DEĞİŞTİYSE
+      ANİMASYONU DURDUR
+    */
+
+    if(
+      myToken!==
+      animationToken
+    ){
+      return;
+    }
+
+    if(
+      aktifTarget!==1
+    ){
+      return;
+    }
+
+    if(start===null)
+      start=time;
+
+    const progress=
+    Math.min(
+      (time-start)/
+      duration,
+      1
+    );
+
+    const index=
+    Math.max(
+      1,
+      Math.floor(
+        progress*
+        (points.length-1)
+      )
+    );
+
+    const partial=
+    points.slice(
+      0,
+      index+1
+    );
+
+    drawFunction(
+      partial
+    );
+
+    if(progress<1){
+
+      requestAnimationFrame(
+        frame
+      );
+
+    }else{
+
+      if(callback)
+        callback();
+    }
+  }
+
+  requestAnimationFrame(
+    frame
+  );
+}
+
+
+/* =====================================================
+   KÜÇÜK a AKIŞ
+===================================================== */
+
+function startSmallC(){
+
+  if(aktifTarget!==1)
+    return;
+
+  completedSmallC=false;
+
+  drawSmallScene();
+
+  showMessage(
+    "1. Önce c çizgisini çiz.",
+    "Sarı okları takip et."
+  );
+
+
+  /*
+    İLK TURDA SESİ DE
+    BURADA BAŞLATIYORUZ.
+
+    Artık birleşik sistemde
+    başlangıç butonunda
+    yazma sesini çalmıyoruz.
+  */
+
+  playSound(
+    sound1
+  );
+
+
+  wTimer(()=>{
+
+    if(aktifTarget!==1)
+      return;
+
+    animate(
+      cPoints,
+      6500,
+      drawSmallScene,
+      startSmallStem
+    );
+
+  },700);
+}
+
+
+function startSmallStem(){
+
+  if(aktifTarget!==1)
+    return;
+
+  completedSmallC=true;
+
+  drawSmallScene();
+
+  showMessage(
+    "2. Şimdi düz çizgiyi çiz.",
+    "Yukarıdan aşağı doğru ilerle."
+  );
+
+  playSound(
+    sound2
+  );
+
+  wTimer(()=>{
+
+    if(aktifTarget!==1)
+      return;
+
+    animate(
+      stemPoints,
+      4000,
+      drawSmallScene,
+      smallRoundFinished
+    );
+
+  },700);
+}
+
+
+function smallRoundFinished(){
+
+  if(aktifTarget!==1)
+    return;
+
+  completedSmallC=true;
+
+  drawSmallScene(
+    stemPoints
+  );
+
+  if(smallRound===1){
+
+    showMessage(
+      "Harika! Bir kez daha yazalım.",
+      "Aynı hareketleri tekrar izle."
+    );
+
+    playSound(
+      sound3
+    );
+
+    smallRound=2;
+
+    let moved=false;
+
+    function next(){
+
+      if(moved)
+        return;
+
+      if(aktifTarget!==1)
+        return;
+
+      moved=true;
+
+      wTimer(
+        startSmallC,
+        500
+      );
+    }
+
+    sound3.onended=
+    next;
+
+    wTimer(
+      next,
+      6000
+    );
+
+  }else{
+
+    finishSmallA();
+  }
+}
+
+
+/* =====================================================
+   KÜÇÜK a BİTTİ
+===================================================== */
+
+function finishSmallA(){
+
+  if(aktifTarget!==1)
+    return;
+
+  completedSmallC=true;
+
+  drawSmallScene(
+    stemPoints
+  );
+
+  showMessage(
+    "Harika! Küçük a tamamlandı.",
+    "Şimdi büyük A harfine geçiyoruz."
+  );
+
+  playSound(
+    sound4
+  );
+
+  let moved=false;
+
+  function goBig(){
+
+    if(moved)
+      return;
+
+    if(aktifTarget!==1)
+      return;
+
+    moved=true;
+
+    wTimer(
+      startBigA,
+      700
+    );
+  }
+
+  sound4.onended=
+  goBig;
+
+  wTimer(
+    goBig,
+    6500
+  );
+}
+
+
+/* =====================================================
+   BÜYÜK A
+===================================================== */
+
+const A_TOP_X=600;
+const A_TOP_Y=255;
+
+const A_LEFT_X=345;
+const A_LEFT_Y=875;
+
+const A_RIGHT_X=855;
+const A_RIGHT_Y=875;
+
+const BAR_Y=635;
+
+const leftRatio=
+(BAR_Y-A_TOP_Y)/
+(A_LEFT_Y-A_TOP_Y);
+
+const BAR_LEFT_X=
+A_TOP_X+
+(A_LEFT_X-A_TOP_X)*
+leftRatio;
+
+const rightRatio=
+(BAR_Y-A_TOP_Y)/
+(A_RIGHT_Y-A_TOP_Y);
+
+const BAR_RIGHT_X=
+A_TOP_X+
+(A_RIGHT_X-A_TOP_X)*
+rightRatio;
+
+
+const bigLeft=
+linePoints(
+  A_TOP_X,
+  A_TOP_Y,
+  A_LEFT_X,
+  A_LEFT_Y,
+  240
+);
+
+const bigRight=
+linePoints(
+  A_TOP_X,
+  A_TOP_Y,
+  A_RIGHT_X,
+  A_RIGHT_Y,
+  240
+);
+
+const bigMiddle=
+linePoints(
+  BAR_LEFT_X,
+  BAR_Y,
+  BAR_RIGHT_X,
+  BAR_Y,
+  180
+);
+
+
+/* =====================================================
+   BÜYÜK A KILAVUZ
+===================================================== */
+
+function drawBigGuide(){
+
+  [
+    bigLeft,
+    bigRight,
+    bigMiddle
+  ].forEach(path=>{
+
+    drawPath(
+      path,
+      "rgba(120,125,130,.55)",
+      108
+    );
+
+    drawPath(
+      path,
+      "rgba(225,227,230,.98)",
+      75
+    );
+
+    drawPath(
+      path,
+      "white",
+      8,
+      [24,20]
+    );
+
+  });
+}
+
+
+function drawBigDirections(){
+
+  numberCircle(
+    A_TOP_X-85,
+    A_TOP_Y-45,
+    "1",
+    "#1976ff"
+  );
+
+  arrow(
+    505,
+    455,
+    1.96
+  );
+
+  arrow(
+    415,
+    700,
+    1.96
+  );
+
+
+  numberCircle(
+    A_TOP_X+85,
+    A_TOP_Y-45,
+    "2",
+    "#ff2d2d"
+  );
+
+  arrow(
+    695,
+    455,
+    1.18
+  );
+
+  arrow(
+    790,
+    700,
+    1.18
+  );
+
+
+  numberCircle(
+    BAR_LEFT_X-75,
+    BAR_Y,
+    "3",
+    "#7b4dff"
+  );
+
+  arrow(
+    600,
+    BAR_Y,
+    0
+  );
+}
+
+
+function drawBigScene(
+active=null
+){
+
+  clearCanvas();
+
+  drawBigGuide();
+
+
+  if(bigLeftDone){
+
+    drawPath(
+      bigLeft,
+      "#ff3030",
+      72
+    );
+
+    drawPath(
+      bigLeft,
+      "white",
+      8,
+      [24,20]
+    );
+  }
+
+
+  if(bigRightDone){
+
+    drawPath(
+      bigRight,
+      "#ff3030",
+      72
+    );
+
+    drawPath(
+      bigRight,
+      "white",
+      8,
+      [24,20]
+    );
+  }
+
+
+  if(bigMiddleDone){
+
+    drawPath(
+      bigMiddle,
+      "#ff3030",
+      72
+    );
+
+    drawPath(
+      bigMiddle,
+      "white",
+      8,
+      [24,20]
+    );
+  }
+
+
+  if(active){
+
+    drawPath(
+      active,
+      "#ff3030",
+      72
+    );
+
+    drawPath(
+      active,
+      "white",
+      8,
+      [24,20]
+    );
+
+    drawPoint(
+      active
+    );
+  }
+
+
+  drawBigDirections();
+
+  updateTexture();
+}
+
+
+/* =====================================================
+   BÜYÜK A AKIŞ
+===================================================== */
+
+function startBigA(){
+
+  if(aktifTarget!==1)
+    return;
+
+  bigLeftDone=false;
+  bigRightDone=false;
+  bigMiddleDone=false;
+
+  drawBigScene();
+
+  showMessage(
+    "Şimdi büyük A harfini yazalım.",
+    "1. Yukarıdan başlayıp sol alta doğru eğik çiz."
+  );
+
+  playSound(
+    sound5
+  );
+
+  wTimer(()=>{
+
+    if(aktifTarget!==1)
+      return;
+
+    animate(
+      bigLeft,
+      4200,
+      drawBigScene,
+      startBigRight
+    );
+
+  },900);
+}
+
+
+function startBigRight(){
+
+  if(aktifTarget!==1)
+    return;
+
+  bigLeftDone=true;
+
+  drawBigScene();
+
+  showMessage(
+    "2. Tekrar yukarıdan başla.",
+    "Bu kez sağ alta doğru eğik çiz."
+  );
+
+  playSound(
+    sound6
+  );
+
+  wTimer(()=>{
+
+    if(aktifTarget!==1)
+      return;
+
+    animate(
+      bigRight,
+      4200,
+      drawBigScene,
+      startBigMiddle
+    );
+
+  },900);
+}
+
+
+function startBigMiddle(){
+
+  if(aktifTarget!==1)
+    return;
+
+  bigLeftDone=true;
+  bigRightDone=true;
+
+  drawBigScene();
+
+  showMessage(
+    "3. Şimdi ortadaki çizgiyi çiz.",
+    "Soldan sağa doğru ilerle."
+  );
+
+  playSound(
+    sound7
+  );
+
+  wTimer(()=>{
+
+    if(aktifTarget!==1)
+      return;
+
+    animate(
+      bigMiddle,
+      3200,
+      drawBigScene,
+      finishBigA
+    );
+
+  },900);
+}
+
+
+function finishBigA(){
+
+  if(aktifTarget!==1)
+    return;
+
+  bigLeftDone=true;
+  bigRightDone=true;
+  bigMiddleDone=true;
+
+  drawBigScene();
+
+  showMessage(
+    "Harika! Büyük A harfini de tamamladın.",
+    "Şimdi sıra sende!"
+  );
+
+  playSound(
+    sound8
+  );
+}
+
+
+/* =====================================================
+   YAZMAYI BAŞLAT
+===================================================== */
+
+function startWriting(){
+
+  if(animationStarted)
+    return;
+
+  if(!userStarted)
+    return;
+
+  if(aktifTarget!==1)
+    return;
+
+  animationStarted=true;
+
+  smallRound=1;
+
+  completedSmallC=false;
+
+  bigLeftDone=false;
+  bigRightDone=false;
+  bigMiddleDone=false;
+
+  animationToken++;
+
+  plane.setAttribute(
+    "visible",
+    true
+  );
+
+  wTimer(
+    startSmallC,
+    400
+  );
+}
+
+
+/* =====================================================
+   YAZMAYI DURDUR
+===================================================== */
+
+function stopWriting(){
+
+  animationStarted=false;
+
+  animationToken++;
+
+  clearWritingTimers();
+
+  stopMP3();
+
+  plane.setAttribute(
+    "visible",
+    false
+  );
+
+  clearCanvas();
+
+  updateTexture();
+
+  hideMessage();
+}
+
+
+/* =====================================================
+   TARGET 1 BULUNDU
+===================================================== */
+
+target.addEventListener(
+"targetFound",
+()=>{
+
+  aktifTarget=1;
+
+  /*
+    TANIMA TARAFINDAKİ
+    FON SESİNİ KAPAT
+  */
+
+  fonDurdur();
+
+  startWriting();
+});
+
+
+/* =====================================================
+   TARGET 1 KAYBOLDU
+===================================================== */
+
+target.addEventListener(
+"targetLost",
+()=>{
+
+  /*
+    KISA KAMERA SARSINTISINDA
+    HEMEN KAPANMASIN
+  */
+
+  setTimeout(()=>{
+
+    if(aktifTarget===1){
+
+      aktifTarget=-1;
+
+      stopWriting();
+    }
+
+  },1200);
+
+});
+
+
+window.addEventListener(
+"neti-user-start",
+()=>{
+
+  if(aktifTarget===1)
+    startWriting();
+
+});
+
+}
+
+});
+
+
+</script>
+
+
+<!-- =====================================================
+     TEK AR SAHNESİ
+===================================================== -->
+
+<a-scene
+
+mindar-image="
+imageTargetSrc: ./a-birlesik.mind;
+filterMinCF:0.0001;
+filterBeta:0.01;
+"
+
+renderer="
+colorManagement:true;
+alpha:true;
+antialias:true;
+"
+
+color-space="sRGB"
+
+vr-mode-ui="enabled:false"
+
+device-orientation-permission-ui="enabled:false">
+
+
+<a-assets>
+
+  <img
+  id="neti"
+  src="./72509361-9673-4AB6-8739-B7646C5522E4.png"
+  crossorigin="anonymous">
+
+  <img
+  id="ariPNG"
+  src="./831FD224-0476-409E-B2D5-24D2A8AD424E.png"
+  crossorigin="anonymous">
+
+</a-assets>
+
+
+<a-camera
+position="0 0 0"
+look-controls="enabled:false">
+</a-camera>
+
+
+<!-- =================================================
+     TARGET 0
+     TANIMA SAYFASI
+================================================== -->
+
+<a-entity
+mindar-image-target="targetIndex:0"
+neti-recognition>
+
+
+<a-image
+id="netiKarakter"
+src="#neti"
+position="0 -.25 .03"
+width=".75"
+height=".75"
+scale=".05 .05 .05"
+
+material="
+shader:flat;
+transparent:true;
+alphaTest:.01;
+">
+</a-image>
+
+
+<a-plane
+id="harfler"
+position="0 .55 .04"
+width=".90"
+height=".45"
+scale=".01 .01 .01"
+visible="false"
+
+material="
+src:#harfCanvas;
+transparent:true;
+shader:flat;
+">
+</a-plane>
+
+
+<a-plane
+id="tekHarf"
+position="0 .48 .12"
+width=".33"
+height=".33"
+visible="false"
+eye-pop-exercise
+
+material="
+src:#tekHarfCanvas;
+transparent:true;
+shader:flat;
+">
+</a-plane>
+
+
+<a-image
+id="ariKarakter"
+src="#ariPNG"
+position="-.48 -.30 .09"
+width=".22"
+height=".22"
+visible="false"
+smooth-bee-flight
+
+material="
+shader:flat;
+transparent:true;
+alphaTest:.01;
+">
+</a-image>
+
+
+</a-entity>
+
+
+<!-- =================================================
+     TARGET 1
+     YAZMA SAYFASI
+================================================== -->
+
+<a-entity
+mindar-image-target="targetIndex:1"
+school-a-writing>
+
+
+<a-plane
+id="drawPlane"
+position="0 .01 .08"
+width="1.12"
+height="1.12"
+visible="false"
+
+material="
+src:#drawCanvas;
+transparent:true;
+shader:flat;
+">
+</a-plane>
+
+
+</a-entity>
+
+
+</a-scene>
+
+</body>
+</html>
