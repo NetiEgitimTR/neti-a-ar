@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
 <title>Neti Akıllı Tahta | A Sesi</title>
 
 <style>
@@ -212,7 +213,9 @@ header{
   background:#4f9fd3;
 }
 
-/* ================= SES TANIMA ================= */
+/* =====================================================
+   SES / GÖZ EGZERSİZİ
+===================================================== */
 
 .soundStage{
   width:min(1050px,94vw);
@@ -230,17 +233,21 @@ header{
   position:absolute;
   left:0;
   right:0;
-  top:20px;
-  font-size:135px;
+  top:18px;
+  font-size:125px;
   font-weight:900;
   color:#ef7038;
+  z-index:2;
 }
+
+/* NETİ SOL ALT */
 
 .netiWrap{
   position:absolute;
-  width:225px;
-  left:28px;
-  bottom:18px;
+  width:205px;
+  left:20px;
+  bottom:15px;
+  z-index:3;
 }
 
 .netiWrap img{
@@ -248,35 +255,24 @@ header{
   display:block;
 }
 
-/* ARININ TAKİP ROTASI */
-
-.routeSvg{
-  position:absolute;
-  left:235px;
-  top:185px;
-  width:760px;
-  height:235px;
-}
-
-.routePath{
-  fill:none;
-  stroke:#aaa;
-  stroke-width:4;
-  stroke-dasharray:11 13;
-  stroke-linecap:round;
-}
-
-/* ARI */
+/* ARI ARTIK KARENİN İÇİNDE KALACAK */
 
 #bee{
   position:absolute;
-  width:82px;
-  height:82px;
-  left:245px;
-  top:230px;
+  width:76px;
+  height:76px;
+
+  /*
+    Başlangıç noktası:
+    SOL TARAFTA.
+  */
+  left:90px;
+  top:185px;
+
+  z-index:5;
+
   will-change:transform;
   transform:translate3d(0,0,0);
-  z-index:4;
 }
 
 #bee img{
@@ -285,16 +281,23 @@ header{
   object-fit:contain;
 }
 
+/*
+  Göz takip yazısı altta.
+*/
+
 .eyeText{
   position:absolute;
-  left:280px;
-  right:30px;
-  bottom:28px;
-  font-size:28px;
+  left:245px;
+  right:20px;
+  bottom:24px;
+  font-size:27px;
   font-weight:900;
+  z-index:3;
 }
 
-/* ================= YAZI ALANI ================= */
+/* =====================================================
+   YAZI ALANI
+===================================================== */
 
 .writingStage{
   width:min(1000px,94vw);
@@ -309,28 +312,35 @@ header{
 }
 
 /*
-  1. SINIF YAZI SATIRI
+  ÇİZGİ ARALIKLARINI DARALTTIK.
+
+  ÜST      = %22
+  ORTA     = %50
+  ALT      = %78
+
+  Böylece üst-alt mesafe eskisinden daha dar.
 */
 
 .schoolLine{
   position:absolute;
-  left:5%;
-  width:90%;
+  left:6%;
+  width:88%;
   z-index:1;
 }
 
 .schoolTop{
-  top:13%;
+  top:22%;
   border-top:3px solid #efa6c9;
 }
 
 .schoolMiddle{
   top:50%;
+  transform:translateY(-50%);
   border-top:4px dashed #efa6c9;
 }
 
 .schoolBottom{
-  top:87%;
+  top:78%;
   border-top:3px solid #efa6c9;
 }
 
@@ -345,7 +355,7 @@ header{
 .guide{
   fill:none;
   stroke:#dedede;
-  stroke-width:25;
+  stroke-width:22;
   stroke-linecap:round;
   stroke-linejoin:round;
 }
@@ -353,7 +363,7 @@ header{
 .drawStroke{
   fill:none;
   stroke:#ef5050;
-  stroke-width:19;
+  stroke-width:17;
   stroke-linecap:round;
   stroke-linejoin:round;
 }
@@ -362,6 +372,30 @@ header{
   fill:#ffd328;
   stroke:#efa900;
   stroke-width:4;
+}
+
+/* NUMARALAR */
+
+.stepCircle{
+  fill:#36a1d4;
+}
+
+.stepNumber{
+  fill:white;
+  font-size:21px;
+  font-weight:900;
+  text-anchor:middle;
+  dominant-baseline:middle;
+}
+
+/* OKLAR */
+
+.arrowLine{
+  fill:none;
+  stroke:#ef5050;
+  stroke-width:6;
+  stroke-linecap:round;
+  stroke-linejoin:round;
 }
 
 /* ================= MOBİL ================= */
@@ -440,17 +474,13 @@ header{
   }
 
   .controls{
-    display:flex;
     flex-direction:column;
-    gap:12px;
     width:100%;
   }
 
   .mainBtn{
-    position:static !important;
     width:min(88vw,430px);
     min-width:0;
-    margin:0;
     font-size:20px;
   }
 
@@ -460,34 +490,27 @@ header{
   }
 
   .soundLetters{
-    font-size:105px;
+    font-size:100px;
   }
 
   .netiWrap{
     width:145px;
     left:8px;
-    bottom:20px;
-  }
-
-  .routeSvg{
-    left:135px;
-    top:185px;
-    width:530px;
-    height:210px;
+    bottom:18px;
   }
 
   #bee{
-    width:67px;
-    height:67px;
-    left:155px;
-    top:235px;
+    width:58px;
+    height:58px;
+    left:42px;
+    top:165px;
   }
 
   .eyeText{
     left:155px;
-    right:10px;
-    bottom:35px;
-    font-size:21px;
+    right:8px;
+    bottom:30px;
+    font-size:20px;
   }
 }
 
@@ -499,7 +522,10 @@ header{
 <header>
 
   <div class="brand">
-    <img src="./72509361-9673-4AB6-8739-B7646C5522E4.png" alt="Neti">
+    <img
+      src="./72509361-9673-4AB6-8739-B7646C5522E4.png"
+      alt="Neti"
+    >
     <span>NETİ</span>
   </div>
 
@@ -509,7 +535,10 @@ header{
 
 </header>
 
-<!-- ================= ANA SAYFA ================= -->
+
+<!-- =====================================================
+ANA SAYFA
+===================================================== -->
 
 <section id="home" class="page active">
 
@@ -520,31 +549,61 @@ header{
   </div>
 
   <div class="letters">
-    <div class="letterBox">A</div>
-    <div class="letterBox small">a</div>
+
+    <div class="letterBox">
+      A
+    </div>
+
+    <div class="letterBox small">
+      a
+    </div>
+
   </div>
 
   <div class="menu">
 
-    <button class="menuCard" onclick="showPage('soundPage')">
+    <button
+      class="menuCard"
+      onclick="showPage('soundPage')"
+    >
       <span class="menuIcon">🔤</span>
-      <span class="menuTitle">A / a Sesini Tanıyalım</span>
+
+      <span class="menuTitle">
+        A / a Sesini Tanıyalım
+      </span>
+
       <span class="menuDesc">
-        Neti'yi dinle • Harfi tanı • Gözlerini çalıştır
+        Sesi dinle • Harfi tanı • Gözlerini çalıştır
       </span>
     </button>
 
-    <button class="menuCard" onclick="showPage('smallPage')">
+
+    <button
+      class="menuCard"
+      onclick="showPage('smallPage')"
+    >
       <span class="menuIcon">✍️</span>
-      <span class="menuTitle">Küçük a Yazımı</span>
+
+      <span class="menuTitle">
+        Küçük a Yazımı
+      </span>
+
       <span class="menuDesc">
         Önce c çizgisi • Sonra düz çizgi
       </span>
     </button>
 
-    <button class="menuCard" onclick="showPage('bigPage')">
+
+    <button
+      class="menuCard"
+      onclick="showPage('bigPage')"
+    >
       <span class="menuIcon">✏️</span>
-      <span class="menuTitle">Büyük A Yazımı</span>
+
+      <span class="menuTitle">
+        Büyük A Yazımı
+      </span>
+
       <span class="menuDesc">
         Sol eğik • Sağ eğik • Orta çizgi
       </span>
@@ -554,9 +613,15 @@ header{
 
 </section>
 
-<!-- ================= SES ================= -->
 
-<section id="soundPage" class="page activity">
+<!-- =====================================================
+SES / ARI
+===================================================== -->
+
+<section
+  id="soundPage"
+  class="page activity"
+>
 
   <h2 class="activityTitle">
     A / a Sesini Tanıyalım
@@ -568,24 +633,18 @@ header{
       A a
     </div>
 
-    <svg class="routeSvg" viewBox="0 0 760 235">
-      <path
-        class="routePath"
-        d="
-        M 20 125
-        C 100 25, 185 220, 280 115
-        C 370 15, 455 205, 555 95
-        C 620 25, 680 75, 735 125
-        ">
-      </path>
-    </svg>
-
     <div class="netiWrap">
-      <img src="./72509361-9673-4AB6-8739-B7646C5522E4.png" alt="Neti">
+      <img
+        src="./72509361-9673-4AB6-8739-B7646C5522E4.png"
+        alt="Neti"
+      >
     </div>
 
     <div id="bee">
-      <img src="./831FD224-0476-409E-B2D5-24D2A8AD424E.png" alt="Arı">
+      <img
+        src="./831FD224-0476-409E-B2D5-24D2A8AD424E.png"
+        alt="Arı"
+      >
     </div>
 
     <div class="eyeText">
@@ -596,11 +655,17 @@ header{
 
   <div class="controls">
 
-    <button class="mainBtn" onclick="startSoundActivity()">
+    <button
+      class="mainBtn"
+      onclick="startSoundActivity()"
+    >
       🔊 Neti ile Başla
     </button>
 
-    <button class="mainBtn homeBtn" onclick="goHome()">
+    <button
+      class="mainBtn homeBtn"
+      onclick="goHome()"
+    >
       🏠 Ana Sayfa
     </button>
 
@@ -608,9 +673,15 @@ header{
 
 </section>
 
-<!-- ================= KÜÇÜK a ================= -->
 
-<section id="smallPage" class="page activity">
+<!-- =====================================================
+KÜÇÜK a
+===================================================== -->
+
+<section
+  id="smallPage"
+  class="page activity"
+>
 
   <h2 class="activityTitle">
     Küçük a Harfini Yazalım
@@ -622,80 +693,187 @@ header{
     <div class="schoolLine schoolMiddle"></div>
     <div class="schoolLine schoolBottom"></div>
 
-    <svg class="letterSvg" viewBox="0 0 900 540">
+
+    <svg
+      class="letterSvg"
+      viewBox="0 0 900 540"
+    >
 
       <!--
-      BÜYÜTÜLMÜŞ KÜÇÜK a
+        KÜÇÜK a SADECE
+        KESİK ÇİZGİ İLE ALT ÇİZGİ ARASINDA.
 
-      1: c hareketi
-      2: yukarıdan aşağı düz çizgi
+        Kesik çizgi SVG'de yaklaşık y=270
+        Alt çizgi yaklaşık y=421
+
+        Harf:
+        üst ≈ 292
+        alt ≈ 402
       -->
 
-      <path
-        class="guide"
-        d="
-        M 555 180
-        C 505 125, 395 115, 320 165
-        C 245 215, 225 315, 275 375
-        C 335 450, 470 440, 555 365
-        "
-      />
+      <!-- C KILAVUZU -->
 
       <path
         class="guide"
         d="
-        M 570 145
-        L 570 375
+        M 515 310
+        C 480 282,
+          415 282,
+          380 310
+
+        C 345 338,
+          345 376,
+          380 395
+
+        C 420 415,
+          480 400,
+          515 370
         "
       />
+
+
+      <!-- DÜZ ÇİZGİ KILAVUZU -->
+
+      <path
+        class="guide"
+        d="
+        M 525 292
+        L 525 397
+        "
+      />
+
+
+      <!-- ANİMASYON C -->
 
       <path
         id="smallC"
         class="drawStroke"
         d="
-        M 555 180
-        C 505 125, 395 115, 320 165
-        C 245 215, 225 315, 275 375
-        C 335 450, 470 440, 555 365
+        M 515 310
+        C 480 282,
+          415 282,
+          380 310
+
+        C 345 338,
+          345 376,
+          380 395
+
+        C 420 415,
+          480 400,
+          515 370
         "
       />
+
+
+      <!-- ANİMASYON DÜZ -->
 
       <path
         id="smallStraight"
         class="drawStroke"
         d="
-        M 570 145
-        L 570 375
+        M 525 292
+        L 525 397
         "
       />
+
+
+      <!-- 1 -->
+
+      <circle
+        class="stepCircle"
+        cx="500"
+        cy="274"
+        r="18"
+      />
+
+      <text
+        class="stepNumber"
+        x="500"
+        y="274"
+      >
+        1
+      </text>
+
+
+      <!-- 2 -->
+
+      <circle
+        class="stepCircle"
+        cx="558"
+        cy="294"
+        r="18"
+      />
+
+      <text
+        class="stepNumber"
+        x="558"
+        y="294"
+      >
+        2
+      </text>
+
+
+      <!-- DÜZ ÇİZGİ YÖN OKU -->
+
+      <path
+        class="arrowLine"
+        d="
+        M 570 315
+        L 570 365
+        "
+      />
+
+      <path
+        class="arrowLine"
+        d="
+        M 558 351
+        L 570 365
+        L 582 351
+        "
+      />
+
 
       <circle
         id="smallDot"
         class="yellowDot"
-        cx="555"
-        cy="180"
-        r="14">
-      </circle>
+        cx="515"
+        cy="310"
+        r="13"
+      />
 
     </svg>
 
   </div>
 
-  <div id="smallInfo" class="info">
+
+  <div
+    id="smallInfo"
+    class="info"
+  >
     Hazırsan başlayalım!
   </div>
 
+
   <div class="controls">
 
-    <button class="mainBtn" onclick="startSmall()">
+    <button
+      class="mainBtn"
+      onclick="startSmall()"
+    >
       🔊 Küçük a'yı Göster
     </button>
 
-    <button class="mainBtn repeatBtn" onclick="startSmall()">
+    <button
+      class="mainBtn repeatBtn"
+      onclick="startSmall()"
+    >
       🔁 Tekrar
     </button>
 
-    <button class="mainBtn homeBtn" onclick="goHome()">
+    <button
+      class="mainBtn homeBtn"
+      onclick="goHome()"
+    >
       🏠 Ana Sayfa
     </button>
 
@@ -703,9 +881,15 @@ header{
 
 </section>
 
-<!-- ================= BÜYÜK A ================= -->
 
-<section id="bigPage" class="page activity">
+<!-- =====================================================
+BÜYÜK A
+===================================================== -->
+
+<section
+  id="bigPage"
+  class="page activity"
+>
 
   <h2 class="activityTitle">
     Büyük A Harfini Yazalım
@@ -717,75 +901,231 @@ header{
     <div class="schoolLine schoolMiddle"></div>
     <div class="schoolLine schoolBottom"></div>
 
-    <svg class="letterSvg" viewBox="0 0 900 540">
+
+    <svg
+      class="letterSvg"
+      viewBox="0 0 900 540"
+    >
 
       <!--
-      BÜYÜK A
-      1 SOL EĞİK
-      2 SAĞ EĞİK
-      3 ORTA
+        BÜYÜK A
+
+        ÜST ÇİZGİ ≈ y119
+        ALT ÇİZGİ ≈ y421
+
+        A bu iki çizginin arasında.
       -->
 
       <path
         class="guide"
-        d="M 450 75 L 225 465">
-      </path>
+        d="
+        M 450 135
+        L 285 410
+        "
+      />
 
       <path
         class="guide"
-        d="M 450 75 L 675 465">
-      </path>
+        d="
+        M 450 135
+        L 615 410
+        "
+      />
 
       <path
         class="guide"
-        d="M 335 275 L 565 275">
-      </path>
+        d="
+        M 365 270
+        L 535 270
+        "
+      />
+
 
       <path
         id="bigLeft"
         class="drawStroke"
-        d="M 450 75 L 225 465">
-      </path>
+        d="
+        M 450 135
+        L 285 410
+        "
+      />
+
 
       <path
         id="bigRight"
         class="drawStroke"
-        d="M 450 75 L 675 465">
-      </path>
+        d="
+        M 450 135
+        L 615 410
+        "
+      />
+
 
       <path
         id="bigMiddle"
         class="drawStroke"
-        d="M 335 275 L 565 275">
-      </path>
+        d="
+        M 365 270
+        L 535 270
+        "
+      />
+
+
+      <!-- NUMARA 1 -->
+
+      <circle
+        class="stepCircle"
+        cx="390"
+        cy="155"
+        r="18"
+      />
+
+      <text
+        class="stepNumber"
+        x="390"
+        y="155"
+      >
+        1
+      </text>
+
+
+      <!-- NUMARA 2 -->
+
+      <circle
+        class="stepCircle"
+        cx="510"
+        cy="155"
+        r="18"
+      />
+
+      <text
+        class="stepNumber"
+        x="510"
+        y="155"
+      >
+        2
+      </text>
+
+
+      <!-- NUMARA 3 -->
+
+      <circle
+        class="stepCircle"
+        cx="450"
+        cy="245"
+        r="18"
+      />
+
+      <text
+        class="stepNumber"
+        x="450"
+        y="245"
+      >
+        3
+      </text>
+
+
+      <!-- SOL OK -->
+
+      <path
+        class="arrowLine"
+        d="
+        M 405 175
+        L 315 325
+        "
+      />
+
+      <path
+        class="arrowLine"
+        d="
+        M 307 307
+        L 315 325
+        L 295 320
+        "
+      />
+
+
+      <!-- SAĞ OK -->
+
+      <path
+        class="arrowLine"
+        d="
+        M 495 175
+        L 585 325
+        "
+      />
+
+      <path
+        class="arrowLine"
+        d="
+        M 605 320
+        L 585 325
+        L 593 307
+        "
+      />
+
+
+      <!-- ORTA OK -->
+
+      <path
+        class="arrowLine"
+        d="
+        M 385 300
+        L 515 300
+        "
+      />
+
+      <path
+        class="arrowLine"
+        d="
+        M 497 288
+        L 515 300
+        L 497 312
+        "
+      />
+
 
       <circle
         id="bigDot"
         class="yellowDot"
         cx="450"
-        cy="75"
-        r="14">
-      </circle>
+        cy="135"
+        r="13"
+      />
 
     </svg>
 
   </div>
 
-  <div id="bigInfo" class="info">
+
+  <div
+    id="bigInfo"
+    class="info"
+  >
     Hazırsan başlayalım!
   </div>
 
+
   <div class="controls">
 
-    <button class="mainBtn" onclick="startBig()">
+    <button
+      class="mainBtn"
+      onclick="startBig()"
+    >
       🔊 Büyük A'yı Göster
     </button>
 
-    <button class="mainBtn repeatBtn" onclick="startBig()">
+    <button
+      class="mainBtn repeatBtn"
+      onclick="startBig()"
+    >
       🔁 Tekrar
     </button>
 
-    <button class="mainBtn homeBtn" onclick="goHome()">
+    <button
+      class="mainBtn homeBtn"
+      onclick="goHome()"
+    >
       🏠 Ana Sayfa
     </button>
 
@@ -793,43 +1133,65 @@ header{
 
 </section>
 
-<!-- ================= SESLER ================= -->
 
-<audio id="introAudio"
-src="./neti-a-tam-ses.mp3"
-preload="auto"></audio>
+<!-- =====================================================
+SESLER
+===================================================== -->
 
-<audio id="small1"
-src="./1-c-cizgisi.mp3.mp3"
-preload="auto"></audio>
+<audio
+  id="introAudio"
+  src="./neti-a-tam-ses.mp3"
+  preload="auto">
+</audio>
 
-<audio id="small2"
-src="./2-duz-cizgi.mp3.mp3"
-preload="auto"></audio>
+<audio
+  id="small1"
+  src="./1-c-cizgisi.mp3.mp3"
+  preload="auto">
+</audio>
 
-<audio id="small3"
-src="./3-bir-kez-daha.mp3.mp3"
-preload="auto"></audio>
+<audio
+  id="small2"
+  src="./2-duz-cizgi.mp3.mp3"
+  preload="auto">
+</audio>
 
-<audio id="small4"
-src="./4-simdi-sen.mp3.mp3"
-preload="auto"></audio>
+<audio
+  id="small3"
+  src="./3-bir-kez-daha.mp3.mp3"
+  preload="auto">
+</audio>
 
-<audio id="big1"
-src="./5-buyuk-a-sol.mp3"
-preload="auto"></audio>
+<audio
+  id="small4"
+  src="./4-simdi-sen.mp3.mp3"
+  preload="auto">
+</audio>
 
-<audio id="big2"
-src="./6-buyuk-a-sag.mp3"
-preload="auto"></audio>
+<audio
+  id="big1"
+  src="./5-buyuk-a-sol.mp3"
+  preload="auto">
+</audio>
 
-<audio id="big3"
-src="./7-buyuk-a-orta.mp3"
-preload="auto"></audio>
+<audio
+  id="big2"
+  src="./6-buyuk-a-sag.mp3"
+  preload="auto">
+</audio>
 
-<audio id="big4"
-src="./8-buyuk-a-bitti.mp3"
-preload="auto"></audio>
+<audio
+  id="big3"
+  src="./7-buyuk-a-orta.mp3"
+  preload="auto">
+</audio>
+
+<audio
+  id="big4"
+  src="./8-buyuk-a-bitti.mp3"
+  preload="auto">
+</audio>
+
 
 <script>
 
@@ -837,63 +1199,80 @@ let soundEnabled = true;
 let running = false;
 let beeAnimation = null;
 
-/* ================= SAYFALAR ================= */
+
+/* =====================================================
+SAYFA
+===================================================== */
 
 function showPage(id){
 
   stopEverything();
 
-  document.querySelectorAll(".page").forEach(page=>{
-    page.classList.remove("active");
-  });
+  document
+    .querySelectorAll(".page")
+    .forEach(page=>{
+      page.classList.remove("active");
+    });
 
-  document.getElementById(id).classList.add("active");
+  document
+    .getElementById(id)
+    .classList.add("active");
 
-  window.scrollTo({
-    top:0,
-    behavior:"instant"
-  });
+  window.scrollTo(0,0);
 }
+
 
 function goHome(){
 
   stopEverything();
 
-  document.querySelectorAll(".page").forEach(page=>{
-    page.classList.remove("active");
-  });
+  document
+    .querySelectorAll(".page")
+    .forEach(page=>{
+      page.classList.remove("active");
+    });
 
-  document.getElementById("home").classList.add("active");
+  document
+    .getElementById("home")
+    .classList.add("active");
 
-  window.scrollTo({
-    top:0,
-    behavior:"instant"
-  });
+  window.scrollTo(0,0);
 }
 
-/* ================= SES ================= */
+
+/* =====================================================
+SES
+===================================================== */
 
 function toggleSound(){
 
   soundEnabled = !soundEnabled;
 
-  document.getElementById("soundToggle").textContent =
-    soundEnabled
-    ? "🔊 Ses Açık"
-    : "🔇 Ses Kapalı";
+  document
+    .getElementById("soundToggle")
+    .textContent =
+      soundEnabled
+      ? "🔊 Ses Açık"
+      : "🔇 Ses Kapalı";
 
   if(!soundEnabled){
     stopAllAudio();
   }
 }
 
+
 function stopAllAudio(){
 
-  document.querySelectorAll("audio").forEach(audio=>{
-    audio.pause();
-    audio.currentTime = 0;
-  });
+  document
+    .querySelectorAll("audio")
+    .forEach(audio=>{
+
+      audio.pause();
+      audio.currentTime = 0;
+
+    });
 }
+
 
 function playAudio(id){
 
@@ -904,7 +1283,8 @@ function playAudio(id){
       return;
     }
 
-    const audio = document.getElementById(id);
+    const audio =
+      document.getElementById(id);
 
     audio.pause();
     audio.currentTime = 0;
@@ -926,117 +1306,172 @@ function playAudio(id){
     audio.onended = done;
     audio.onerror = done;
 
-    const result = audio.play();
+    const promise = audio.play();
 
-    if(result){
-      result.catch(()=>{
+    if(promise){
+
+      promise.catch(()=>{
         done();
       });
+
     }
 
   });
 }
 
-/* ================= ARI ================= */
+
+/* =====================================================
+ARI
+
+ÖNEMLİ:
+- SOL TARAFTAN BAŞLAR
+- SAĞDAN DIŞARI ÇIKMAZ
+- KARENİN ÜST / ORTA / ALT KISIMLARINI GEZER
+- GERİ DÖNÜŞ DE KARENİN İÇİNDEDİR
+===================================================== */
 
 function stopBee(){
 
   if(beeAnimation){
+
     beeAnimation.cancel();
     beeAnimation = null;
+
   }
 
-  const bee = document.getElementById("bee");
+  const bee =
+    document.getElementById("bee");
 
   bee.style.transform =
     "translate3d(0px,0px,0px)";
 }
 
+
 function startBee(){
 
   stopBee();
 
-  const bee = document.getElementById("bee");
+  const bee =
+    document.getElementById("bee");
 
   /*
-    SADECE TRANSFORM KULLANIYORUZ.
-    Safari için daha akıcı.
+    Hareket miktarlarını soundStage'ın
+    gerçek genişliğine göre hesaplıyoruz.
+
+    Böylece telefonda da akıllı tahtada da
+    arı kutudan dışarı çıkmaz.
   */
+
+  const stage =
+    document.querySelector(".soundStage");
+
+  const stageWidth =
+    stage.clientWidth;
+
+  const stageHeight =
+    stage.clientHeight;
+
+  const beeWidth =
+    bee.offsetWidth;
+
+  /*
+    Arının başlangıç left değeri zaten var.
+    Buradan sağ kenara kadar güvenli mesafe.
+  */
+
+  const startLeft =
+    bee.offsetLeft;
+
+  const maxX =
+    Math.max(
+      0,
+      stageWidth - startLeft - beeWidth - 30
+    );
+
+  /*
+    Dikey hareket:
+    başlangıç konumunun hem üstünü
+    hem altını kullanıyoruz.
+  */
+
+  const up =
+    Math.min(120, stageHeight * 0.22);
+
+  const down =
+    Math.min(155, stageHeight * 0.28);
+
 
   beeAnimation = bee.animate(
 
     [
+      /* SOL ORTA */
       {
         transform:
-        "translate3d(0px,0px,0px) rotate(-5deg)"
+          "translate3d(0px,0px,0px) rotate(0deg)"
       },
 
+      /* SOL ÜST */
       {
         transform:
-        "translate3d(85px,-75px,0px) rotate(5deg)"
+          `translate3d(${maxX*0.14}px,${-up}px,0px) rotate(8deg)`
       },
 
+      /* ORTA ÜST */
       {
         transform:
-        "translate3d(180px,45px,0px) rotate(-3deg)"
+          `translate3d(${maxX*0.40}px,${-up*0.65}px,0px) rotate(-5deg)`
       },
 
+      /* SAĞ ÜST */
       {
         transform:
-        "translate3d(285px,-65px,0px) rotate(5deg)"
+          `translate3d(${maxX*0.72}px,${-up}px,0px) rotate(6deg)`
       },
 
+      /* SAĞ ORTA */
       {
         transform:
-        "translate3d(395px,35px,0px) rotate(-4deg)"
+          `translate3d(${maxX}px,0px,0px) rotate(0deg)`
       },
 
+      /* SAĞ ALT */
       {
         transform:
-        "translate3d(505px,-60px,0px) rotate(5deg)"
+          `translate3d(${maxX*0.84}px,${down}px,0px) rotate(-7deg)`
       },
 
+      /* ORTA ALT */
       {
         transform:
-        "translate3d(590px,10px,0px) rotate(-3deg)"
+          `translate3d(${maxX*0.55}px,${down*0.85}px,0px) rotate(5deg)`
       },
 
+      /* SOL ALT */
       {
         transform:
-        "translate3d(505px,65px,0px) rotate(4deg)"
+          `translate3d(${maxX*0.22}px,${down}px,0px) rotate(-6deg)`
       },
 
+      /* SOL ORTA */
       {
         transform:
-        "translate3d(390px,-15px,0px) rotate(-5deg)"
-      },
-
-      {
-        transform:
-        "translate3d(275px,70px,0px) rotate(4deg)"
-      },
-
-      {
-        transform:
-        "translate3d(160px,-20px,0px) rotate(-4deg)"
-      },
-
-      {
-        transform:
-        "translate3d(0px,0px,0px) rotate(-5deg)"
+          "translate3d(0px,0px,0px) rotate(0deg)"
       }
     ],
 
     {
-      duration:9000,
+      duration:11000,
       iterations:Infinity,
-      easing:"linear"
+      easing:"ease-in-out"
     }
 
   );
 }
 
-/* ================= DURDUR ================= */
+
+/* =====================================================
+DURDUR
+===================================================== */
 
 function stopEverything(){
 
@@ -1046,15 +1481,23 @@ function stopEverything(){
   stopBee();
 }
 
-/* ================= PATH ================= */
+
+/* =====================================================
+PATH
+===================================================== */
 
 function hidePath(path){
 
-  const length = path.getTotalLength();
+  const length =
+    path.getTotalLength();
 
-  path.style.strokeDasharray = length;
-  path.style.strokeDashoffset = length;
+  path.style.strokeDasharray =
+    length;
+
+  path.style.strokeDashoffset =
+    length;
 }
+
 
 function resetSmall(){
 
@@ -1069,9 +1512,10 @@ function resetSmall(){
   const dot =
     document.getElementById("smallDot");
 
-  dot.setAttribute("cx","555");
-  dot.setAttribute("cy","180");
+  dot.setAttribute("cx","515");
+  dot.setAttribute("cy","310");
 }
+
 
 function resetBig(){
 
@@ -1091,21 +1535,34 @@ function resetBig(){
     document.getElementById("bigDot");
 
   dot.setAttribute("cx","450");
-  dot.setAttribute("cy","75");
+  dot.setAttribute("cy","135");
 }
 
-/* ================= ÇİZİM ================= */
 
-function animatePath(path,dot,duration){
+/* =====================================================
+ÇİZİM
+===================================================== */
+
+function animatePath(
+  path,
+  dot,
+  duration
+){
 
   return new Promise(resolve=>{
 
-    const length = path.getTotalLength();
+    const length =
+      path.getTotalLength();
 
-    path.style.strokeDasharray = length;
-    path.style.strokeDashoffset = length;
+    path.style.strokeDasharray =
+      length;
 
-    const start = performance.now();
+    path.style.strokeDashoffset =
+      length;
+
+    const start =
+      performance.now();
+
 
     function frame(now){
 
@@ -1135,17 +1592,25 @@ function animatePath(path,dot,duration){
       );
 
       if(progress < 1){
+
         requestAnimationFrame(frame);
+
       }else{
+
         resolve();
+
       }
     }
 
     requestAnimationFrame(frame);
+
   });
 }
 
-/* ================= SES TANIMA ================= */
+
+/* =====================================================
+SES + ARI
+===================================================== */
 
 async function startSoundActivity(){
 
@@ -1156,8 +1621,9 @@ async function startSoundActivity(){
   stopAllAudio();
 
   /*
-    BUTONA BASILDIĞI ANDA
-    SESİ BAŞLATIYORUZ.
+    iPhone Safari:
+    sesi doğrudan buton tıklamasından
+    başlatıyoruz.
   */
 
   const audioPromise =
@@ -1166,11 +1632,6 @@ async function startSoundActivity(){
   startBee();
 
   await audioPromise;
-
-  /*
-    Ses bittikten sonra arı biraz daha
-    hareket edebilir.
-  */
 
   await new Promise(resolve=>{
     setTimeout(resolve,2500);
@@ -1181,7 +1642,10 @@ async function startSoundActivity(){
   running = false;
 }
 
-/* ================= KÜÇÜK a ================= */
+
+/* =====================================================
+KÜÇÜK a
+===================================================== */
 
 async function startSmall(){
 
@@ -1191,6 +1655,7 @@ async function startSmall(){
 
   stopAllAudio();
   resetSmall();
+
 
   const c =
     document.getElementById("smallC");
@@ -1204,9 +1669,8 @@ async function startSmall(){
   const info =
     document.getElementById("smallInfo");
 
-  /*
-    1 — C
-  */
+
+  /* 1 — C */
 
   info.textContent =
     "1️⃣ Önce c çizgisini çiz. Sarı okları takip et.";
@@ -1223,15 +1687,14 @@ async function startSmall(){
 
   ]);
 
-  /*
-    2 — DÜZ
-  */
+
+  /* 2 — DÜZ */
 
   info.textContent =
     "2️⃣ Şimdi düz çizgiyi yukarıdan aşağı doğru çiz.";
 
-  dot.setAttribute("cx","570");
-  dot.setAttribute("cy","145");
+  dot.setAttribute("cx","525");
+  dot.setAttribute("cy","292");
 
   await Promise.all([
 
@@ -1245,9 +1708,8 @@ async function startSmall(){
 
   ]);
 
-  /*
-    BİR KEZ DAHA
-  */
+
+  /* BİR KEZ DAHA */
 
   info.textContent =
     "🌟 Harika! Bir kez daha yazalım.";
@@ -1262,8 +1724,8 @@ async function startSmall(){
     3500
   );
 
-  dot.setAttribute("cx","570");
-  dot.setAttribute("cy","145");
+  dot.setAttribute("cx","525");
+  dot.setAttribute("cy","292");
 
   await animatePath(
     straight,
@@ -1271,9 +1733,8 @@ async function startSmall(){
     2500
   );
 
-  /*
-    BİTİŞ
-  */
+
+  /* BİTİŞ */
 
   info.textContent =
     "✏️ Şimdi sıra sende!";
@@ -1283,7 +1744,10 @@ async function startSmall(){
   running = false;
 }
 
-/* ================= BÜYÜK A ================= */
+
+/* =====================================================
+BÜYÜK A
+===================================================== */
 
 async function startBig(){
 
@@ -1293,6 +1757,7 @@ async function startBig(){
 
   stopAllAudio();
   resetBig();
+
 
   const left =
     document.getElementById("bigLeft");
@@ -1309,9 +1774,8 @@ async function startBig(){
   const info =
     document.getElementById("bigInfo");
 
-  /*
-    1 — SOL EĞİK
-  */
+
+  /* 1 */
 
   info.textContent =
     "1️⃣ Yukarıdan başlayıp sol alta doğru eğik çiz.";
@@ -1328,13 +1792,11 @@ async function startBig(){
 
   ]);
 
-  /*
-    2 — SAĞ EĞİK
-    NOKTA TEPEYE GERİ DÖNER
-  */
+
+  /* 2 */
 
   dot.setAttribute("cx","450");
-  dot.setAttribute("cy","75");
+  dot.setAttribute("cy","135");
 
   info.textContent =
     "2️⃣ Tekrar yukarıdan başla. Bu kez sağ alta doğru eğik çiz.";
@@ -1351,13 +1813,11 @@ async function startBig(){
 
   ]);
 
-  /*
-    3 — ORTA
-    SOLDAN SAĞA
-  */
 
-  dot.setAttribute("cx","335");
-  dot.setAttribute("cy","275");
+  /* 3 */
+
+  dot.setAttribute("cx","365");
+  dot.setAttribute("cy","270");
 
   info.textContent =
     "3️⃣ Şimdi ortadaki çizgiyi soldan sağa doğru çiz.";
@@ -1374,9 +1834,8 @@ async function startBig(){
 
   ]);
 
-  /*
-    BİTİŞ
-  */
+
+  /* BİTİŞ */
 
   info.textContent =
     "🌟 Harika! Büyük A harfini de tamamladın. Şimdi sıra sende!";
@@ -1386,20 +1845,26 @@ async function startBig(){
   running = false;
 }
 
-/* ================= AÇILIŞ ================= */
 
-window.addEventListener("load",()=>{
+/* =====================================================
+AÇILIŞ
+===================================================== */
 
-  resetSmall();
-  resetBig();
+window.addEventListener(
+  "load",
+  ()=>{
 
-  document
-    .querySelectorAll("audio")
-    .forEach(audio=>{
-      audio.load();
-    });
+    resetSmall();
+    resetBig();
 
-});
+    document
+      .querySelectorAll("audio")
+      .forEach(audio=>{
+        audio.load();
+      });
+
+  }
+);
 
 </script>
 
